@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="2255" viewBox="0 0 1500 2255">
+  <rect x="0" y="0" width="1500" height="2255" fill="white"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#253957"/>
+    </marker>
+  </defs>
+  <text x="55" y="44" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">TuCriadero · BPMN 2.0 · PIC</text>
+  <text x="55" y="90" font-family="Arial, Liberation Sans, sans-serif" font-size="34" text-anchor="start" fill="#253957" font-weight="bold">Registrar pichones de un cruce</text>
+  <rect x="40" y="150" width="1420" height="1745" fill="white" stroke="#253957" stroke-width="2"/>
+  <rect x="40" y="150" width="60" height="1745" fill="#253957"/>
+  <text transform="translate(79,1022.5) rotate(-90)" font-family="Arial" font-size="25" text-anchor="middle" fill="white">TuCriadero · PIC</text>
+  <rect x="100" y="150" width="690" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="445.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">Criador</text>
+  <rect x="790" y="150" width="670" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="1125.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">TuCriadero (aplicación web)</text>
+  <line x1="790" y1="150" x2="790" y2="1895" stroke="#253957" stroke-width="2"/>
+  <polyline points="440,324.0 440,402.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="660.0,460 900.0,460" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="660.0,620 900.0,620" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1120,678.0 1120,746.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1120,814.0 1120,882.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="900.0,940 660.0,940" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="220.0,940 125,940 125,620 220.0,620" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="900.0,460 710,460 710,620 660.0,620" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1154.0,780 1375,780 1375,1100 1340.0,1100" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1120,1158.0 1120,1202.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1120,1318.0 1120,1362.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="900.0,1420 660.0,1420" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="440,1478.0 440,1546.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="406.0,1580 139,1580 139,620 220.0,620" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="440,1614.0 440,1716.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <circle cx="440" cy="300" r="24" fill="white" stroke="#253957" stroke-width="2"/>
+  <text x="482.0" y="292" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="start" fill="#253957" font-weight="normal">Registrar pichones</text>
+  <rect x="220.0" y="402.0" width="440" height="116" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="243.0" cy="424.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M232.0,444.0 v-5 q11,-16 22,0 v5 M237.0,444.0 v9 M249.0,444.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="460" y="423.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_elegir · RF027</text>
+  <text x="462" y="458" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Elegir un cruce y abrir su</text>
+  <text x="462" y="486" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">ficha de cría</text>
+  <rect x="900.0" y="402.0" width="440" height="116" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="923.0" cy="427.0" r="11" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="923.0" cy="427.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="934.0" y1="427.0" x2="939.0" y2="427.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="434.77817459305203" x2="934.3137084989847" y2="438.31370849898474" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="438.0" x2="923.0" y2="443.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="434.77817459305203" x2="911.6862915010153" y2="438.31370849898474" stroke="#253957" stroke-width="3"/>
+  <line x1="912.0" y1="427.0" x2="907.0" y2="427.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="419.22182540694797" x2="911.6862915010153" y2="415.68629150101526" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="416.0" x2="923.0" y2="411.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="419.22182540694797" x2="934.3137084989847" y2="415.68629150101526" stroke="#253957" stroke-width="3"/>
+  <text x="1140" y="423.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_cruce · RF004, RF027</text>
+  <text x="1142" y="458" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Obtener cruce, progenitores y</text>
+  <text x="1142" y="486" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">datos por defecto</text>
+  <rect x="220.0" y="562.0" width="440" height="116" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="243.0" cy="584.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M232.0,604.0 v-5 q11,-16 22,0 v5 M237.0,604.0 v9 M249.0,604.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="460" y="583.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_anillos_datos</text>
+  <text x="462" y="618" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Ingresar anillos y fechas de</text>
+  <text x="462" y="646" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">los pichones</text>
+  <rect x="900.0" y="562.0" width="440" height="116" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="923.0" cy="587.0" r="11" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="923.0" cy="587.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="934.0" y1="587.0" x2="939.0" y2="587.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="594.778174593052" x2="934.3137084989847" y2="598.3137084989847" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="598.0" x2="923.0" y2="603.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="594.778174593052" x2="911.6862915010153" y2="598.3137084989847" stroke="#253957" stroke-width="3"/>
+  <line x1="912.0" y1="587.0" x2="907.0" y2="587.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="579.221825406948" x2="911.6862915010153" y2="575.6862915010153" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="576.0" x2="923.0" y2="571.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="579.221825406948" x2="934.3137084989847" y2="575.6862915010153" stroke="#253957" stroke-width="3"/>
+  <text x="1140" y="583.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_anillos_validar</text>
+  <text x="1142" y="618" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Validar anillos, variedad,</text>
+  <text x="1142" y="646" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">sexo y fechas</text>
+  <polygon points="1120,746 1154,780 1120,814 1086,780" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M1108,768 L1132,792 M1132,768 L1108,792" stroke="#253957" stroke-width="3"/>
+  <text x="1172.0" y="762" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="start" fill="#253957" font-weight="normal">¿Datos válidos?</text>
+  <rect x="900.0" y="882.0" width="440" height="116" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="923.0" cy="907.0" r="11" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="923.0" cy="907.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="934.0" y1="907.0" x2="939.0" y2="907.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="914.778174593052" x2="934.3137084989847" y2="918.3137084989847" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="918.0" x2="923.0" y2="923.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="914.778174593052" x2="911.6862915010153" y2="918.3137084989847" stroke="#253957" stroke-width="3"/>
+  <line x1="912.0" y1="907.0" x2="907.0" y2="907.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="899.221825406948" x2="911.6862915010153" y2="895.6862915010153" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="896.0" x2="923.0" y2="891.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="899.221825406948" x2="934.3137084989847" y2="895.6862915010153" stroke="#253957" stroke-width="3"/>
+  <text x="1140" y="903.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_anillos_error</text>
+  <text x="1142" y="938" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Mostrar los errores sin</text>
+  <text x="1142" y="966" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">guardar cambios</text>
+  <rect x="220.0" y="882.0" width="440" height="116" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="243.0" cy="904.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M232.0,924.0 v-5 q11,-16 22,0 v5 M237.0,924.0 v9 M249.0,924.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="460" y="903.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_anillos_corregir</text>
+  <text x="462" y="938" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Corregir los datos del</text>
+  <text x="462" y="966" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">formulario</text>
+  <rect x="900.0" y="1042.0" width="440" height="116" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="923.0" cy="1067.0" r="11" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="923.0" cy="1067.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="934.0" y1="1067.0" x2="939.0" y2="1067.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="1074.778174593052" x2="934.3137084989847" y2="1078.3137084989849" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="1078.0" x2="923.0" y2="1083.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="1074.778174593052" x2="911.6862915010153" y2="1078.3137084989849" stroke="#253957" stroke-width="3"/>
+  <line x1="912.0" y1="1067.0" x2="907.0" y2="1067.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="1059.221825406948" x2="911.6862915010153" y2="1055.6862915010151" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="1056.0" x2="923.0" y2="1051.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="1059.221825406948" x2="934.3137084989847" y2="1055.6862915010151" stroke="#253957" stroke-width="3"/>
+  <text x="1140" y="1063.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_fichas · RF021</text>
+  <text x="1142" y="1098" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Crear fichas con padre, madre</text>
+  <text x="1142" y="1126" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">y cruce de origen</text>
+  <rect x="900.0" y="1202.0" width="440" height="116" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="923.0" cy="1227.0" r="11" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="923.0" cy="1227.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="934.0" y1="1227.0" x2="939.0" y2="1227.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="1234.778174593052" x2="934.3137084989847" y2="1238.3137084989849" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="1238.0" x2="923.0" y2="1243.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="1234.778174593052" x2="911.6862915010153" y2="1238.3137084989849" stroke="#253957" stroke-width="3"/>
+  <line x1="912.0" y1="1227.0" x2="907.0" y2="1227.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="1219.221825406948" x2="911.6862915010153" y2="1215.6862915010151" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="1216.0" x2="923.0" y2="1211.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="1219.221825406948" x2="934.3137084989847" y2="1215.6862915010151" stroke="#253957" stroke-width="3"/>
+  <text x="1140" y="1223.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_factores · RF033, RF034</text>
+  <text x="1142" y="1258" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Obtener manifestados y</text>
+  <text x="1142" y="1286" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">deducir portadores ciertos</text>
+  <rect x="900.0" y="1362.0" width="440" height="116" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="923.0" cy="1387.0" r="11" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="923.0" cy="1387.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="934.0" y1="1387.0" x2="939.0" y2="1387.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="1394.778174593052" x2="934.3137084989847" y2="1398.3137084989849" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="1398.0" x2="923.0" y2="1403.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="1394.778174593052" x2="911.6862915010153" y2="1398.3137084989849" stroke="#253957" stroke-width="3"/>
+  <line x1="912.0" y1="1387.0" x2="907.0" y2="1387.0" stroke="#253957" stroke-width="3"/>
+  <line x1="915.221825406948" y1="1379.221825406948" x2="911.6862915010153" y2="1375.6862915010151" stroke="#253957" stroke-width="3"/>
+  <line x1="923.0" y1="1376.0" x2="923.0" y2="1371.0" stroke="#253957" stroke-width="3"/>
+  <line x1="930.778174593052" y1="1379.221825406948" x2="934.3137084989847" y2="1375.6862915010151" stroke="#253957" stroke-width="3"/>
+  <text x="1140" y="1383.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_mostrar · RF021, RF027</text>
+  <text x="1142" y="1418" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Actualizar ficha de cría y</text>
+  <text x="1142" y="1446" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">registrar auditoría</text>
+  <rect x="220.0" y="1362.0" width="440" height="116" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="243.0" cy="1384.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M232.0,1404.0 v-5 q11,-16 22,0 v5 M237.0,1404.0 v9 M249.0,1404.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="460" y="1383.0" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="middle" fill="#475569" font-weight="normal">PIC_seguir · RF021, RF027</text>
+  <text x="462" y="1418" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">Revisar fichas y elegir si</text>
+  <text x="462" y="1446" font-family="Arial, Liberation Sans, sans-serif" font-size="26" text-anchor="middle" fill="#253957" font-weight="normal">registra más pichones</text>
+  <polygon points="440,1546 474,1580 440,1614 406,1580" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M428,1568 L452,1592 M452,1568 L428,1592" stroke="#253957" stroke-width="3"/>
+  <text x="492.0" y="1562" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="start" fill="#253957" font-weight="normal">¿Más pichones?</text>
+  <circle cx="440" cy="1740" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <text x="440" y="1796" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="middle" fill="#253957" font-weight="normal">Pichones registrados; cruce</text>
+  <text x="440" y="1823" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="middle" fill="#253957" font-weight="normal">conservado</text>
+  <rect x="1128" y="833.0" width="40" height="29" fill="white"/>
+  <text x="1132" y="855.0" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <line x1="1113" y1="826.0" x2="1127" y2="836.0" stroke="#253957" stroke-width="2"/>
+  <rect x="133" y="846" width="144" height="29" fill="white"/>
+  <text x="137" y="868" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">Reintentar</text>
+  <rect x="1268.5" y="790" width="40" height="29" fill="white"/>
+  <text x="1272.5" y="812" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="147" y="1486" width="40" height="29" fill="white"/>
+  <text x="151" y="1508" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="448" y="1650.0" width="40" height="29" fill="white"/>
+  <text x="452" y="1672.0" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <line x1="433" y1="1626.0" x2="447" y2="1636.0" stroke="#253957" stroke-width="2"/>
+  <text x="55" y="1947" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="start" fill="#253957" font-weight="bold">Reglas y alcance del proceso</text>
+  <text x="55" y="1981" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Precondición: sesión de criador válida. El cruce y sus progenitores pertenecen al criadero de la sesión (RF003,</text>
+  <text x="55" y="2011" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">  DAT-004).</text>
+  <text x="55" y="2041" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• El anillado físico a los 10–12 días es contexto de crianza; el sistema registra los datos. No se crea un</text>
+  <text x="55" y="2071" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">  temporizador automático ni una función de posturas de huevos.</text>
+  <text x="55" y="2101" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Sexo y variedad pueden quedar sin determinar; fecha de nacimiento opcional. Padres y cruce se asignan desde el</text>
+  <text x="55" y="2131" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">  cruce seleccionado. Portadores manuales se conservan; solo se deduce lo comprobable (RF007, RF021, RF034).</text>
+  <text x="55" y="2161" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Repetir este proceso cuando haya más pichones. Registrar pichones no termina el cruce; su cierre se modela por</text>
+  <text x="55" y="2191" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">  separado (RF022).</text>
+</svg>

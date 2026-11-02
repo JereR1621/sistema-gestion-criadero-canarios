@@ -1,0 +1,2658 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="1.0">
+  <bpmn:process id="Process_CRU" name="Planificar y registrar un cruce" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. Solo se consultan y modifican registros de su propio criadero (RF002–RF003).
+Los cruces de una hembra con varios machos y de un macho con varias hembras se registran repitiendo este proceso para cada pareja, sin sustituir los cruces anteriores (RF019–RF020).
+El catálogo está precargado. Se usan su composición y tipos de herencia; los resultados se separan por sexo. SUP-004: independencia de factores y una dosis dominante; avisar cuando el resultado sea aproximado.
+La vista previa no guarda un cruce. Si faltan reglas, se informa lo no calculable sin inventar porcentajes; los cálculos disponibles se muestran con esa advertencia (RF039).</bpmn:documentation>
+    <bpmn:laneSet id="CRU_lanes">
+      <bpmn:lane id="CRU_persona" name="Criador">
+        <bpmn:flowNodeRef>CRU_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_confirma</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="CRU_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>CRU_propuesta_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_catalogo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_calcular</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_reglas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_aviso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_resultado_listo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_mostrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_revalidar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_confirmacion_valida</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_cambio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="CRU_inicio" name="Planificar un cruce">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>CRU_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="CRU_propuesta_datos" name="Elegir macho, hembra, jaula, temporada y fecha">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F05</bpmn:incoming>
+      <bpmn:incoming>CRU_F06</bpmn:incoming>
+      <bpmn:incoming>CRU_F16</bpmn:incoming>
+      <bpmn:incoming>CRU_F21</bpmn:incoming>
+      <bpmn:outgoing>CRU_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CRU_propuesta_validar" name="Validar progenitores, sexo, jaula y criadero">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020
+Macho y hembra con sexo conocido y del criadero; jaula del mismo criadero; datos obligatorios completos. DAT-004.</bpmn:documentation>
+      <bpmn:incoming>CRU_F01</bpmn:incoming>
+      <bpmn:outgoing>CRU_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CRU_propuesta_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="CRU_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F02</bpmn:incoming>
+      <bpmn:outgoing>CRU_F03</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CRU_propuesta_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F03</bpmn:incoming>
+      <bpmn:outgoing>CRU_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="CRU_propuesta_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F04</bpmn:incoming>
+      <bpmn:outgoing>CRU_F05</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CRU_catalogo" name="Obtener factores manifestados, portados y herencia">
+      <bpmn:documentation>SRS-RF028, SRS-RF029, SRS-RF030, SRS-RF031, SRS-RF033, SRS-RF034
+Armar genotipos con la variedad y los portadores de ambos progenitores. Un dato sin determinar no equivale a un factor normal conocido; informar lo que no puede calcularse.</bpmn:documentation>
+      <bpmn:incoming>CRU_F07</bpmn:incoming>
+      <bpmn:outgoing>CRU_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CRU_calcular" name="Calcular proporciones con las reglas disponibles">
+      <bpmn:documentation>SRS-RF035, SRS-RF036, SRS-RF037, SRS-RF038, SRS-RF039
+Reglas ligadas al sexo, recesivas y dominantes. Combinar según SUP-004; resolver variedad o lista de factores.</bpmn:documentation>
+      <bpmn:incoming>CRU_F08</bpmn:incoming>
+      <bpmn:outgoing>CRU_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CRU_reglas" name="¿Faltan reglas?" gatewayDirection="Diverging" default="CRU_F11">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F09</bpmn:incoming>
+      <bpmn:outgoing>CRU_F10</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CRU_aviso" name="Informar factores no calculables y limitaciones">
+      <bpmn:documentation>SRS-RF039</bpmn:documentation>
+      <bpmn:incoming>CRU_F10</bpmn:incoming>
+      <bpmn:outgoing>CRU_F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CRU_resultado_listo" name="" gatewayDirection="Converging">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F11</bpmn:incoming>
+      <bpmn:incoming>CRU_F12</bpmn:incoming>
+      <bpmn:outgoing>CRU_F13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CRU_mostrar" name="Mostrar porcentajes por sexo, factores y avisos">
+      <bpmn:documentation>SRS-RF035, SRS-RF039</bpmn:documentation>
+      <bpmn:incoming>CRU_F13</bpmn:incoming>
+      <bpmn:outgoing>CRU_F14</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="CRU_revisar" name="Revisar el posible resultado y decidir">
+      <bpmn:documentation>SRS-RF035</bpmn:documentation>
+      <bpmn:incoming>CRU_F14</bpmn:incoming>
+      <bpmn:outgoing>CRU_F15</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="CRU_confirma" name="¿Qué decide?" gatewayDirection="Diverging" default="CRU_F17">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F15</bpmn:incoming>
+      <bpmn:outgoing>CRU_F16</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F17</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="CRU_cancelado" name="Propuesta cancelada; sin cruce guardado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F17</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="CRU_revalidar" name="Revalidar los datos al confirmar">
+      <bpmn:documentation>SRS-RF018</bpmn:documentation>
+      <bpmn:incoming>CRU_F18</bpmn:incoming>
+      <bpmn:outgoing>CRU_F19</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CRU_confirmacion_valida" name="¿Datos vigentes?" gatewayDirection="Diverging" default="CRU_F20">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F19</bpmn:incoming>
+      <bpmn:outgoing>CRU_F20</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F22</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CRU_cambio" name="Informar cambios o errores y no guardar">
+      <bpmn:documentation>SRS-RF018</bpmn:documentation>
+      <bpmn:incoming>CRU_F20</bpmn:incoming>
+      <bpmn:outgoing>CRU_F21</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CRU_guardar" name="Registrar cruce con fecha de inicio y auditar">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F22</bpmn:incoming>
+      <bpmn:outgoing>CRU_F23</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CRU_fin" name="Cruce registrado; ficha de cría disponible">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F23</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="CRU_F01" sourceRef="CRU_propuesta_datos" targetRef="CRU_propuesta_validar" name=""/>
+    <bpmn:sequenceFlow id="CRU_F02" sourceRef="CRU_propuesta_validar" targetRef="CRU_propuesta_valido" name=""/>
+    <bpmn:sequenceFlow id="CRU_F03" sourceRef="CRU_propuesta_valido" targetRef="CRU_propuesta_error" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F04" sourceRef="CRU_propuesta_error" targetRef="CRU_propuesta_corregir" name=""/>
+    <bpmn:sequenceFlow id="CRU_F05" sourceRef="CRU_propuesta_corregir" targetRef="CRU_propuesta_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="CRU_F06" sourceRef="CRU_inicio" targetRef="CRU_propuesta_datos" name=""/>
+    <bpmn:sequenceFlow id="CRU_F07" sourceRef="CRU_propuesta_valido" targetRef="CRU_catalogo" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F08" sourceRef="CRU_catalogo" targetRef="CRU_calcular" name=""/>
+    <bpmn:sequenceFlow id="CRU_F09" sourceRef="CRU_calcular" targetRef="CRU_reglas" name=""/>
+    <bpmn:sequenceFlow id="CRU_F10" sourceRef="CRU_reglas" targetRef="CRU_aviso" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">faltan_reglas</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F11" sourceRef="CRU_reglas" targetRef="CRU_resultado_listo" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F12" sourceRef="CRU_aviso" targetRef="CRU_resultado_listo" name=""/>
+    <bpmn:sequenceFlow id="CRU_F13" sourceRef="CRU_resultado_listo" targetRef="CRU_mostrar" name=""/>
+    <bpmn:sequenceFlow id="CRU_F14" sourceRef="CRU_mostrar" targetRef="CRU_revisar" name=""/>
+    <bpmn:sequenceFlow id="CRU_F15" sourceRef="CRU_revisar" targetRef="CRU_confirma" name=""/>
+    <bpmn:sequenceFlow id="CRU_F16" sourceRef="CRU_confirma" targetRef="CRU_propuesta_datos" name="Modificar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">decision = modificar</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F17" sourceRef="CRU_confirma" targetRef="CRU_cancelado" name="Cancelar"/>
+    <bpmn:sequenceFlow id="CRU_F18" sourceRef="CRU_confirma" targetRef="CRU_revalidar" name="Confirmar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">decision = confirmar</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F19" sourceRef="CRU_revalidar" targetRef="CRU_confirmacion_valida" name=""/>
+    <bpmn:sequenceFlow id="CRU_F20" sourceRef="CRU_confirmacion_valida" targetRef="CRU_cambio" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F21" sourceRef="CRU_cambio" targetRef="CRU_propuesta_datos" name="Corregir propuesta"/>
+    <bpmn:sequenceFlow id="CRU_F22" sourceRef="CRU_confirmacion_valida" targetRef="CRU_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_vigentes</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F23" sourceRef="CRU_guardar" targetRef="CRU_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_CRU">
+    <bpmn:participant id="Participant_CRU" name="TuCriadero — Planificar y registrar un cruce" processRef="Process_CRU"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_PIC" name="Registrar pichones de un cruce" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. El cruce y sus progenitores pertenecen al criadero de la sesión (RF003, DAT-004).
+El anillado físico a los 10–12 días es contexto de crianza; el sistema registra los datos. No se crea un temporizador automático ni una función de posturas de huevos.
+Sexo y variedad pueden quedar sin determinar; fecha de nacimiento opcional. Padres y cruce se asignan desde el cruce seleccionado. Portadores manuales se conservan; solo se deduce lo comprobable (RF007, RF021, RF034).
+Repetir este proceso cuando haya más pichones. Registrar pichones no termina el cruce; su cierre se modela por separado (RF022).</bpmn:documentation>
+    <bpmn:laneSet id="PIC_lanes">
+      <bpmn:lane id="PIC_persona" name="Criador">
+        <bpmn:flowNodeRef>PIC_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_elegir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_seguir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_mas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="PIC_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>PIC_cruce</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_fichas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_factores</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_mostrar</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="PIC_inicio" name="Registrar pichones">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>PIC_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="PIC_elegir" name="Elegir un cruce y abrir su ficha de cría">
+      <bpmn:documentation>SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F01</bpmn:incoming>
+      <bpmn:outgoing>PIC_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="PIC_cruce" name="Obtener cruce, progenitores y datos por defecto">
+      <bpmn:documentation>SRS-RF004, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F02</bpmn:incoming>
+      <bpmn:outgoing>PIC_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="PIC_anillos_datos" name="Ingresar anillos y fechas de los pichones">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF012, SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F07</bpmn:incoming>
+      <bpmn:incoming>PIC_F08</bpmn:incoming>
+      <bpmn:incoming>PIC_F14</bpmn:incoming>
+      <bpmn:outgoing>PIC_F03</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="PIC_anillos_validar" name="Validar anillos, variedad, sexo y fechas">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF012, SRS-RF021
+Anillo obligatorio y no duplicado en el criadero ni en el envío; fecha de anillado; nacimiento opcional; variedad compatible con sexo cuando se determine. DAT-004.</bpmn:documentation>
+      <bpmn:incoming>PIC_F03</bpmn:incoming>
+      <bpmn:outgoing>PIC_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="PIC_anillos_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="PIC_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F04</bpmn:incoming>
+      <bpmn:outgoing>PIC_F05</bpmn:outgoing>
+      <bpmn:outgoing>PIC_F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="PIC_anillos_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF012, SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F05</bpmn:incoming>
+      <bpmn:outgoing>PIC_F06</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="PIC_anillos_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF012, SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F06</bpmn:incoming>
+      <bpmn:outgoing>PIC_F07</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="PIC_fichas" name="Crear fichas con padre, madre y cruce de origen">
+      <bpmn:documentation>SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F09</bpmn:incoming>
+      <bpmn:outgoing>PIC_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="PIC_factores" name="Obtener manifestados y deducir portadores ciertos">
+      <bpmn:documentation>SRS-RF033, SRS-RF034</bpmn:documentation>
+      <bpmn:incoming>PIC_F10</bpmn:incoming>
+      <bpmn:outgoing>PIC_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="PIC_mostrar" name="Actualizar ficha de cría y registrar auditoría">
+      <bpmn:documentation>SRS-RF021, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F11</bpmn:incoming>
+      <bpmn:outgoing>PIC_F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="PIC_seguir" name="Revisar fichas y elegir si registra más pichones">
+      <bpmn:documentation>SRS-RF021, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F12</bpmn:incoming>
+      <bpmn:outgoing>PIC_F13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="PIC_mas" name="¿Más pichones?" gatewayDirection="Diverging" default="PIC_F15">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F13</bpmn:incoming>
+      <bpmn:outgoing>PIC_F14</bpmn:outgoing>
+      <bpmn:outgoing>PIC_F15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="PIC_fin" name="Pichones registrados; cruce conservado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F15</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="PIC_F01" sourceRef="PIC_inicio" targetRef="PIC_elegir" name=""/>
+    <bpmn:sequenceFlow id="PIC_F02" sourceRef="PIC_elegir" targetRef="PIC_cruce" name=""/>
+    <bpmn:sequenceFlow id="PIC_F03" sourceRef="PIC_anillos_datos" targetRef="PIC_anillos_validar" name=""/>
+    <bpmn:sequenceFlow id="PIC_F04" sourceRef="PIC_anillos_validar" targetRef="PIC_anillos_valido" name=""/>
+    <bpmn:sequenceFlow id="PIC_F05" sourceRef="PIC_anillos_valido" targetRef="PIC_anillos_error" name="No"/>
+    <bpmn:sequenceFlow id="PIC_F06" sourceRef="PIC_anillos_error" targetRef="PIC_anillos_corregir" name=""/>
+    <bpmn:sequenceFlow id="PIC_F07" sourceRef="PIC_anillos_corregir" targetRef="PIC_anillos_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="PIC_F08" sourceRef="PIC_cruce" targetRef="PIC_anillos_datos" name=""/>
+    <bpmn:sequenceFlow id="PIC_F09" sourceRef="PIC_anillos_valido" targetRef="PIC_fichas" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="PIC_F10" sourceRef="PIC_fichas" targetRef="PIC_factores" name=""/>
+    <bpmn:sequenceFlow id="PIC_F11" sourceRef="PIC_factores" targetRef="PIC_mostrar" name=""/>
+    <bpmn:sequenceFlow id="PIC_F12" sourceRef="PIC_mostrar" targetRef="PIC_seguir" name=""/>
+    <bpmn:sequenceFlow id="PIC_F13" sourceRef="PIC_seguir" targetRef="PIC_mas" name=""/>
+    <bpmn:sequenceFlow id="PIC_F14" sourceRef="PIC_mas" targetRef="PIC_anillos_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">mas_pichones</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="PIC_F15" sourceRef="PIC_mas" targetRef="PIC_fin" name="No"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_PIC">
+    <bpmn:participant id="Participant_PIC" name="TuCriadero — Registrar pichones de un cruce" processRef="Process_PIC"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_FIN" name="Terminar un cruce" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. Solo se opera sobre un cruce del propio criadero (RF003).
+La fecha de fin no puede ser anterior a la fecha de inicio. El cierre conserva padres, pichones e historial (RF022, DAT-004).
+Terminar el cruce no traslada automáticamente a sus integrantes ni finaliza otros cruces de la temporada. Los traslados se registran en el proceso de jaulas y ubicaciones.</bpmn:documentation>
+    <bpmn:laneSet id="FIN_lanes">
+      <bpmn:lane id="FIN_persona" name="Criador">
+        <bpmn:flowNodeRef>FIN_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_corregir</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="FIN_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>FIN_cierre_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cerrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_historial</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="FIN_inicio" name="Terminar un cruce">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>FIN_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="FIN_cierre_datos" name="Abrir el cruce e indicar la fecha de fin">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F05</bpmn:incoming>
+      <bpmn:incoming>FIN_F06</bpmn:incoming>
+      <bpmn:outgoing>FIN_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="FIN_cierre_validar" name="Validar criadero y fechas de inicio y fin">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F01</bpmn:incoming>
+      <bpmn:outgoing>FIN_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="FIN_cierre_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="FIN_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>FIN_F02</bpmn:incoming>
+      <bpmn:outgoing>FIN_F03</bpmn:outgoing>
+      <bpmn:outgoing>FIN_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="FIN_cierre_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F03</bpmn:incoming>
+      <bpmn:outgoing>FIN_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="FIN_cierre_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F04</bpmn:incoming>
+      <bpmn:outgoing>FIN_F05</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="FIN_cerrar" name="Guardar fecha de fin y retirar el cruce de activos">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F07</bpmn:incoming>
+      <bpmn:outgoing>FIN_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="FIN_historial" name="Conservar fichas e historial y registrar auditoría">
+      <bpmn:documentation>SRS-RF017, SRS-RF022, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>FIN_F08</bpmn:incoming>
+      <bpmn:outgoing>FIN_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="FIN_fin" name="Cruce terminado; historial disponible">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>FIN_F09</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="FIN_F01" sourceRef="FIN_cierre_datos" targetRef="FIN_cierre_validar" name=""/>
+    <bpmn:sequenceFlow id="FIN_F02" sourceRef="FIN_cierre_validar" targetRef="FIN_cierre_valido" name=""/>
+    <bpmn:sequenceFlow id="FIN_F03" sourceRef="FIN_cierre_valido" targetRef="FIN_cierre_error" name="No"/>
+    <bpmn:sequenceFlow id="FIN_F04" sourceRef="FIN_cierre_error" targetRef="FIN_cierre_corregir" name=""/>
+    <bpmn:sequenceFlow id="FIN_F05" sourceRef="FIN_cierre_corregir" targetRef="FIN_cierre_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="FIN_F06" sourceRef="FIN_inicio" targetRef="FIN_cierre_datos" name=""/>
+    <bpmn:sequenceFlow id="FIN_F07" sourceRef="FIN_cierre_valido" targetRef="FIN_cerrar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="FIN_F08" sourceRef="FIN_cerrar" targetRef="FIN_historial" name=""/>
+    <bpmn:sequenceFlow id="FIN_F09" sourceRef="FIN_historial" targetRef="FIN_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_FIN">
+    <bpmn:participant id="Participant_FIN" name="TuCriadero — Terminar un cruce" processRef="Process_FIN"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_JAU" name="Gestionar jaulas y ubicaciones" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. Número de jaula único por criadero; canario y jaula pertenecen al criadero de la sesión (RF003, DAT-004).
+Jaula grande: ubicación sin número de jaula. Un traslado cierra la ubicación anterior y abre la nueva; como máximo una ubicación abierta por canario (DAT-004).
+El historial reúne ocupantes y cruces ordenados por fecha. Consultarlo no altera las ubicaciones (RF017).</bpmn:documentation>
+    <bpmn:laneSet id="JAU_lanes">
+      <bpmn:lane id="JAU_persona" name="Criador">
+        <bpmn:flowNodeRef>JAU_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_operacion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_opcion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_ubicacion_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_ubicacion_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_seleccionar</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="JAU_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>JAU_nueva_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_alta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_ubicacion_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_ubicacion_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_ubicacion_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_mover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_historial</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="JAU_inicio" name="Gestionar jaulas">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>JAU_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="JAU_operacion" name="Elegir alta, asignación, traslado o historial">
+      <bpmn:documentation>SRS-RF014, SRS-RF015, SRS-RF016, SRS-RF017</bpmn:documentation>
+      <bpmn:incoming>JAU_F01</bpmn:incoming>
+      <bpmn:outgoing>JAU_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="JAU_opcion" name="¿Qué operación?" gatewayDirection="Diverging" default="JAU_F19">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F02</bpmn:incoming>
+      <bpmn:outgoing>JAU_F08</bpmn:outgoing>
+      <bpmn:outgoing>JAU_F16</bpmn:outgoing>
+      <bpmn:outgoing>JAU_F19</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="JAU_nueva_datos" name="Ingresar el número de la nueva jaula">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F07</bpmn:incoming>
+      <bpmn:incoming>JAU_F08</bpmn:incoming>
+      <bpmn:outgoing>JAU_F03</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="JAU_nueva_validar" name="Validar número único en el criadero">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F03</bpmn:incoming>
+      <bpmn:outgoing>JAU_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="JAU_nueva_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="JAU_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F04</bpmn:incoming>
+      <bpmn:outgoing>JAU_F05</bpmn:outgoing>
+      <bpmn:outgoing>JAU_F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="JAU_nueva_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F05</bpmn:incoming>
+      <bpmn:outgoing>JAU_F06</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="JAU_nueva_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F06</bpmn:incoming>
+      <bpmn:outgoing>JAU_F07</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="JAU_alta" name="Registrar la jaula numerada">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F09</bpmn:incoming>
+      <bpmn:outgoing>JAU_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="JAU_fin" name="Operación de jaulas completada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F10</bpmn:incoming>
+      <bpmn:incoming>JAU_F18</bpmn:incoming>
+      <bpmn:incoming>JAU_F21</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="JAU_ubicacion_datos" name="Elegir canario, destino y fecha del movimiento">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>JAU_F15</bpmn:incoming>
+      <bpmn:incoming>JAU_F16</bpmn:incoming>
+      <bpmn:outgoing>JAU_F11</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="JAU_ubicacion_validar" name="Validar canario, destino y pertenencia al criadero">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>JAU_F11</bpmn:incoming>
+      <bpmn:outgoing>JAU_F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="JAU_ubicacion_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="JAU_F13">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F12</bpmn:incoming>
+      <bpmn:outgoing>JAU_F13</bpmn:outgoing>
+      <bpmn:outgoing>JAU_F17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="JAU_ubicacion_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>JAU_F13</bpmn:incoming>
+      <bpmn:outgoing>JAU_F14</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="JAU_ubicacion_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>JAU_F14</bpmn:incoming>
+      <bpmn:outgoing>JAU_F15</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="JAU_mover" name="Cerrar ubicación anterior y abrir la nueva">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>JAU_F17</bpmn:incoming>
+      <bpmn:outgoing>JAU_F18</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="JAU_seleccionar" name="Elegir la jaula cuyo historial consulta">
+      <bpmn:documentation>SRS-RF017</bpmn:documentation>
+      <bpmn:incoming>JAU_F19</bpmn:incoming>
+      <bpmn:outgoing>JAU_F20</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="JAU_historial" name="Mostrar ocupantes y cruces ordenados por fecha">
+      <bpmn:documentation>SRS-RF017</bpmn:documentation>
+      <bpmn:incoming>JAU_F20</bpmn:incoming>
+      <bpmn:outgoing>JAU_F21</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="JAU_F01" sourceRef="JAU_inicio" targetRef="JAU_operacion" name=""/>
+    <bpmn:sequenceFlow id="JAU_F02" sourceRef="JAU_operacion" targetRef="JAU_opcion" name=""/>
+    <bpmn:sequenceFlow id="JAU_F03" sourceRef="JAU_nueva_datos" targetRef="JAU_nueva_validar" name=""/>
+    <bpmn:sequenceFlow id="JAU_F04" sourceRef="JAU_nueva_validar" targetRef="JAU_nueva_valido" name=""/>
+    <bpmn:sequenceFlow id="JAU_F05" sourceRef="JAU_nueva_valido" targetRef="JAU_nueva_error" name="No"/>
+    <bpmn:sequenceFlow id="JAU_F06" sourceRef="JAU_nueva_error" targetRef="JAU_nueva_corregir" name=""/>
+    <bpmn:sequenceFlow id="JAU_F07" sourceRef="JAU_nueva_corregir" targetRef="JAU_nueva_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="JAU_F08" sourceRef="JAU_opcion" targetRef="JAU_nueva_datos" name="Nueva jaula">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">operacion = alta</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="JAU_F09" sourceRef="JAU_nueva_valido" targetRef="JAU_alta" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="JAU_F10" sourceRef="JAU_alta" targetRef="JAU_fin" name=""/>
+    <bpmn:sequenceFlow id="JAU_F11" sourceRef="JAU_ubicacion_datos" targetRef="JAU_ubicacion_validar" name=""/>
+    <bpmn:sequenceFlow id="JAU_F12" sourceRef="JAU_ubicacion_validar" targetRef="JAU_ubicacion_valido" name=""/>
+    <bpmn:sequenceFlow id="JAU_F13" sourceRef="JAU_ubicacion_valido" targetRef="JAU_ubicacion_error" name="No"/>
+    <bpmn:sequenceFlow id="JAU_F14" sourceRef="JAU_ubicacion_error" targetRef="JAU_ubicacion_corregir" name=""/>
+    <bpmn:sequenceFlow id="JAU_F15" sourceRef="JAU_ubicacion_corregir" targetRef="JAU_ubicacion_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="JAU_F16" sourceRef="JAU_opcion" targetRef="JAU_ubicacion_datos" name="Asignar o trasladar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">operacion = movimiento</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="JAU_F17" sourceRef="JAU_ubicacion_valido" targetRef="JAU_mover" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="JAU_F18" sourceRef="JAU_mover" targetRef="JAU_fin" name=""/>
+    <bpmn:sequenceFlow id="JAU_F19" sourceRef="JAU_opcion" targetRef="JAU_seleccionar" name="Consultar historial"/>
+    <bpmn:sequenceFlow id="JAU_F20" sourceRef="JAU_seleccionar" targetRef="JAU_historial" name=""/>
+    <bpmn:sequenceFlow id="JAU_F21" sourceRef="JAU_historial" targetRef="JAU_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_JAU">
+    <bpmn:participant id="Participant_JAU" name="TuCriadero — Gestionar jaulas y ubicaciones" processRef="Process_JAU"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_CAN" name="Registrar y actualizar canarios" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. El canario y los padres, cuando existan, pertenecen al propio criadero (RF003, DAT-004).
+El anillo identifica de por vida: socio, año, correlativo y club. El canario adquirido puede no tener padres y registra procedencia. Sexo y variedad admiten sin determinar (RF007–RF010).
+La variedad con sexo debe coincidir con el del canario. No se permite portar un factor manifestado, dominante ni ligado al sexo en una hembra (RF012–RF013, DAT-004).
+Al cambiar sexo, variedad o padres se recalculan solo portadores deducidos; los indicados por el criador se conservan. El cambio de variedad se propaga a las crías afectadas según RF034.</bpmn:documentation>
+    <bpmn:laneSet id="CAN_lanes">
+      <bpmn:lane id="CAN_persona" name="Criador">
+        <bpmn:flowNodeRef>CAN_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_corregir</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="CAN_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>CAN_ficha_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_manifestados</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_deducidos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_mostrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="CAN_inicio" name="Registrar o editar un canario">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>CAN_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="CAN_ficha_datos" name="Completar ficha, procedencia y portadores conocidos">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF009, SRS-RF010, SRS-RF012, SRS-RF013</bpmn:documentation>
+      <bpmn:incoming>CAN_F05</bpmn:incoming>
+      <bpmn:incoming>CAN_F06</bpmn:incoming>
+      <bpmn:outgoing>CAN_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CAN_ficha_validar" name="Validar anillo, sexo, variedad, padres y portadores">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF009, SRS-RF010, SRS-RF012, SRS-RF013
+Si el anillo ya existe, indicar el canario que lo usa; al editar, excluir el registro actual de la comprobación de duplicados.</bpmn:documentation>
+      <bpmn:incoming>CAN_F01</bpmn:incoming>
+      <bpmn:outgoing>CAN_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CAN_ficha_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="CAN_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAN_F02</bpmn:incoming>
+      <bpmn:outgoing>CAN_F03</bpmn:outgoing>
+      <bpmn:outgoing>CAN_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CAN_ficha_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF009, SRS-RF010, SRS-RF012, SRS-RF013</bpmn:documentation>
+      <bpmn:incoming>CAN_F03</bpmn:incoming>
+      <bpmn:outgoing>CAN_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="CAN_ficha_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF009, SRS-RF010, SRS-RF012, SRS-RF013</bpmn:documentation>
+      <bpmn:incoming>CAN_F04</bpmn:incoming>
+      <bpmn:outgoing>CAN_F05</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CAN_guardar" name="Guardar ficha y portadores indicados por el criador">
+      <bpmn:documentation>SRS-RF007, SRS-RF009, SRS-RF010</bpmn:documentation>
+      <bpmn:incoming>CAN_F07</bpmn:incoming>
+      <bpmn:outgoing>CAN_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CAN_manifestados" name="Obtener los factores de la composición de variedad">
+      <bpmn:documentation>SRS-RF033</bpmn:documentation>
+      <bpmn:incoming>CAN_F08</bpmn:incoming>
+      <bpmn:outgoing>CAN_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CAN_deducidos" name="Recalcular los portadores deducidos afectados">
+      <bpmn:documentation>SRS-RF034</bpmn:documentation>
+      <bpmn:incoming>CAN_F09</bpmn:incoming>
+      <bpmn:outgoing>CAN_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CAN_mostrar" name="Auditar el cambio y mostrar la ficha actualizada">
+      <bpmn:documentation>SRS-RF024</bpmn:documentation>
+      <bpmn:incoming>CAN_F10</bpmn:incoming>
+      <bpmn:outgoing>CAN_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CAN_fin" name="Ficha registrada o actualizada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAN_F11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="CAN_F01" sourceRef="CAN_ficha_datos" targetRef="CAN_ficha_validar" name=""/>
+    <bpmn:sequenceFlow id="CAN_F02" sourceRef="CAN_ficha_validar" targetRef="CAN_ficha_valido" name=""/>
+    <bpmn:sequenceFlow id="CAN_F03" sourceRef="CAN_ficha_valido" targetRef="CAN_ficha_error" name="No"/>
+    <bpmn:sequenceFlow id="CAN_F04" sourceRef="CAN_ficha_error" targetRef="CAN_ficha_corregir" name=""/>
+    <bpmn:sequenceFlow id="CAN_F05" sourceRef="CAN_ficha_corregir" targetRef="CAN_ficha_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="CAN_F06" sourceRef="CAN_inicio" targetRef="CAN_ficha_datos" name=""/>
+    <bpmn:sequenceFlow id="CAN_F07" sourceRef="CAN_ficha_valido" targetRef="CAN_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CAN_F08" sourceRef="CAN_guardar" targetRef="CAN_manifestados" name=""/>
+    <bpmn:sequenceFlow id="CAN_F09" sourceRef="CAN_manifestados" targetRef="CAN_deducidos" name=""/>
+    <bpmn:sequenceFlow id="CAN_F10" sourceRef="CAN_deducidos" targetRef="CAN_mostrar" name=""/>
+    <bpmn:sequenceFlow id="CAN_F11" sourceRef="CAN_mostrar" targetRef="CAN_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_CAN">
+    <bpmn:participant id="Participant_CAN" name="TuCriadero — Registrar y actualizar canarios" processRef="Process_CAN"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_BUS" name="Buscar y consultar genealogía" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. Todas las búsquedas y enlaces se filtran por el criadero de la sesión; un ID ajeno se trata como no disponible sin revelar datos (RF003).
+Por anillo se incluyen canarios dados de baja; por variedad solo activos. Por jaula se muestran ocupantes actuales y cruce activo (RF023, RF025, RF026).
+La ficha enlaza padres, hermanos, medios hermanos, crías y cruces. Cada cruce abre su ficha de cría con macho, hembra y pichones (RF024, RF027).</bpmn:documentation>
+    <bpmn:laneSet id="BUS_lanes">
+      <bpmn:lane id="BUS_persona" name="Criador">
+        <bpmn:flowNodeRef>BUS_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_consulta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_seguir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_continuar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_seleccionar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="BUS_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>BUS_buscar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_coincidencias</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_sin_resultados</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_resultados</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_ficha</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="BUS_inicio" name="Consultar el criadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>BUS_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="BUS_consulta" name="Elegir anillo, variedad o jaula e ingresar la búsqueda">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F01</bpmn:incoming>
+      <bpmn:incoming>BUS_F12</bpmn:incoming>
+      <bpmn:outgoing>BUS_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BUS_buscar" name="Buscar en el criadero según el criterio elegido">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F02</bpmn:incoming>
+      <bpmn:outgoing>BUS_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="BUS_coincidencias" name="¿Hay coincidencias?" gatewayDirection="Diverging" default="BUS_F04">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BUS_F03</bpmn:incoming>
+      <bpmn:outgoing>BUS_F04</bpmn:outgoing>
+      <bpmn:outgoing>BUS_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="BUS_sin_resultados" name="Informar que no hay resultados disponibles">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F04</bpmn:incoming>
+      <bpmn:outgoing>BUS_F07</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="BUS_resultados" name="Mostrar ficha o coincidencias con identificación">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F05</bpmn:incoming>
+      <bpmn:outgoing>BUS_F06</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="BUS_seguir" name="Revisar el resultado y elegir cómo continuar">
+      <bpmn:documentation>SRS-RF023, SRS-RF024, SRS-RF025, SRS-RF026, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>BUS_F06</bpmn:incoming>
+      <bpmn:incoming>BUS_F07</bpmn:incoming>
+      <bpmn:incoming>BUS_F11</bpmn:incoming>
+      <bpmn:outgoing>BUS_F08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="BUS_continuar" name="¿Cómo continúa?" gatewayDirection="Diverging" default="BUS_F13">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BUS_F08</bpmn:incoming>
+      <bpmn:outgoing>BUS_F09</bpmn:outgoing>
+      <bpmn:outgoing>BUS_F12</bpmn:outgoing>
+      <bpmn:outgoing>BUS_F13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="BUS_seleccionar" name="Elegir un resultado o un enlace de la ficha">
+      <bpmn:documentation>SRS-RF024, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>BUS_F09</bpmn:incoming>
+      <bpmn:outgoing>BUS_F10</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BUS_ficha" name="Mostrar la ficha autorizada del registro elegido">
+      <bpmn:documentation>SRS-RF024, SRS-RF026, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>BUS_F10</bpmn:incoming>
+      <bpmn:outgoing>BUS_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="BUS_fin" name="Consulta terminada; sin modificar datos">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BUS_F13</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="BUS_F01" sourceRef="BUS_inicio" targetRef="BUS_consulta" name=""/>
+    <bpmn:sequenceFlow id="BUS_F02" sourceRef="BUS_consulta" targetRef="BUS_buscar" name=""/>
+    <bpmn:sequenceFlow id="BUS_F03" sourceRef="BUS_buscar" targetRef="BUS_coincidencias" name=""/>
+    <bpmn:sequenceFlow id="BUS_F04" sourceRef="BUS_coincidencias" targetRef="BUS_sin_resultados" name="No"/>
+    <bpmn:sequenceFlow id="BUS_F05" sourceRef="BUS_coincidencias" targetRef="BUS_resultados" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">hay_coincidencias</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BUS_F06" sourceRef="BUS_resultados" targetRef="BUS_seguir" name=""/>
+    <bpmn:sequenceFlow id="BUS_F07" sourceRef="BUS_sin_resultados" targetRef="BUS_seguir" name=""/>
+    <bpmn:sequenceFlow id="BUS_F08" sourceRef="BUS_seguir" targetRef="BUS_continuar" name=""/>
+    <bpmn:sequenceFlow id="BUS_F09" sourceRef="BUS_continuar" targetRef="BUS_seleccionar" name="Abrir enlace">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">accion = enlace y hay_resultados</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BUS_F10" sourceRef="BUS_seleccionar" targetRef="BUS_ficha" name=""/>
+    <bpmn:sequenceFlow id="BUS_F11" sourceRef="BUS_ficha" targetRef="BUS_seguir" name=""/>
+    <bpmn:sequenceFlow id="BUS_F12" sourceRef="BUS_continuar" targetRef="BUS_consulta" name="Buscar otra vez">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">accion = buscar</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BUS_F13" sourceRef="BUS_continuar" targetRef="BUS_fin" name="Finalizar"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_BUS">
+    <bpmn:participant id="Participant_BUS" name="TuCriadero — Buscar y consultar genealogía" processRef="Process_BUS"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_BAJ" name="Dar de baja un canario" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. La ficha seleccionada pertenece al propio criadero (RF003).
+Motivos: venta, muerte u otra salida del criadero; fecha y motivo obligatorios (RF011). No se incorpora un módulo de cobros ni una eliminación física de la ficha.
+La baja y el cambio de estado se guardan en la misma operación. Se excluye al canario de listados de activos, conservando genealogía y búsqueda por anillo (DAT-004, RF023).</bpmn:documentation>
+    <bpmn:laneSet id="BAJ_lanes">
+      <bpmn:lane id="BAJ_persona" name="Criador">
+        <bpmn:flowNodeRef>BAJ_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_corregir</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="BAJ_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>BAJ_baja_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_conservar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="BAJ_inicio" name="Registrar una salida del criadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>BAJ_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="BAJ_baja_datos" name="Abrir el canario e indicar motivo y fecha de baja">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F05</bpmn:incoming>
+      <bpmn:incoming>BAJ_F06</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BAJ_baja_validar" name="Validar canario, criadero, motivo y fecha">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F01</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="BAJ_baja_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="BAJ_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BAJ_F02</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F03</bpmn:outgoing>
+      <bpmn:outgoing>BAJ_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="BAJ_baja_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F03</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="BAJ_baja_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F04</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F05</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BAJ_guardar" name="Registrar baja y actualizar estado en una operación">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F07</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="BAJ_conservar" name="Auditar; conservar ficha y genealogía para consultas">
+      <bpmn:documentation>SRS-RF011, SRS-RF023, SRS-RF024</bpmn:documentation>
+      <bpmn:incoming>BAJ_F08</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="BAJ_fin" name="Baja registrada; historia conservada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BAJ_F09</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="BAJ_F01" sourceRef="BAJ_baja_datos" targetRef="BAJ_baja_validar" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F02" sourceRef="BAJ_baja_validar" targetRef="BAJ_baja_valido" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F03" sourceRef="BAJ_baja_valido" targetRef="BAJ_baja_error" name="No"/>
+    <bpmn:sequenceFlow id="BAJ_F04" sourceRef="BAJ_baja_error" targetRef="BAJ_baja_corregir" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F05" sourceRef="BAJ_baja_corregir" targetRef="BAJ_baja_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="BAJ_F06" sourceRef="BAJ_inicio" targetRef="BAJ_baja_datos" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F07" sourceRef="BAJ_baja_valido" targetRef="BAJ_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BAJ_F08" sourceRef="BAJ_guardar" targetRef="BAJ_conservar" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F09" sourceRef="BAJ_conservar" targetRef="BAJ_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_BAJ">
+    <bpmn:participant id="Participant_BAJ" name="TuCriadero — Dar de baja un canario" processRef="Process_BAJ"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_ACC" name="Acceder al criadero y completar el perfil" isExecutable="false">
+    <bpmn:documentation>Este proceso permite el autorregistro exclusivamente como criador. La cuenta de administrador se precarga por el equipo, nunca por autorregistro (RF001, SEG-001).
+Cuenta desactivada: no inicia sesión y conserva sus datos (RF005). Sesión limitada al criadero del usuario autenticado; las operaciones de administración usan su rol separado (RF002–RF003).
+Número de socio y club del perfil se proponen por defecto para anillos propios (RF004). Cierre manual de sesión disponible y expiración tras 7 días de inactividad (SEG-004).</bpmn:documentation>
+    <bpmn:laneSet id="ACC_lanes">
+      <bpmn:lane id="ACC_persona" name="Criador">
+        <bpmn:flowNodeRef>ACC_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_cuenta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil_opcion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_editar_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_editar_corregir</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="ACC_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>ACC_registro_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_crear</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_sesion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_editar_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_editar_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_editar_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_guardar_perfil</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ACC_inicio" name="Acceder a TuCriadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>ACC_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="ACC_cuenta" name="¿Tiene cuenta?" gatewayDirection="Diverging" default="ACC_F07">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F01</bpmn:incoming>
+      <bpmn:outgoing>ACC_F07</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="ACC_registro_datos" name="Ingresar nombre, correo y contraseña">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F06</bpmn:incoming>
+      <bpmn:incoming>ACC_F07</bpmn:incoming>
+      <bpmn:outgoing>ACC_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_registro_validar" name="Validar el registro de una cuenta de criador">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F02</bpmn:incoming>
+      <bpmn:outgoing>ACC_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_registro_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ACC_F04">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F03</bpmn:incoming>
+      <bpmn:outgoing>ACC_F04</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ACC_registro_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F04</bpmn:incoming>
+      <bpmn:outgoing>ACC_F05</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ACC_registro_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F05</bpmn:incoming>
+      <bpmn:outgoing>ACC_F06</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_crear" name="Crear cuenta de criador y criadero propio vacío">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F08</bpmn:incoming>
+      <bpmn:outgoing>ACC_F14</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ACC_ingreso_datos" name="Ingresar correo y contraseña">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F13</bpmn:incoming>
+      <bpmn:incoming>ACC_F14</bpmn:incoming>
+      <bpmn:incoming>ACC_F15</bpmn:incoming>
+      <bpmn:outgoing>ACC_F09</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_ingreso_validar" name="Validar credenciales y estado de la cuenta">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F09</bpmn:incoming>
+      <bpmn:outgoing>ACC_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_ingreso_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ACC_F11">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F10</bpmn:incoming>
+      <bpmn:outgoing>ACC_F11</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F16</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ACC_ingreso_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F11</bpmn:incoming>
+      <bpmn:outgoing>ACC_F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ACC_ingreso_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F12</bpmn:incoming>
+      <bpmn:outgoing>ACC_F13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_sesion" name="Abrir sesión con rol y criadero autorizados">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F16</bpmn:incoming>
+      <bpmn:outgoing>ACC_F17</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ACC_perfil_opcion" name="Elegir si completa o actualiza socio y club">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F17</bpmn:incoming>
+      <bpmn:outgoing>ACC_F18</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ACC_perfil" name="¿Actualiza perfil?" gatewayDirection="Diverging" default="ACC_F27">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F18</bpmn:incoming>
+      <bpmn:outgoing>ACC_F24</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="ACC_editar_datos" name="Ingresar número de socio y club">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F23</bpmn:incoming>
+      <bpmn:incoming>ACC_F24</bpmn:incoming>
+      <bpmn:outgoing>ACC_F19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_editar_validar" name="Validar los datos del perfil propio">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F19</bpmn:incoming>
+      <bpmn:outgoing>ACC_F20</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_editar_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ACC_F21">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F20</bpmn:incoming>
+      <bpmn:outgoing>ACC_F21</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F25</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ACC_editar_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F21</bpmn:incoming>
+      <bpmn:outgoing>ACC_F22</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ACC_editar_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F22</bpmn:incoming>
+      <bpmn:outgoing>ACC_F23</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_guardar_perfil" name="Guardar socio y club como valores por defecto">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F25</bpmn:incoming>
+      <bpmn:outgoing>ACC_F26</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="ACC_fin" name="Acceso disponible con sesión autorizada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F26</bpmn:incoming>
+      <bpmn:incoming>ACC_F27</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="ACC_F01" sourceRef="ACC_inicio" targetRef="ACC_cuenta" name=""/>
+    <bpmn:sequenceFlow id="ACC_F02" sourceRef="ACC_registro_datos" targetRef="ACC_registro_validar" name=""/>
+    <bpmn:sequenceFlow id="ACC_F03" sourceRef="ACC_registro_validar" targetRef="ACC_registro_valido" name=""/>
+    <bpmn:sequenceFlow id="ACC_F04" sourceRef="ACC_registro_valido" targetRef="ACC_registro_error" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F05" sourceRef="ACC_registro_error" targetRef="ACC_registro_corregir" name=""/>
+    <bpmn:sequenceFlow id="ACC_F06" sourceRef="ACC_registro_corregir" targetRef="ACC_registro_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="ACC_F07" sourceRef="ACC_cuenta" targetRef="ACC_registro_datos" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F08" sourceRef="ACC_registro_valido" targetRef="ACC_crear" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F09" sourceRef="ACC_ingreso_datos" targetRef="ACC_ingreso_validar" name=""/>
+    <bpmn:sequenceFlow id="ACC_F10" sourceRef="ACC_ingreso_validar" targetRef="ACC_ingreso_valido" name=""/>
+    <bpmn:sequenceFlow id="ACC_F11" sourceRef="ACC_ingreso_valido" targetRef="ACC_ingreso_error" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F12" sourceRef="ACC_ingreso_error" targetRef="ACC_ingreso_corregir" name=""/>
+    <bpmn:sequenceFlow id="ACC_F13" sourceRef="ACC_ingreso_corregir" targetRef="ACC_ingreso_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="ACC_F14" sourceRef="ACC_crear" targetRef="ACC_ingreso_datos" name=""/>
+    <bpmn:sequenceFlow id="ACC_F15" sourceRef="ACC_cuenta" targetRef="ACC_ingreso_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">tiene_cuenta</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F16" sourceRef="ACC_ingreso_valido" targetRef="ACC_sesion" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F17" sourceRef="ACC_sesion" targetRef="ACC_perfil_opcion" name=""/>
+    <bpmn:sequenceFlow id="ACC_F18" sourceRef="ACC_perfil_opcion" targetRef="ACC_perfil" name=""/>
+    <bpmn:sequenceFlow id="ACC_F19" sourceRef="ACC_editar_datos" targetRef="ACC_editar_validar" name=""/>
+    <bpmn:sequenceFlow id="ACC_F20" sourceRef="ACC_editar_validar" targetRef="ACC_editar_valido" name=""/>
+    <bpmn:sequenceFlow id="ACC_F21" sourceRef="ACC_editar_valido" targetRef="ACC_editar_error" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F22" sourceRef="ACC_editar_error" targetRef="ACC_editar_corregir" name=""/>
+    <bpmn:sequenceFlow id="ACC_F23" sourceRef="ACC_editar_corregir" targetRef="ACC_editar_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="ACC_F24" sourceRef="ACC_perfil" targetRef="ACC_editar_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">actualizar_perfil</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F25" sourceRef="ACC_editar_valido" targetRef="ACC_guardar_perfil" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F26" sourceRef="ACC_guardar_perfil" targetRef="ACC_fin" name=""/>
+    <bpmn:sequenceFlow id="ACC_F27" sourceRef="ACC_perfil" targetRef="ACC_fin" name="No"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_ACC">
+    <bpmn:participant id="Participant_ACC" name="TuCriadero — Acceder al criadero y completar el perfil" processRef="Process_ACC"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_ADM" name="Administrar cuentas y catálogo" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de administrador. Un criador no accede a estas operaciones. El administrador ve datos de registro de las cuentas y catálogo, nunca los datos de los criaderos (RF005–RF006, SEG-001).
+Catálogo inicial: el equipo precarga las 762 variedades de color, sus factores y composición (RF028, DAT-005). No se modela una importación de planillas por el criador.
+El administrador agrega o corrige variedades, composición y factores; no se permiten códigos duplicados ni eliminar variedades asignadas. La composición no se repite para un mismo sexo (RF032, DAT-004).
+Una cuenta desactivada no inicia sesión y conserva sus datos. Los cambios de catálogo aplican para todos los criadores. Toda acción administrativa se audita (RF005, RF032, SEG-003).</bpmn:documentation>
+    <bpmn:laneSet id="ADM_lanes">
+      <bpmn:lane id="ADM_persona" name="Administrador">
+        <bpmn:flowNodeRef>ADM_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_operacion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_opcion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_estado_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_estado_corregir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_catalogo_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_catalogo_corregir</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="ADM_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>ADM_cuentas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_estado_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_estado_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_estado_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_estado_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_catalogo_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_catalogo_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_catalogo_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ADM_catalogo_guardar</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ADM_inicio" name="Administrar TuCriadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>ADM_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="ADM_operacion" name="Elegir administración de cuentas o catálogo">
+      <bpmn:documentation>SRS-RF005, SRS-RF006, SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>ADM_F01</bpmn:incoming>
+      <bpmn:outgoing>ADM_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ADM_opcion" name="¿Qué administra?" gatewayDirection="Diverging" default="ADM_F17">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ADM_F02</bpmn:incoming>
+      <bpmn:outgoing>ADM_F03</bpmn:outgoing>
+      <bpmn:outgoing>ADM_F17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ADM_cuentas" name="Listar registro y estado de las cuentas">
+      <bpmn:documentation>SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>ADM_F03</bpmn:incoming>
+      <bpmn:outgoing>ADM_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ADM_estado_datos" name="Seleccionar cuenta y cambio de estado">
+      <bpmn:documentation>SRS-RF005, SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>ADM_F08</bpmn:incoming>
+      <bpmn:incoming>ADM_F09</bpmn:incoming>
+      <bpmn:outgoing>ADM_F04</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ADM_estado_validar" name="Validar cuenta y operación administrativa">
+      <bpmn:documentation>SRS-RF005, SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>ADM_F04</bpmn:incoming>
+      <bpmn:outgoing>ADM_F05</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ADM_estado_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ADM_F06">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ADM_F05</bpmn:incoming>
+      <bpmn:outgoing>ADM_F06</bpmn:outgoing>
+      <bpmn:outgoing>ADM_F10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ADM_estado_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF005, SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>ADM_F06</bpmn:incoming>
+      <bpmn:outgoing>ADM_F07</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ADM_estado_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF005, SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>ADM_F07</bpmn:incoming>
+      <bpmn:outgoing>ADM_F08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ADM_estado_guardar" name="Guardar estado sin borrar datos y auditar">
+      <bpmn:documentation>SRS-RF005</bpmn:documentation>
+      <bpmn:incoming>ADM_F10</bpmn:incoming>
+      <bpmn:outgoing>ADM_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="ADM_fin" name="Operación administrativa completada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ADM_F11</bpmn:incoming>
+      <bpmn:incoming>ADM_F19</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="ADM_catalogo_datos" name="Agregar, corregir o solicitar eliminar datos del catálogo">
+      <bpmn:documentation>SRS-RF028, SRS-RF029, SRS-RF030, SRS-RF031, SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>ADM_F16</bpmn:incoming>
+      <bpmn:incoming>ADM_F17</bpmn:incoming>
+      <bpmn:outgoing>ADM_F12</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ADM_catalogo_validar" name="Validar códigos, composición, herencia y uso">
+      <bpmn:documentation>SRS-RF028, SRS-RF029, SRS-RF030, SRS-RF031, SRS-RF032
+Solo variedades de color; códigos únicos; variedad asignada no se elimina; composición única por sexo; tipo de herencia del catálogo.</bpmn:documentation>
+      <bpmn:incoming>ADM_F12</bpmn:incoming>
+      <bpmn:outgoing>ADM_F13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ADM_catalogo_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ADM_F14">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ADM_F13</bpmn:incoming>
+      <bpmn:outgoing>ADM_F14</bpmn:outgoing>
+      <bpmn:outgoing>ADM_F18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="ADM_catalogo_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF028, SRS-RF029, SRS-RF030, SRS-RF031, SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>ADM_F14</bpmn:incoming>
+      <bpmn:outgoing>ADM_F15</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ADM_catalogo_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF028, SRS-RF029, SRS-RF030, SRS-RF031, SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>ADM_F15</bpmn:incoming>
+      <bpmn:outgoing>ADM_F16</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ADM_catalogo_guardar" name="Aplicar catálogo para todos los criadores y auditar">
+      <bpmn:documentation>SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>ADM_F18</bpmn:incoming>
+      <bpmn:outgoing>ADM_F19</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="ADM_F01" sourceRef="ADM_inicio" targetRef="ADM_operacion" name=""/>
+    <bpmn:sequenceFlow id="ADM_F02" sourceRef="ADM_operacion" targetRef="ADM_opcion" name=""/>
+    <bpmn:sequenceFlow id="ADM_F03" sourceRef="ADM_opcion" targetRef="ADM_cuentas" name="Cuentas">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">area = cuentas</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ADM_F04" sourceRef="ADM_estado_datos" targetRef="ADM_estado_validar" name=""/>
+    <bpmn:sequenceFlow id="ADM_F05" sourceRef="ADM_estado_validar" targetRef="ADM_estado_valido" name=""/>
+    <bpmn:sequenceFlow id="ADM_F06" sourceRef="ADM_estado_valido" targetRef="ADM_estado_error" name="No"/>
+    <bpmn:sequenceFlow id="ADM_F07" sourceRef="ADM_estado_error" targetRef="ADM_estado_corregir" name=""/>
+    <bpmn:sequenceFlow id="ADM_F08" sourceRef="ADM_estado_corregir" targetRef="ADM_estado_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="ADM_F09" sourceRef="ADM_cuentas" targetRef="ADM_estado_datos" name=""/>
+    <bpmn:sequenceFlow id="ADM_F10" sourceRef="ADM_estado_valido" targetRef="ADM_estado_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ADM_F11" sourceRef="ADM_estado_guardar" targetRef="ADM_fin" name=""/>
+    <bpmn:sequenceFlow id="ADM_F12" sourceRef="ADM_catalogo_datos" targetRef="ADM_catalogo_validar" name=""/>
+    <bpmn:sequenceFlow id="ADM_F13" sourceRef="ADM_catalogo_validar" targetRef="ADM_catalogo_valido" name=""/>
+    <bpmn:sequenceFlow id="ADM_F14" sourceRef="ADM_catalogo_valido" targetRef="ADM_catalogo_error" name="No"/>
+    <bpmn:sequenceFlow id="ADM_F15" sourceRef="ADM_catalogo_error" targetRef="ADM_catalogo_corregir" name=""/>
+    <bpmn:sequenceFlow id="ADM_F16" sourceRef="ADM_catalogo_corregir" targetRef="ADM_catalogo_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="ADM_F17" sourceRef="ADM_opcion" targetRef="ADM_catalogo_datos" name="Catálogo"/>
+    <bpmn:sequenceFlow id="ADM_F18" sourceRef="ADM_catalogo_valido" targetRef="ADM_catalogo_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ADM_F19" sourceRef="ADM_catalogo_guardar" targetRef="ADM_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_ADM">
+    <bpmn:participant id="Participant_ADM" name="TuCriadero — Administrar cuentas y catálogo" processRef="Process_ADM"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_CRU" name="Planificar y registrar un cruce">
+    <bpmndi:BPMNPlane id="Plane_CRU" bpmnElement="Collaboration_CRU">
+      <bpmndi:BPMNShape id="Participant_CRU_di" bpmnElement="Participant_CRU" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="2705"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_persona_di" bpmnElement="CRU_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="2705"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_sistema_di" bpmnElement="CRU_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="2705"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_inicio_di" bpmnElement="CRU_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_datos_di" bpmnElement="CRU_propuesta_datos">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_validar_di" bpmnElement="CRU_propuesta_validar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_valido_di" bpmnElement="CRU_propuesta_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_error_di" bpmnElement="CRU_propuesta_error">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_corregir_di" bpmnElement="CRU_propuesta_corregir">
+        <dc:Bounds x="220.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_catalogo_di" bpmnElement="CRU_catalogo">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_calcular_di" bpmnElement="CRU_calcular">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_reglas_di" bpmnElement="CRU_reglas" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="1226.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="1218" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_aviso_di" bpmnElement="CRU_aviso">
+        <dc:Bounds x="900.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_resultado_listo_di" bpmnElement="CRU_resultado_listo" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="1546.0" width="68" height="68"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_mostrar_di" bpmnElement="CRU_mostrar">
+        <dc:Bounds x="900.0" y="1682.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_revisar_di" bpmnElement="CRU_revisar">
+        <dc:Bounds x="220.0" y="1682.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_confirma_di" bpmnElement="CRU_confirma" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="1866.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="1858" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_cancelado_di" bpmnElement="CRU_cancelado">
+        <dc:Bounds x="416.0" y="2036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="240" y="2100" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_revalidar_di" bpmnElement="CRU_revalidar">
+        <dc:Bounds x="900.0" y="2002.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_confirmacion_valida_di" bpmnElement="CRU_confirmacion_valida" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="2186.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="2178" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_cambio_di" bpmnElement="CRU_cambio">
+        <dc:Bounds x="900.0" y="2322.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_guardar_di" bpmnElement="CRU_guardar">
+        <dc:Bounds x="900.0" y="2482.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_fin_di" bpmnElement="CRU_fin">
+        <dc:Bounds x="1096.0" y="2676.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="2740" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CRU_F01_di" bpmnElement="CRU_F01">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F02_di" bpmnElement="CRU_F02">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F03_di" bpmnElement="CRU_F03">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F04_di" bpmnElement="CRU_F04">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="660.0" y="780"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F05_di" bpmnElement="CRU_F05">
+        <di:waypoint x="220.0" y="780"/>
+        <di:waypoint x="125" y="780"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="686" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F06_di" bpmnElement="CRU_F06">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F07_di" bpmnElement="CRU_F07">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F08_di" bpmnElement="CRU_F08">
+        <di:waypoint x="1120" y="998.0"/>
+        <di:waypoint x="1120" y="1042.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F09_di" bpmnElement="CRU_F09">
+        <di:waypoint x="1120" y="1158.0"/>
+        <di:waypoint x="1120" y="1226.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F10_di" bpmnElement="CRU_F10">
+        <di:waypoint x="1120" y="1294.0"/>
+        <di:waypoint x="1120" y="1362.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="1313.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F11_di" bpmnElement="CRU_F11">
+        <di:waypoint x="1154.0" y="1260"/>
+        <di:waypoint x="1375" y="1260"/>
+        <di:waypoint x="1375" y="1580"/>
+        <di:waypoint x="1154.0" y="1580"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="1270" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F12_di" bpmnElement="CRU_F12">
+        <di:waypoint x="1120" y="1478.0"/>
+        <di:waypoint x="1120" y="1546.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F13_di" bpmnElement="CRU_F13">
+        <di:waypoint x="1120" y="1614.0"/>
+        <di:waypoint x="1120" y="1682.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F14_di" bpmnElement="CRU_F14">
+        <di:waypoint x="900.0" y="1740"/>
+        <di:waypoint x="660.0" y="1740"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F15_di" bpmnElement="CRU_F15">
+        <di:waypoint x="440" y="1798.0"/>
+        <di:waypoint x="440" y="1866.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F16_di" bpmnElement="CRU_F16">
+        <di:waypoint x="406.0" y="1900"/>
+        <di:waypoint x="139" y="1900"/>
+        <di:waypoint x="139" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="151" y="1806" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F17_di" bpmnElement="CRU_F17">
+        <di:waypoint x="440" y="1934.0"/>
+        <di:waypoint x="440" y="2036.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="1970.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F18_di" bpmnElement="CRU_F18">
+        <di:waypoint x="474.0" y="1900"/>
+        <di:waypoint x="710" y="1900"/>
+        <di:waypoint x="710" y="2060"/>
+        <di:waypoint x="900.0" y="2060"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600.0" y="1910" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F19_di" bpmnElement="CRU_F19">
+        <di:waypoint x="1120" y="2118.0"/>
+        <di:waypoint x="1120" y="2186.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F20_di" bpmnElement="CRU_F20">
+        <di:waypoint x="1120" y="2254.0"/>
+        <di:waypoint x="1120" y="2322.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="2273.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F21_di" bpmnElement="CRU_F21">
+        <di:waypoint x="900.0" y="2380"/>
+        <di:waypoint x="726" y="2380"/>
+        <di:waypoint x="726" y="460"/>
+        <di:waypoint x="660.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="738" y="2286" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F22_di" bpmnElement="CRU_F22">
+        <di:waypoint x="1154.0" y="2220"/>
+        <di:waypoint x="1375" y="2220"/>
+        <di:waypoint x="1375" y="2540"/>
+        <di:waypoint x="1340.0" y="2540"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="2230" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F23_di" bpmnElement="CRU_F23">
+        <di:waypoint x="1120" y="2598.0"/>
+        <di:waypoint x="1120" y="2676.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_PIC" name="Registrar pichones de un cruce">
+    <bpmndi:BPMNPlane id="Plane_PIC" bpmnElement="Collaboration_PIC">
+      <bpmndi:BPMNShape id="Participant_PIC_di" bpmnElement="Participant_PIC" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1745"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_persona_di" bpmnElement="PIC_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1745"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_sistema_di" bpmnElement="PIC_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1745"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_inicio_di" bpmnElement="PIC_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_elegir_di" bpmnElement="PIC_elegir">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_cruce_di" bpmnElement="PIC_cruce">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_datos_di" bpmnElement="PIC_anillos_datos">
+        <dc:Bounds x="220.0" y="562.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_validar_di" bpmnElement="PIC_anillos_validar">
+        <dc:Bounds x="900.0" y="562.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_valido_di" bpmnElement="PIC_anillos_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="746.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="738" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_error_di" bpmnElement="PIC_anillos_error">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_corregir_di" bpmnElement="PIC_anillos_corregir">
+        <dc:Bounds x="220.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_fichas_di" bpmnElement="PIC_fichas">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_factores_di" bpmnElement="PIC_factores">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_mostrar_di" bpmnElement="PIC_mostrar">
+        <dc:Bounds x="900.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_seguir_di" bpmnElement="PIC_seguir">
+        <dc:Bounds x="220.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_mas_di" bpmnElement="PIC_mas" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="1546.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="1538" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_fin_di" bpmnElement="PIC_fin">
+        <dc:Bounds x="416.0" y="1716.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="240" y="1780" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="PIC_F01_di" bpmnElement="PIC_F01">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F02_di" bpmnElement="PIC_F02">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F03_di" bpmnElement="PIC_F03">
+        <di:waypoint x="660.0" y="620"/>
+        <di:waypoint x="900.0" y="620"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F04_di" bpmnElement="PIC_F04">
+        <di:waypoint x="1120" y="678.0"/>
+        <di:waypoint x="1120" y="746.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F05_di" bpmnElement="PIC_F05">
+        <di:waypoint x="1120" y="814.0"/>
+        <di:waypoint x="1120" y="882.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="833.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F06_di" bpmnElement="PIC_F06">
+        <di:waypoint x="900.0" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F07_di" bpmnElement="PIC_F07">
+        <di:waypoint x="220.0" y="940"/>
+        <di:waypoint x="125" y="940"/>
+        <di:waypoint x="125" y="620"/>
+        <di:waypoint x="220.0" y="620"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="846" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F08_di" bpmnElement="PIC_F08">
+        <di:waypoint x="900.0" y="460"/>
+        <di:waypoint x="710" y="460"/>
+        <di:waypoint x="710" y="620"/>
+        <di:waypoint x="660.0" y="620"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F09_di" bpmnElement="PIC_F09">
+        <di:waypoint x="1154.0" y="780"/>
+        <di:waypoint x="1375" y="780"/>
+        <di:waypoint x="1375" y="1100"/>
+        <di:waypoint x="1340.0" y="1100"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="790" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F10_di" bpmnElement="PIC_F10">
+        <di:waypoint x="1120" y="1158.0"/>
+        <di:waypoint x="1120" y="1202.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F11_di" bpmnElement="PIC_F11">
+        <di:waypoint x="1120" y="1318.0"/>
+        <di:waypoint x="1120" y="1362.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F12_di" bpmnElement="PIC_F12">
+        <di:waypoint x="900.0" y="1420"/>
+        <di:waypoint x="660.0" y="1420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F13_di" bpmnElement="PIC_F13">
+        <di:waypoint x="440" y="1478.0"/>
+        <di:waypoint x="440" y="1546.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F14_di" bpmnElement="PIC_F14">
+        <di:waypoint x="406.0" y="1580"/>
+        <di:waypoint x="139" y="1580"/>
+        <di:waypoint x="139" y="620"/>
+        <di:waypoint x="220.0" y="620"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="151" y="1486" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F15_di" bpmnElement="PIC_F15">
+        <di:waypoint x="440" y="1614.0"/>
+        <di:waypoint x="440" y="1716.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="1650.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_FIN" name="Terminar un cruce">
+    <bpmndi:BPMNPlane id="Plane_FIN" bpmnElement="Collaboration_FIN">
+      <bpmndi:BPMNShape id="Participant_FIN_di" bpmnElement="Participant_FIN" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_persona_di" bpmnElement="FIN_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_sistema_di" bpmnElement="FIN_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_inicio_di" bpmnElement="FIN_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_datos_di" bpmnElement="FIN_cierre_datos">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_validar_di" bpmnElement="FIN_cierre_validar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_valido_di" bpmnElement="FIN_cierre_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_error_di" bpmnElement="FIN_cierre_error">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_corregir_di" bpmnElement="FIN_cierre_corregir">
+        <dc:Bounds x="220.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cerrar_di" bpmnElement="FIN_cerrar">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_historial_di" bpmnElement="FIN_historial">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_fin_di" bpmnElement="FIN_fin">
+        <dc:Bounds x="1096.0" y="1236.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="1300" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="FIN_F01_di" bpmnElement="FIN_F01">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F02_di" bpmnElement="FIN_F02">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F03_di" bpmnElement="FIN_F03">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F04_di" bpmnElement="FIN_F04">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="660.0" y="780"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F05_di" bpmnElement="FIN_F05">
+        <di:waypoint x="220.0" y="780"/>
+        <di:waypoint x="125" y="780"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="686" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F06_di" bpmnElement="FIN_F06">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F07_di" bpmnElement="FIN_F07">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F08_di" bpmnElement="FIN_F08">
+        <di:waypoint x="1120" y="998.0"/>
+        <di:waypoint x="1120" y="1042.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F09_di" bpmnElement="FIN_F09">
+        <di:waypoint x="1120" y="1158.0"/>
+        <di:waypoint x="1120" y="1236.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_JAU" name="Gestionar jaulas y ubicaciones">
+    <bpmndi:BPMNPlane id="Plane_JAU" bpmnElement="Collaboration_JAU">
+      <bpmndi:BPMNShape id="Participant_JAU_di" bpmnElement="Participant_JAU" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="2545"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_persona_di" bpmnElement="JAU_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="2545"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_sistema_di" bpmnElement="JAU_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="2545"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_inicio_di" bpmnElement="JAU_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_operacion_di" bpmnElement="JAU_operacion">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_opcion_di" bpmnElement="JAU_opcion" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_datos_di" bpmnElement="JAU_nueva_datos">
+        <dc:Bounds x="220.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_validar_di" bpmnElement="JAU_nueva_validar">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_valido_di" bpmnElement="JAU_nueva_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="906.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="898" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_error_di" bpmnElement="JAU_nueva_error">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_corregir_di" bpmnElement="JAU_nueva_corregir">
+        <dc:Bounds x="220.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_alta_di" bpmnElement="JAU_alta">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_fin_di" bpmnElement="JAU_fin">
+        <dc:Bounds x="1096.0" y="2516.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="2580" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_ubicacion_datos_di" bpmnElement="JAU_ubicacion_datos">
+        <dc:Bounds x="220.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_ubicacion_validar_di" bpmnElement="JAU_ubicacion_validar">
+        <dc:Bounds x="900.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_ubicacion_valido_di" bpmnElement="JAU_ubicacion_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="1546.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="1538" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_ubicacion_error_di" bpmnElement="JAU_ubicacion_error">
+        <dc:Bounds x="900.0" y="1682.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_ubicacion_corregir_di" bpmnElement="JAU_ubicacion_corregir">
+        <dc:Bounds x="220.0" y="1682.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_mover_di" bpmnElement="JAU_mover">
+        <dc:Bounds x="900.0" y="1842.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_seleccionar_di" bpmnElement="JAU_seleccionar">
+        <dc:Bounds x="220.0" y="2002.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_historial_di" bpmnElement="JAU_historial">
+        <dc:Bounds x="900.0" y="2162.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="JAU_F01_di" bpmnElement="JAU_F01">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F02_di" bpmnElement="JAU_F02">
+        <di:waypoint x="440" y="518.0"/>
+        <di:waypoint x="440" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F03_di" bpmnElement="JAU_F03">
+        <di:waypoint x="660.0" y="780"/>
+        <di:waypoint x="900.0" y="780"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F04_di" bpmnElement="JAU_F04">
+        <di:waypoint x="1120" y="838.0"/>
+        <di:waypoint x="1120" y="906.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F05_di" bpmnElement="JAU_F05">
+        <di:waypoint x="1120" y="974.0"/>
+        <di:waypoint x="1120" y="1042.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="993.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F06_di" bpmnElement="JAU_F06">
+        <di:waypoint x="900.0" y="1100"/>
+        <di:waypoint x="660.0" y="1100"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F07_di" bpmnElement="JAU_F07">
+        <di:waypoint x="220.0" y="1100"/>
+        <di:waypoint x="125" y="1100"/>
+        <di:waypoint x="125" y="780"/>
+        <di:waypoint x="220.0" y="780"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1006" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F08_di" bpmnElement="JAU_F08">
+        <di:waypoint x="440" y="654.0"/>
+        <di:waypoint x="440" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F09_di" bpmnElement="JAU_F09">
+        <di:waypoint x="1154.0" y="940"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1375" y="1260"/>
+        <di:waypoint x="1340.0" y="1260"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="950" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F10_di" bpmnElement="JAU_F10">
+        <di:waypoint x="1340.0" y="1260"/>
+        <di:waypoint x="1389" y="1260"/>
+        <di:waypoint x="1389" y="2540"/>
+        <di:waypoint x="1144.0" y="2540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F11_di" bpmnElement="JAU_F11">
+        <di:waypoint x="660.0" y="1420"/>
+        <di:waypoint x="900.0" y="1420"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F12_di" bpmnElement="JAU_F12">
+        <di:waypoint x="1120" y="1478.0"/>
+        <di:waypoint x="1120" y="1546.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F13_di" bpmnElement="JAU_F13">
+        <di:waypoint x="1120" y="1614.0"/>
+        <di:waypoint x="1120" y="1682.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="1633.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F14_di" bpmnElement="JAU_F14">
+        <di:waypoint x="900.0" y="1740"/>
+        <di:waypoint x="660.0" y="1740"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F15_di" bpmnElement="JAU_F15">
+        <di:waypoint x="220.0" y="1740"/>
+        <di:waypoint x="125" y="1740"/>
+        <di:waypoint x="125" y="1420"/>
+        <di:waypoint x="220.0" y="1420"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1646" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F16_di" bpmnElement="JAU_F16">
+        <di:waypoint x="406.0" y="620"/>
+        <di:waypoint x="139" y="620"/>
+        <di:waypoint x="139" y="1420"/>
+        <di:waypoint x="220.0" y="1420"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="280.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F17_di" bpmnElement="JAU_F17">
+        <di:waypoint x="1154.0" y="1580"/>
+        <di:waypoint x="1375" y="1580"/>
+        <di:waypoint x="1375" y="1900"/>
+        <di:waypoint x="1340.0" y="1900"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="1590" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F18_di" bpmnElement="JAU_F18">
+        <di:waypoint x="1340.0" y="1900"/>
+        <di:waypoint x="1403" y="1900"/>
+        <di:waypoint x="1403" y="2540"/>
+        <di:waypoint x="1144.0" y="2540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F19_di" bpmnElement="JAU_F19">
+        <di:waypoint x="474.0" y="620"/>
+        <di:waypoint x="710" y="620"/>
+        <di:waypoint x="710" y="2060"/>
+        <di:waypoint x="660.0" y="2060"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600.0" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F20_di" bpmnElement="JAU_F20">
+        <di:waypoint x="660.0" y="2060"/>
+        <di:waypoint x="726" y="2060"/>
+        <di:waypoint x="726" y="2220"/>
+        <di:waypoint x="900.0" y="2220"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F21_di" bpmnElement="JAU_F21">
+        <di:waypoint x="1120" y="2278.0"/>
+        <di:waypoint x="1120" y="2516.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_CAN" name="Registrar y actualizar canarios">
+    <bpmndi:BPMNPlane id="Plane_CAN" bpmnElement="Collaboration_CAN">
+      <bpmndi:BPMNShape id="Participant_CAN_di" bpmnElement="Participant_CAN" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1585"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_persona_di" bpmnElement="CAN_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1585"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_sistema_di" bpmnElement="CAN_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1585"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_inicio_di" bpmnElement="CAN_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_datos_di" bpmnElement="CAN_ficha_datos">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_validar_di" bpmnElement="CAN_ficha_validar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_valido_di" bpmnElement="CAN_ficha_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_error_di" bpmnElement="CAN_ficha_error">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_corregir_di" bpmnElement="CAN_ficha_corregir">
+        <dc:Bounds x="220.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_guardar_di" bpmnElement="CAN_guardar">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_manifestados_di" bpmnElement="CAN_manifestados">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_deducidos_di" bpmnElement="CAN_deducidos">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_mostrar_di" bpmnElement="CAN_mostrar">
+        <dc:Bounds x="900.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_fin_di" bpmnElement="CAN_fin">
+        <dc:Bounds x="1096.0" y="1556.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="1620" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAN_F01_di" bpmnElement="CAN_F01">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F02_di" bpmnElement="CAN_F02">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F03_di" bpmnElement="CAN_F03">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F04_di" bpmnElement="CAN_F04">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="660.0" y="780"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F05_di" bpmnElement="CAN_F05">
+        <di:waypoint x="220.0" y="780"/>
+        <di:waypoint x="125" y="780"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="686" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F06_di" bpmnElement="CAN_F06">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F07_di" bpmnElement="CAN_F07">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F08_di" bpmnElement="CAN_F08">
+        <di:waypoint x="1120" y="998.0"/>
+        <di:waypoint x="1120" y="1042.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F09_di" bpmnElement="CAN_F09">
+        <di:waypoint x="1120" y="1158.0"/>
+        <di:waypoint x="1120" y="1202.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F10_di" bpmnElement="CAN_F10">
+        <di:waypoint x="1120" y="1318.0"/>
+        <di:waypoint x="1120" y="1362.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F11_di" bpmnElement="CAN_F11">
+        <di:waypoint x="1120" y="1478.0"/>
+        <di:waypoint x="1120" y="1556.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_BUS" name="Buscar y consultar genealogía">
+    <bpmndi:BPMNPlane id="Plane_BUS" bpmnElement="Collaboration_BUS">
+      <bpmndi:BPMNShape id="Participant_BUS_di" bpmnElement="Participant_BUS" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1425"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_persona_di" bpmnElement="BUS_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1425"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_sistema_di" bpmnElement="BUS_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1425"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_inicio_di" bpmnElement="BUS_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_consulta_di" bpmnElement="BUS_consulta">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_buscar_di" bpmnElement="BUS_buscar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_coincidencias_di" bpmnElement="BUS_coincidencias" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_sin_resultados_di" bpmnElement="BUS_sin_resultados">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_resultados_di" bpmnElement="BUS_resultados">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_seguir_di" bpmnElement="BUS_seguir">
+        <dc:Bounds x="220.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_continuar_di" bpmnElement="BUS_continuar" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="1066.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="1058" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_seleccionar_di" bpmnElement="BUS_seleccionar">
+        <dc:Bounds x="220.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_ficha_di" bpmnElement="BUS_ficha">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_fin_di" bpmnElement="BUS_fin">
+        <dc:Bounds x="416.0" y="1396.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="240" y="1460" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BUS_F01_di" bpmnElement="BUS_F01">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F02_di" bpmnElement="BUS_F02">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F03_di" bpmnElement="BUS_F03">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F04_di" bpmnElement="BUS_F04">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F05_di" bpmnElement="BUS_F05">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F06_di" bpmnElement="BUS_F06">
+        <di:waypoint x="900.0" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F07_di" bpmnElement="BUS_F07">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="710" y="780"/>
+        <di:waypoint x="710" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F08_di" bpmnElement="BUS_F08">
+        <di:waypoint x="440" y="998.0"/>
+        <di:waypoint x="440" y="1066.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F09_di" bpmnElement="BUS_F09">
+        <di:waypoint x="440" y="1134.0"/>
+        <di:waypoint x="440" y="1202.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="1153.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F10_di" bpmnElement="BUS_F10">
+        <di:waypoint x="660.0" y="1260"/>
+        <di:waypoint x="900.0" y="1260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F11_di" bpmnElement="BUS_F11">
+        <di:waypoint x="900.0" y="1260"/>
+        <di:waypoint x="726" y="1260"/>
+        <di:waypoint x="726" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F12_di" bpmnElement="BUS_F12">
+        <di:waypoint x="406.0" y="1100"/>
+        <di:waypoint x="125" y="1100"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1006" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F13_di" bpmnElement="BUS_F13">
+        <di:waypoint x="406.0" y="1100"/>
+        <di:waypoint x="139" y="1100"/>
+        <di:waypoint x="139" y="1420"/>
+        <di:waypoint x="416.0" y="1420"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="280.5" y="1110" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_BAJ" name="Dar de baja un canario">
+    <bpmndi:BPMNPlane id="Plane_BAJ" bpmnElement="Collaboration_BAJ">
+      <bpmndi:BPMNShape id="Participant_BAJ_di" bpmnElement="Participant_BAJ" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_persona_di" bpmnElement="BAJ_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_sistema_di" bpmnElement="BAJ_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_inicio_di" bpmnElement="BAJ_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_datos_di" bpmnElement="BAJ_baja_datos">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_validar_di" bpmnElement="BAJ_baja_validar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_valido_di" bpmnElement="BAJ_baja_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_error_di" bpmnElement="BAJ_baja_error">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_corregir_di" bpmnElement="BAJ_baja_corregir">
+        <dc:Bounds x="220.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_guardar_di" bpmnElement="BAJ_guardar">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_conservar_di" bpmnElement="BAJ_conservar">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_fin_di" bpmnElement="BAJ_fin">
+        <dc:Bounds x="1096.0" y="1236.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="1300" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BAJ_F01_di" bpmnElement="BAJ_F01">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F02_di" bpmnElement="BAJ_F02">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F03_di" bpmnElement="BAJ_F03">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F04_di" bpmnElement="BAJ_F04">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="660.0" y="780"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F05_di" bpmnElement="BAJ_F05">
+        <di:waypoint x="220.0" y="780"/>
+        <di:waypoint x="125" y="780"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="686" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F06_di" bpmnElement="BAJ_F06">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F07_di" bpmnElement="BAJ_F07">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F08_di" bpmnElement="BAJ_F08">
+        <di:waypoint x="1120" y="998.0"/>
+        <di:waypoint x="1120" y="1042.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F09_di" bpmnElement="BAJ_F09">
+        <di:waypoint x="1120" y="1158.0"/>
+        <di:waypoint x="1120" y="1236.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_ACC" name="Acceder al criadero y completar el perfil">
+    <bpmndi:BPMNPlane id="Plane_ACC" bpmnElement="Collaboration_ACC">
+      <bpmndi:BPMNShape id="Participant_ACC_di" bpmnElement="Participant_ACC" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="2705"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_persona_di" bpmnElement="ACC_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="2705"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_sistema_di" bpmnElement="ACC_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="2705"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_inicio_di" bpmnElement="ACC_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_cuenta_di" bpmnElement="ACC_cuenta" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="426.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="418" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_datos_di" bpmnElement="ACC_registro_datos">
+        <dc:Bounds x="220.0" y="562.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_validar_di" bpmnElement="ACC_registro_validar">
+        <dc:Bounds x="900.0" y="562.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_valido_di" bpmnElement="ACC_registro_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="746.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="738" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_error_di" bpmnElement="ACC_registro_error">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_corregir_di" bpmnElement="ACC_registro_corregir">
+        <dc:Bounds x="220.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_crear_di" bpmnElement="ACC_crear">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_datos_di" bpmnElement="ACC_ingreso_datos">
+        <dc:Bounds x="220.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_validar_di" bpmnElement="ACC_ingreso_validar">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_valido_di" bpmnElement="ACC_ingreso_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="1386.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="1378" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_error_di" bpmnElement="ACC_ingreso_error">
+        <dc:Bounds x="900.0" y="1522.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_corregir_di" bpmnElement="ACC_ingreso_corregir">
+        <dc:Bounds x="220.0" y="1522.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_sesion_di" bpmnElement="ACC_sesion">
+        <dc:Bounds x="900.0" y="1682.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_opcion_di" bpmnElement="ACC_perfil_opcion">
+        <dc:Bounds x="220.0" y="1682.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_di" bpmnElement="ACC_perfil" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="1866.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="1858" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_editar_datos_di" bpmnElement="ACC_editar_datos">
+        <dc:Bounds x="220.0" y="2002.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_editar_validar_di" bpmnElement="ACC_editar_validar">
+        <dc:Bounds x="900.0" y="2002.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_editar_valido_di" bpmnElement="ACC_editar_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="2186.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="2178" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_editar_error_di" bpmnElement="ACC_editar_error">
+        <dc:Bounds x="900.0" y="2322.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_editar_corregir_di" bpmnElement="ACC_editar_corregir">
+        <dc:Bounds x="220.0" y="2322.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_guardar_perfil_di" bpmnElement="ACC_guardar_perfil">
+        <dc:Bounds x="900.0" y="2482.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_fin_di" bpmnElement="ACC_fin">
+        <dc:Bounds x="1096.0" y="2676.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="2740" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ACC_F01_di" bpmnElement="ACC_F01">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="426.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F02_di" bpmnElement="ACC_F02">
+        <di:waypoint x="660.0" y="620"/>
+        <di:waypoint x="900.0" y="620"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F03_di" bpmnElement="ACC_F03">
+        <di:waypoint x="1120" y="678.0"/>
+        <di:waypoint x="1120" y="746.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F04_di" bpmnElement="ACC_F04">
+        <di:waypoint x="1120" y="814.0"/>
+        <di:waypoint x="1120" y="882.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="833.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F05_di" bpmnElement="ACC_F05">
+        <di:waypoint x="900.0" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F06_di" bpmnElement="ACC_F06">
+        <di:waypoint x="220.0" y="940"/>
+        <di:waypoint x="125" y="940"/>
+        <di:waypoint x="125" y="620"/>
+        <di:waypoint x="220.0" y="620"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="846" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F07_di" bpmnElement="ACC_F07">
+        <di:waypoint x="440" y="494.0"/>
+        <di:waypoint x="440" y="562.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="513.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F08_di" bpmnElement="ACC_F08">
+        <di:waypoint x="1154.0" y="780"/>
+        <di:waypoint x="1375" y="780"/>
+        <di:waypoint x="1375" y="1100"/>
+        <di:waypoint x="1340.0" y="1100"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="790" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F09_di" bpmnElement="ACC_F09">
+        <di:waypoint x="660.0" y="1260"/>
+        <di:waypoint x="900.0" y="1260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F10_di" bpmnElement="ACC_F10">
+        <di:waypoint x="1120" y="1318.0"/>
+        <di:waypoint x="1120" y="1386.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F11_di" bpmnElement="ACC_F11">
+        <di:waypoint x="1120" y="1454.0"/>
+        <di:waypoint x="1120" y="1522.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="1473.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F12_di" bpmnElement="ACC_F12">
+        <di:waypoint x="900.0" y="1580"/>
+        <di:waypoint x="660.0" y="1580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F13_di" bpmnElement="ACC_F13">
+        <di:waypoint x="220.0" y="1580"/>
+        <di:waypoint x="125" y="1580"/>
+        <di:waypoint x="125" y="1260"/>
+        <di:waypoint x="220.0" y="1260"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1486" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F14_di" bpmnElement="ACC_F14">
+        <di:waypoint x="900.0" y="1100"/>
+        <di:waypoint x="710" y="1100"/>
+        <di:waypoint x="710" y="1260"/>
+        <di:waypoint x="660.0" y="1260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F15_di" bpmnElement="ACC_F15">
+        <di:waypoint x="406.0" y="460"/>
+        <di:waypoint x="139" y="460"/>
+        <di:waypoint x="139" y="1260"/>
+        <di:waypoint x="220.0" y="1260"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="280.5" y="470" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F16_di" bpmnElement="ACC_F16">
+        <di:waypoint x="1154.0" y="1420"/>
+        <di:waypoint x="1375" y="1420"/>
+        <di:waypoint x="1375" y="1740"/>
+        <di:waypoint x="1340.0" y="1740"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="1430" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F17_di" bpmnElement="ACC_F17">
+        <di:waypoint x="900.0" y="1740"/>
+        <di:waypoint x="660.0" y="1740"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F18_di" bpmnElement="ACC_F18">
+        <di:waypoint x="440" y="1798.0"/>
+        <di:waypoint x="440" y="1866.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F19_di" bpmnElement="ACC_F19">
+        <di:waypoint x="660.0" y="2060"/>
+        <di:waypoint x="900.0" y="2060"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F20_di" bpmnElement="ACC_F20">
+        <di:waypoint x="1120" y="2118.0"/>
+        <di:waypoint x="1120" y="2186.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F21_di" bpmnElement="ACC_F21">
+        <di:waypoint x="1120" y="2254.0"/>
+        <di:waypoint x="1120" y="2322.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="2273.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F22_di" bpmnElement="ACC_F22">
+        <di:waypoint x="900.0" y="2380"/>
+        <di:waypoint x="660.0" y="2380"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F23_di" bpmnElement="ACC_F23">
+        <di:waypoint x="220.0" y="2380"/>
+        <di:waypoint x="125" y="2380"/>
+        <di:waypoint x="125" y="2060"/>
+        <di:waypoint x="220.0" y="2060"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="2286" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F24_di" bpmnElement="ACC_F24">
+        <di:waypoint x="440" y="1934.0"/>
+        <di:waypoint x="440" y="2002.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="1953.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F25_di" bpmnElement="ACC_F25">
+        <di:waypoint x="1154.0" y="2220"/>
+        <di:waypoint x="1375" y="2220"/>
+        <di:waypoint x="1375" y="2540"/>
+        <di:waypoint x="1340.0" y="2540"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="2230" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F26_di" bpmnElement="ACC_F26">
+        <di:waypoint x="1120" y="2598.0"/>
+        <di:waypoint x="1120" y="2676.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F27_di" bpmnElement="ACC_F27">
+        <di:waypoint x="474.0" y="1900"/>
+        <di:waypoint x="710" y="1900"/>
+        <di:waypoint x="710" y="2700"/>
+        <di:waypoint x="1096.0" y="2700"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600.0" y="1910" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_ADM" name="Administrar cuentas y catálogo">
+    <bpmndi:BPMNPlane id="Plane_ADM" bpmnElement="Collaboration_ADM">
+      <bpmndi:BPMNShape id="Participant_ADM_di" bpmnElement="Participant_ADM" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="2225"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_persona_di" bpmnElement="ADM_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="2225"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_sistema_di" bpmnElement="ADM_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="2225"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_inicio_di" bpmnElement="ADM_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_operacion_di" bpmnElement="ADM_operacion">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_opcion_di" bpmnElement="ADM_opcion" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_cuentas_di" bpmnElement="ADM_cuentas">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_estado_datos_di" bpmnElement="ADM_estado_datos">
+        <dc:Bounds x="220.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_estado_validar_di" bpmnElement="ADM_estado_validar">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_estado_valido_di" bpmnElement="ADM_estado_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="1066.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="1058" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_estado_error_di" bpmnElement="ADM_estado_error">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_estado_corregir_di" bpmnElement="ADM_estado_corregir">
+        <dc:Bounds x="220.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_estado_guardar_di" bpmnElement="ADM_estado_guardar">
+        <dc:Bounds x="900.0" y="1362.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_fin_di" bpmnElement="ADM_fin">
+        <dc:Bounds x="1096.0" y="2196.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="2260" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_catalogo_datos_di" bpmnElement="ADM_catalogo_datos">
+        <dc:Bounds x="220.0" y="1522.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_catalogo_validar_di" bpmnElement="ADM_catalogo_validar">
+        <dc:Bounds x="900.0" y="1522.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_catalogo_valido_di" bpmnElement="ADM_catalogo_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="1706.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="1698" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_catalogo_error_di" bpmnElement="ADM_catalogo_error">
+        <dc:Bounds x="900.0" y="1842.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_catalogo_corregir_di" bpmnElement="ADM_catalogo_corregir">
+        <dc:Bounds x="220.0" y="1842.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ADM_catalogo_guardar_di" bpmnElement="ADM_catalogo_guardar">
+        <dc:Bounds x="900.0" y="2002.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ADM_F01_di" bpmnElement="ADM_F01">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F02_di" bpmnElement="ADM_F02">
+        <di:waypoint x="440" y="518.0"/>
+        <di:waypoint x="440" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F03_di" bpmnElement="ADM_F03">
+        <di:waypoint x="474.0" y="620"/>
+        <di:waypoint x="710" y="620"/>
+        <di:waypoint x="710" y="780"/>
+        <di:waypoint x="900.0" y="780"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600.0" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F04_di" bpmnElement="ADM_F04">
+        <di:waypoint x="660.0" y="940"/>
+        <di:waypoint x="900.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F05_di" bpmnElement="ADM_F05">
+        <di:waypoint x="1120" y="998.0"/>
+        <di:waypoint x="1120" y="1066.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F06_di" bpmnElement="ADM_F06">
+        <di:waypoint x="1120" y="1134.0"/>
+        <di:waypoint x="1120" y="1202.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="1153.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F07_di" bpmnElement="ADM_F07">
+        <di:waypoint x="900.0" y="1260"/>
+        <di:waypoint x="660.0" y="1260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F08_di" bpmnElement="ADM_F08">
+        <di:waypoint x="220.0" y="1260"/>
+        <di:waypoint x="125" y="1260"/>
+        <di:waypoint x="125" y="940"/>
+        <di:waypoint x="220.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1166" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F09_di" bpmnElement="ADM_F09">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="726" y="780"/>
+        <di:waypoint x="726" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F10_di" bpmnElement="ADM_F10">
+        <di:waypoint x="1154.0" y="1100"/>
+        <di:waypoint x="1375" y="1100"/>
+        <di:waypoint x="1375" y="1420"/>
+        <di:waypoint x="1340.0" y="1420"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="1110" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F11_di" bpmnElement="ADM_F11">
+        <di:waypoint x="1340.0" y="1420"/>
+        <di:waypoint x="1389" y="1420"/>
+        <di:waypoint x="1389" y="2220"/>
+        <di:waypoint x="1144.0" y="2220"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F12_di" bpmnElement="ADM_F12">
+        <di:waypoint x="660.0" y="1580"/>
+        <di:waypoint x="900.0" y="1580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F13_di" bpmnElement="ADM_F13">
+        <di:waypoint x="1120" y="1638.0"/>
+        <di:waypoint x="1120" y="1706.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F14_di" bpmnElement="ADM_F14">
+        <di:waypoint x="1120" y="1774.0"/>
+        <di:waypoint x="1120" y="1842.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="1793.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F15_di" bpmnElement="ADM_F15">
+        <di:waypoint x="900.0" y="1900"/>
+        <di:waypoint x="660.0" y="1900"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F16_di" bpmnElement="ADM_F16">
+        <di:waypoint x="220.0" y="1900"/>
+        <di:waypoint x="125" y="1900"/>
+        <di:waypoint x="125" y="1580"/>
+        <di:waypoint x="220.0" y="1580"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1806" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F17_di" bpmnElement="ADM_F17">
+        <di:waypoint x="406.0" y="620"/>
+        <di:waypoint x="139" y="620"/>
+        <di:waypoint x="139" y="1580"/>
+        <di:waypoint x="220.0" y="1580"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="280.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F18_di" bpmnElement="ADM_F18">
+        <di:waypoint x="1154.0" y="1740"/>
+        <di:waypoint x="1375" y="1740"/>
+        <di:waypoint x="1375" y="2060"/>
+        <di:waypoint x="1340.0" y="2060"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="1750" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ADM_F19_di" bpmnElement="ADM_F19">
+        <di:waypoint x="1120" y="2118.0"/>
+        <di:waypoint x="1120" y="2196.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -12,6 +12,7 @@ Nombre oficial del producto: **TuCriadero**.
 | [`docs/backend.md`](docs/backend.md) | Backend: modelo de datos, reglas, cálculo genético y seguridad. |
 | [`docs/frontend.md`](docs/frontend.md) | Frontend: pantallas, mensajes, experiencia de uso en el teléfono. |
 | [`docs/contrato-back-front.md`](docs/contrato-back-front.md) | Backend y frontend: rutas, datos que recibe cada vista, campos de cada formulario y errores. **Preliminar:** se acuerda en la épica E0. |
+| [`docs/bpmn/`](docs/bpmn/) | Todos: nueve procesos BPMN 2.0, archivos editables, vistas vectoriales y trazabilidad al SRS. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Todos: ramas, commits, pull requests y cómo cerrar un issue. |
 
 ## Stack

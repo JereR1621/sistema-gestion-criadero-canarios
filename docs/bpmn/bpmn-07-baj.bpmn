@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="1.0">
+  <bpmn:process id="Process_BAJ" name="Dar de baja un canario" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. La ficha seleccionada pertenece al propio criadero (RF003).
+Motivos: venta, muerte u otra salida del criadero; fecha y motivo obligatorios (RF011). No se incorpora un módulo de cobros ni una eliminación física de la ficha.
+La baja y el cambio de estado se guardan en la misma operación. Se excluye al canario de listados de activos, conservando genealogía y búsqueda por anillo (DAT-004, RF023).</bpmn:documentation>
+    <bpmn:laneSet id="BAJ_lanes">
+      <bpmn:lane id="BAJ_persona" name="Criador">
+        <bpmn:flowNodeRef>BAJ_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_corregir</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="BAJ_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>BAJ_baja_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_baja_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_conservar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BAJ_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="BAJ_inicio" name="Registrar una salida del criadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>BAJ_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="BAJ_baja_datos" name="Abrir el canario e indicar motivo y fecha de baja">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F05</bpmn:incoming>
+      <bpmn:incoming>BAJ_F06</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BAJ_baja_validar" name="Validar canario, criadero, motivo y fecha">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F01</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="BAJ_baja_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="BAJ_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BAJ_F02</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F03</bpmn:outgoing>
+      <bpmn:outgoing>BAJ_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="BAJ_baja_error" name="Mostrar los errores sin guardar cambios">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F03</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="BAJ_baja_corregir" name="Corregir los datos del formulario">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F04</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F05</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BAJ_guardar" name="Registrar baja y actualizar estado en una operación">
+      <bpmn:documentation>SRS-RF011</bpmn:documentation>
+      <bpmn:incoming>BAJ_F07</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="BAJ_conservar" name="Auditar; conservar ficha y genealogía para consultas">
+      <bpmn:documentation>SRS-RF011, SRS-RF023, SRS-RF024</bpmn:documentation>
+      <bpmn:incoming>BAJ_F08</bpmn:incoming>
+      <bpmn:outgoing>BAJ_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="BAJ_fin" name="Baja registrada; historia conservada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BAJ_F09</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="BAJ_F01" sourceRef="BAJ_baja_datos" targetRef="BAJ_baja_validar" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F02" sourceRef="BAJ_baja_validar" targetRef="BAJ_baja_valido" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F03" sourceRef="BAJ_baja_valido" targetRef="BAJ_baja_error" name="No"/>
+    <bpmn:sequenceFlow id="BAJ_F04" sourceRef="BAJ_baja_error" targetRef="BAJ_baja_corregir" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F05" sourceRef="BAJ_baja_corregir" targetRef="BAJ_baja_datos" name="Reintentar"/>
+    <bpmn:sequenceFlow id="BAJ_F06" sourceRef="BAJ_inicio" targetRef="BAJ_baja_datos" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F07" sourceRef="BAJ_baja_valido" targetRef="BAJ_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BAJ_F08" sourceRef="BAJ_guardar" targetRef="BAJ_conservar" name=""/>
+    <bpmn:sequenceFlow id="BAJ_F09" sourceRef="BAJ_conservar" targetRef="BAJ_fin" name=""/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_BAJ">
+    <bpmn:participant id="Participant_BAJ" name="TuCriadero — Dar de baja un canario" processRef="Process_BAJ"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_BAJ" name="Dar de baja un canario">
+    <bpmndi:BPMNPlane id="Plane_BAJ" bpmnElement="Collaboration_BAJ">
+      <bpmndi:BPMNShape id="Participant_BAJ_di" bpmnElement="Participant_BAJ" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_persona_di" bpmnElement="BAJ_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_sistema_di" bpmnElement="BAJ_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1265"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_inicio_di" bpmnElement="BAJ_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_datos_di" bpmnElement="BAJ_baja_datos">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_validar_di" bpmnElement="BAJ_baja_validar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_valido_di" bpmnElement="BAJ_baja_valido" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_error_di" bpmnElement="BAJ_baja_error">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_baja_corregir_di" bpmnElement="BAJ_baja_corregir">
+        <dc:Bounds x="220.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_guardar_di" bpmnElement="BAJ_guardar">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_conservar_di" bpmnElement="BAJ_conservar">
+        <dc:Bounds x="900.0" y="1042.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BAJ_fin_di" bpmnElement="BAJ_fin">
+        <dc:Bounds x="1096.0" y="1236.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="920" y="1300" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BAJ_F01_di" bpmnElement="BAJ_F01">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F02_di" bpmnElement="BAJ_F02">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F03_di" bpmnElement="BAJ_F03">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F04_di" bpmnElement="BAJ_F04">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="660.0" y="780"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F05_di" bpmnElement="BAJ_F05">
+        <di:waypoint x="220.0" y="780"/>
+        <di:waypoint x="125" y="780"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="686" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F06_di" bpmnElement="BAJ_F06">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F07_di" bpmnElement="BAJ_F07">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F08_di" bpmnElement="BAJ_F08">
+        <di:waypoint x="1120" y="998.0"/>
+        <di:waypoint x="1120" y="1042.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BAJ_F09_di" bpmnElement="BAJ_F09">
+        <di:waypoint x="1120" y="1158.0"/>
+        <di:waypoint x="1120" y="1236.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

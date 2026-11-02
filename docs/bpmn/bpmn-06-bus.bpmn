@@ -1,0 +1,241 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="1.0">
+  <bpmn:process id="Process_BUS" name="Buscar y consultar genealogía" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. Todas las búsquedas y enlaces se filtran por el criadero de la sesión; un ID ajeno se trata como no disponible sin revelar datos (RF003).
+Por anillo se incluyen canarios dados de baja; por variedad solo activos. Por jaula se muestran ocupantes actuales y cruce activo (RF023, RF025, RF026).
+La ficha enlaza padres, hermanos, medios hermanos, crías y cruces. Cada cruce abre su ficha de cría con macho, hembra y pichones (RF024, RF027).</bpmn:documentation>
+    <bpmn:laneSet id="BUS_lanes">
+      <bpmn:lane id="BUS_persona" name="Criador">
+        <bpmn:flowNodeRef>BUS_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_consulta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_seguir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_continuar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_seleccionar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="BUS_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>BUS_buscar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_coincidencias</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_sin_resultados</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_resultados</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BUS_ficha</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="BUS_inicio" name="Consultar el criadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>BUS_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="BUS_consulta" name="Elegir anillo, variedad o jaula e ingresar la búsqueda">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F01</bpmn:incoming>
+      <bpmn:incoming>BUS_F12</bpmn:incoming>
+      <bpmn:outgoing>BUS_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BUS_buscar" name="Buscar en el criadero según el criterio elegido">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F02</bpmn:incoming>
+      <bpmn:outgoing>BUS_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="BUS_coincidencias" name="¿Hay coincidencias?" gatewayDirection="Diverging" default="BUS_F04">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BUS_F03</bpmn:incoming>
+      <bpmn:outgoing>BUS_F04</bpmn:outgoing>
+      <bpmn:outgoing>BUS_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="BUS_sin_resultados" name="Informar que no hay resultados disponibles">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F04</bpmn:incoming>
+      <bpmn:outgoing>BUS_F07</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="BUS_resultados" name="Mostrar ficha o coincidencias con identificación">
+      <bpmn:documentation>SRS-RF023, SRS-RF025, SRS-RF026</bpmn:documentation>
+      <bpmn:incoming>BUS_F05</bpmn:incoming>
+      <bpmn:outgoing>BUS_F06</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="BUS_seguir" name="Revisar el resultado y elegir cómo continuar">
+      <bpmn:documentation>SRS-RF023, SRS-RF024, SRS-RF025, SRS-RF026, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>BUS_F06</bpmn:incoming>
+      <bpmn:incoming>BUS_F07</bpmn:incoming>
+      <bpmn:incoming>BUS_F11</bpmn:incoming>
+      <bpmn:outgoing>BUS_F08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="BUS_continuar" name="¿Cómo continúa?" gatewayDirection="Diverging" default="BUS_F13">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BUS_F08</bpmn:incoming>
+      <bpmn:outgoing>BUS_F09</bpmn:outgoing>
+      <bpmn:outgoing>BUS_F12</bpmn:outgoing>
+      <bpmn:outgoing>BUS_F13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="BUS_seleccionar" name="Elegir un resultado o un enlace de la ficha">
+      <bpmn:documentation>SRS-RF024, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>BUS_F09</bpmn:incoming>
+      <bpmn:outgoing>BUS_F10</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="BUS_ficha" name="Mostrar la ficha autorizada del registro elegido">
+      <bpmn:documentation>SRS-RF024, SRS-RF026, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>BUS_F10</bpmn:incoming>
+      <bpmn:outgoing>BUS_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="BUS_fin" name="Consulta terminada; sin modificar datos">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>BUS_F13</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="BUS_F01" sourceRef="BUS_inicio" targetRef="BUS_consulta" name=""/>
+    <bpmn:sequenceFlow id="BUS_F02" sourceRef="BUS_consulta" targetRef="BUS_buscar" name=""/>
+    <bpmn:sequenceFlow id="BUS_F03" sourceRef="BUS_buscar" targetRef="BUS_coincidencias" name=""/>
+    <bpmn:sequenceFlow id="BUS_F04" sourceRef="BUS_coincidencias" targetRef="BUS_sin_resultados" name="No"/>
+    <bpmn:sequenceFlow id="BUS_F05" sourceRef="BUS_coincidencias" targetRef="BUS_resultados" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">hay_coincidencias</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BUS_F06" sourceRef="BUS_resultados" targetRef="BUS_seguir" name=""/>
+    <bpmn:sequenceFlow id="BUS_F07" sourceRef="BUS_sin_resultados" targetRef="BUS_seguir" name=""/>
+    <bpmn:sequenceFlow id="BUS_F08" sourceRef="BUS_seguir" targetRef="BUS_continuar" name=""/>
+    <bpmn:sequenceFlow id="BUS_F09" sourceRef="BUS_continuar" targetRef="BUS_seleccionar" name="Abrir enlace">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">accion = enlace y hay_resultados</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BUS_F10" sourceRef="BUS_seleccionar" targetRef="BUS_ficha" name=""/>
+    <bpmn:sequenceFlow id="BUS_F11" sourceRef="BUS_ficha" targetRef="BUS_seguir" name=""/>
+    <bpmn:sequenceFlow id="BUS_F12" sourceRef="BUS_continuar" targetRef="BUS_consulta" name="Buscar otra vez">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">accion = buscar</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="BUS_F13" sourceRef="BUS_continuar" targetRef="BUS_fin" name="Finalizar"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_BUS">
+    <bpmn:participant id="Participant_BUS" name="TuCriadero — Buscar y consultar genealogía" processRef="Process_BUS"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_BUS" name="Buscar y consultar genealogía">
+    <bpmndi:BPMNPlane id="Plane_BUS" bpmnElement="Collaboration_BUS">
+      <bpmndi:BPMNShape id="Participant_BUS_di" bpmnElement="Participant_BUS" isHorizontal="true">
+        <dc:Bounds x="40" y="150" width="1420" height="1425"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_persona_di" bpmnElement="BUS_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="690" height="1425"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_sistema_di" bpmnElement="BUS_sistema" isHorizontal="false">
+        <dc:Bounds x="790" y="150" width="670" height="1425"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_inicio_di" bpmnElement="BUS_inicio">
+        <dc:Bounds x="416.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478.0" y="258" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_consulta_di" bpmnElement="BUS_consulta">
+        <dc:Bounds x="220.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_buscar_di" bpmnElement="BUS_buscar">
+        <dc:Bounds x="900.0" y="402.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_coincidencias_di" bpmnElement="BUS_coincidencias" isMarkerVisible="true">
+        <dc:Bounds x="1086.0" y="586.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168.0" y="578" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_sin_resultados_di" bpmnElement="BUS_sin_resultados">
+        <dc:Bounds x="900.0" y="722.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_resultados_di" bpmnElement="BUS_resultados">
+        <dc:Bounds x="900.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_seguir_di" bpmnElement="BUS_seguir">
+        <dc:Bounds x="220.0" y="882.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_continuar_di" bpmnElement="BUS_continuar" isMarkerVisible="true">
+        <dc:Bounds x="406.0" y="1066.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488.0" y="1058" width="285" height="80"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_seleccionar_di" bpmnElement="BUS_seleccionar">
+        <dc:Bounds x="220.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_ficha_di" bpmnElement="BUS_ficha">
+        <dc:Bounds x="900.0" y="1202.0" width="440" height="116"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BUS_fin_di" bpmnElement="BUS_fin">
+        <dc:Bounds x="416.0" y="1396.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="240" y="1460" width="400" height="95"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BUS_F01_di" bpmnElement="BUS_F01">
+        <di:waypoint x="440" y="324.0"/>
+        <di:waypoint x="440" y="402.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F02_di" bpmnElement="BUS_F02">
+        <di:waypoint x="660.0" y="460"/>
+        <di:waypoint x="900.0" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F03_di" bpmnElement="BUS_F03">
+        <di:waypoint x="1120" y="518.0"/>
+        <di:waypoint x="1120" y="586.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F04_di" bpmnElement="BUS_F04">
+        <di:waypoint x="1120" y="654.0"/>
+        <di:waypoint x="1120" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1132" y="673.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F05_di" bpmnElement="BUS_F05">
+        <di:waypoint x="1154.0" y="620"/>
+        <di:waypoint x="1375" y="620"/>
+        <di:waypoint x="1375" y="940"/>
+        <di:waypoint x="1340.0" y="940"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1272.5" y="630" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F06_di" bpmnElement="BUS_F06">
+        <di:waypoint x="900.0" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F07_di" bpmnElement="BUS_F07">
+        <di:waypoint x="900.0" y="780"/>
+        <di:waypoint x="710" y="780"/>
+        <di:waypoint x="710" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F08_di" bpmnElement="BUS_F08">
+        <di:waypoint x="440" y="998.0"/>
+        <di:waypoint x="440" y="1066.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F09_di" bpmnElement="BUS_F09">
+        <di:waypoint x="440" y="1134.0"/>
+        <di:waypoint x="440" y="1202.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="1153.0" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F10_di" bpmnElement="BUS_F10">
+        <di:waypoint x="660.0" y="1260"/>
+        <di:waypoint x="900.0" y="1260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F11_di" bpmnElement="BUS_F11">
+        <di:waypoint x="900.0" y="1260"/>
+        <di:waypoint x="726" y="1260"/>
+        <di:waypoint x="726" y="940"/>
+        <di:waypoint x="660.0" y="940"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F12_di" bpmnElement="BUS_F12">
+        <di:waypoint x="406.0" y="1100"/>
+        <di:waypoint x="125" y="1100"/>
+        <di:waypoint x="125" y="460"/>
+        <di:waypoint x="220.0" y="460"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="137" y="1006" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BUS_F13_di" bpmnElement="BUS_F13">
+        <di:waypoint x="406.0" y="1100"/>
+        <di:waypoint x="139" y="1100"/>
+        <di:waypoint x="139" y="1420"/>
+        <di:waypoint x="416.0" y="1420"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="280.5" y="1110" width="230" height="28"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
