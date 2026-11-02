@@ -1,8 +1,8 @@
-# Sistema de Gestión de Criadero de Canarios
+# TuCriadero — Sistema de Gestión de Criadero de Canarios
 
 Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno de crías por un registro digital, usable desde el teléfono: canarios identificados por su anillo, jaulas, cruces, pichones, genealogía, bajas y previsualización de los resultados de un cruce según la tabla de Mendel.
 
-Nombre comercial tentativo: TuCriadero (por confirmar con el cliente).
+Nombre oficial del producto: **TuCriadero**.
 
 ## Documentación
 
