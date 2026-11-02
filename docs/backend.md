@@ -148,5 +148,5 @@ Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100
 ## 9. Pruebas
 
 - PHPUnit para los servicios, en especial `Services/Genetica`: un caso por regla (RF036 a RF038), la excepción de las hembras en RF034 y el aviso de RF039.
-- Cada RF tiene su issue en GitHub. Se cierra cuando QA aprueba su prueba.
+- Cada RF tiene su issue en GitHub. Se cierra con pruebas internas y revisión de código; QA externo revisa por hito y el PM registra su informe y las correcciones (ver `CONTRIBUTING.md`).
 - Prueba de acceso cruzado entre dos cuentas (SEG-001) antes de cada entrega.

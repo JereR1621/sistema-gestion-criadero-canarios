@@ -95,4 +95,4 @@ Usar siempre estos términos en la interfaz, igual que en el SRS (§1.4):
 
 1. Diseño de pantallas en Figma, partiendo por el teléfono. El cliente revisa los mockups (SRS §7.2, Sesión 2).
 2. Cada pantalla se trabaja en el issue del RF correspondiente.
-3. QA prueba en teléfono antes de cerrar el issue.
+3. El equipo prueba en teléfono y conserva las evidencias antes de cerrar la implementación. QA externo revisa la entrega por hito; el PM registra el resultado (ver `CONTRIBUTING.md`).

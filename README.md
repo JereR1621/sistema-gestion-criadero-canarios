@@ -38,23 +38,27 @@ docs/                 SRS y resúmenes por equipo
 
 El trabajo está en los [issues](../../issues), en dos niveles:
 
-- **9 épicas** (`tipo:epica`), una por etapa. Forman una cadena: cada una depende solo de la anterior.
+- **9 épicas** (`tipo:epica`), una por etapa, con dependencias técnicas explícitas.
 
   ```
-  E0 Base técnica ─┬─ E1 Cuentas ── E3 Canarios ── E4 Jaulas ── E5 Libro de crías ─┬─ E6 Búsqueda y genealogía ─┬─ E8 Beta
-                   └─ E2 Catálogo                                                   └─ E7 Genética y cruces ───────┘
+  E0 → E1 Cuentas y E2 Catálogo → E3 Canarios → E4 Jaulas → E5 Libro de crías
+  E5 → E6 Búsqueda y genealogía y E7 Genética → E8 Beta
   ```
 
-- Dentro de cada épica, sus **sub-issues** (un RF del SRS o una tarea) son independientes entre sí: se pueden repartir y trabajar en paralelo en cuanto la épica anterior está cerrada.
+- Dentro de cada épica, sus **sub-issues** (un RF del SRS o una tarea) pueden diseñarse en paralelo; la integración y verificación respetan las dependencias indicadas en cada issue.
 
-Cada issue tiene etiquetas de área (`area:backend`, `area:frontend`, `area:qa`), de módulo y de prioridad, y pertenece a un hito (M1 a M5).
+- **5 revisiones externas**, una por hito, coordinadas por el PM. QA externo entrega su informe y no recibe tareas de implementación ni de pruebas internas.
+
+Plan actual: **63 issues** (9 épicas, 39 RF, 10 tareas y 5 revisiones externas). La tarea de entrega beta incluye despliegue, documentación y capacitación del SRS. Las revisiones no son sub-issues de implementación y su cierre no se confunde con la aceptación final del cliente.
+
+Las etiquetas de área son `area:backend`, `area:frontend`, `area:pruebas` (pruebas internas del equipo) y `area:gestion` (coordinación del PM). Las issues pertenecen a un hito (M1 a M5); los RF además indican módulo y prioridad.
 
 ## Equipo
 
 | Rol | Integrantes |
 |---|---|
 | Jefe de Proyecto (PM) | Jeremy Edgardo Rojas Herrera |
-| QA | Boris Barrios, José Barraza |
+| QA externo | Boris Barrios, José Barraza |
 | Desarrollo | Equipo A |
 
 ## Puesta en marcha local

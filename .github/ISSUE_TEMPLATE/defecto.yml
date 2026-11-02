@@ -1,8 +1,13 @@
 name: Defecto
-description: QA reporta algo que no cumple el SRS
+description: El equipo registra defectos internos o el PM registra hallazgos de QA externo
 title: "Defecto: "
 labels: ["tipo:defecto"]
 body:
+  - type: input
+    id: informe
+    attributes:
+      label: Informe de QA externo o revisión del hito (si corresponde)
+      placeholder: Revisión M1, fecha y referencia del informe recibido por el PM
   - type: input
     id: requisito
     attributes:
