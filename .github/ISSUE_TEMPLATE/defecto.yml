@@ -1,0 +1,42 @@
+name: Defecto
+description: QA reporta algo que no cumple el SRS
+title: "Defecto: "
+labels: ["tipo:defecto"]
+body:
+  - type: input
+    id: requisito
+    attributes:
+      label: Requisito afectado
+      placeholder: SRS-RF023
+    validations:
+      required: true
+  - type: dropdown
+    id: severidad
+    attributes:
+      label: Severidad
+      options:
+        - Alta (bloquea la entrega)
+        - Media
+        - Baja
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducirlo
+      placeholder: |
+        1. Iniciar sesión como criador A
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Resultado esperado (según el SRS) y resultado obtenido
+    validations:
+      required: true
+  - type: input
+    id: entorno
+    attributes:
+      label: Dispositivo y navegador
+      placeholder: Android, Chrome 130, 360 px
