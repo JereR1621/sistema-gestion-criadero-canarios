@@ -8,11 +8,26 @@ Estas reglas están en definición por el PM. El SRS v1.0 está preparado para p
 |---|---|---|
 | `main` | Versión entregable (la que se despliega en producción). | Solo por pull request desde `develop`, con revisión interna y autorización del PM basada en la revisión externa del hito. |
 | `develop` | Integración del trabajo terminado. Se despliega en el entorno de pruebas. | Por pull request desde una rama de trabajo, con una revisión. |
-| `feature/RF0xx-descripcion` | Trabajo de un requisito (por ejemplo, `feature/RF023-busqueda-correlativo`). | — |
+| `feature/RF0xx-backend-descripcion` / `feature/RF0xx-frontend-descripcion` | Trabajo de una issue de implementación (por ejemplo, `feature/RF023-backend-busqueda-por-anillo-o-correlativo`). Cada issue trae el nombre exacto en «Cómo hacerlo». | — |
 | `fix/descripcion` | Corrección de un defecto detectado internamente o comunicado por QA externo. | — |
 | `docs/descripcion` | Cambios de documentación y reglas del repositorio. | — |
 
 Las ramas permanentes son `main` y `develop`. Las ramas de trabajo se nombran por el cambio que realizan. No se crea ni se mantiene una rama QA: las revisiones externas se registran mediante informes y las correcciones se realizan en ramas de trabajo del equipo.
+
+### Una rama por issue, y se borra al integrar
+
+1. **Cada issue tiene su propia rama**, creada desde `develop` actualizado. Nunca se trabajan dos issues en la misma rama.
+2. **La rama vive solo mientras dura la issue.** Al integrar el pull request, GitHub la borra automáticamente.
+3. **En tu computador también se borra:**
+   ```
+   git checkout develop
+   git pull
+   git branch -d feature/RF023-backend-busqueda-por-anillo-o-correlativo
+   git fetch --prune
+   ```
+4. **Para la siguiente issue, una rama nueva** desde `develop` actualizado. No se reutiliza una rama vieja.
+
+Así, en GitHub solo quedan `main`, `develop` y las ramas de las issues en curso: cada rama abierta corresponde a una issue que alguien está trabajando.
 
 Nadie del equipo sube cambios directo a `main` ni a `develop`, las borra ni fuerza un push: lo impiden las reglas del repositorio. La única excepción es el PM (ver «Pull requests», punto 5).
 
@@ -42,6 +57,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 - [ ] Si cambia la base: migración nueva (nunca editar una ya integrada) y `docs/backend.md` §3 actualizado (`docs/base-de-datos.md`).
 - [ ] Pruebas internas realizadas y evidencias del método de verificación del SRS disponibles.
 - [ ] Código revisado e integrado en `develop`.
+- [ ] Rama de la issue borrada en GitHub y en tu computador.
 
 Cerrar una implementación significa que está lista para revisión externa; no equivale a aprobar la entrega. Las tareas documentales se cierran con el entregable revisado por el equipo y la conformidad del PM. Un RF con pantalla se cierra cuando sus issues de backend y frontend están cerradas y el RF completo se comprobó en el entorno de pruebas. Las épicas se cierran al terminar sus entregables, respetando las dependencias técnicas; la entrega beta además exige las revisiones externas previstas.
 
