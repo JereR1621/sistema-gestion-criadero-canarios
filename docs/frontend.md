@@ -10,9 +10,9 @@ El stack es **PHP con HTML embebido**: cada pantalla es una vista HTML que el se
 - Los buscadores son formularios que envían la búsqueda y muestran los resultados en la página siguiente.
 - Las validaciones las hace el servidor. En el navegador solo se usan los atributos de HTML (`required`, `maxlength`, `type`, `pattern`), como ayuda.
 
-El trabajo de frontend vive en `app/Views/` (ver `README.md`). Backend entrega a cada vista los datos ya filtrados por el criador que inició sesión. **Qué variables recibe cada vista y cómo se llaman los campos de cada formulario está en `docs/contrato-back-front.md`.**
+El trabajo de frontend vive en la carpeta `frontend/`: las vistas en `frontend/views/<modulo>/<vista>.php` y los estilos en `frontend/css/` (ver `frontend/README.md`). Backend entrega a cada vista los datos ya filtrados por el criador que inició sesión. **Qué variables recibe cada vista y cómo se llaman los campos de cada formulario está en `docs/contrato-back-front.md`.**
 
-> **Diseño responsivo:** cumplir el ancho de 360 px (RNF001) requiere estilos CSS junto al HTML. Hay que confirmar con el PM si van dentro de las vistas o en un archivo `.css` propio.
+> **Diseño responsivo:** cumplir el ancho de 360 px (RNF001) requiere estilos CSS junto al HTML. Si se acuerda un archivo `.css` propio (contrato §8), va en `frontend/css/`; la tarea de estructura base lo deja publicado en la URL `/css/`.
 
 ## 2. Usuarios
 

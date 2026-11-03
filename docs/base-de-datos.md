@@ -14,11 +14,11 @@ Guía para el equipo de backend. Explica cómo instalar MySQL y PHP en tu comput
 
 | Va en GitHub | Nunca va en GitHub |
 |---|---|
-| Migraciones: `database/migrations/NNN_descripcion.sql` | `.env` con usuario y contraseña reales |
+| Migraciones: `backend/database/migrations/NNN_descripcion.sql` | `.env` con usuario y contraseña reales |
 | Seeds del catálogo: variedades, factores y composición (sin datos personales) | El Excel del cliente: trae datos personales de un tercero |
 | Seed de datos de prueba **inventados** | Volcados o respaldos de una base con datos (`mysqldump`) |
 | `.env.example`: los nombres de las variables, sin valores secretos | Datos reales de criadores de la beta |
-| `database/migrar.php`, el script que aplica migraciones y seeds | Credenciales de la base de AWS: van en AWS o en los *secrets* de GitHub |
+| `backend/database/migrar.php`, el script que aplica migraciones y seeds | Credenciales de la base de AWS: van en AWS o en los *secrets* de GitHub |
 
 Antes de cada commit, revisa con `git status` qué vas a subir. Si aparece `.env`, un `.xlsx` o un volcado, **no lo agregues**. El `.gitignore` bloquea los casos conocidos, pero la revisión es tuya.
 
@@ -76,7 +76,7 @@ En macOS o Linux, instala las mismas versiones con el gestor de paquetes del sis
 3. En la carpeta del repositorio, copia `.env.example` como `.env` y completa `DB_PASS` (y `ADMIN_CONTRASENA`) con tus valores locales.
 4. Crea las tablas y carga el catálogo y los datos de prueba:
    ```
-   php database/migrar.php --seeds
+   php backend/database/migrar.php --seeds
    ```
 5. Comprueba que funcionó:
    ```
@@ -84,23 +84,23 @@ En macOS o Linux, instala las mismas versiones con el gestor de paquetes del sis
    ```
    Debe responder **762**.
 
-Si rompes tu base, la vuelves a crear desde cero con `php database/migrar.php --desde-cero --seeds`. Solo funciona con `APP_ENV=local`: así nadie borra por error la base del entorno de pruebas.
+Si rompes tu base, la vuelves a crear desde cero con `php backend/database/migrar.php --desde-cero --seeds`. Solo funciona con `APP_ENV=local`: así nadie borra por error la base del entorno de pruebas.
 
 ## 5. Cambiar una tabla: crear una migración
 
 Ejemplo: tu RF necesita una tabla o una columna nueva.
 
 1. Actualiza `develop` y crea tu rama de trabajo (ver `CONTRIBUTING.md`).
-2. Mira el número más alto en `database/migrations/` y crea el siguiente, con un nombre que diga qué hace:
+2. Mira el número más alto en `backend/database/migrations/` y crea el siguiente, con un nombre que diga qué hace:
    ```
-   database/migrations/014_agregar_observacion_a_baja.sql
+   backend/database/migrations/014_agregar_observacion_a_baja.sql
    ```
 3. Escribe solo SQL de MySQL, un cambio por archivo:
    ```sql
    -- RF011: observación opcional en la baja (ejemplo)
    ALTER TABLE baja ADD COLUMN observacion VARCHAR(255) NULL;
    ```
-4. Aplícala en tu base: `php database/migrar.php`. El script corre solo las migraciones que tu base todavía no tiene.
+4. Aplícala en tu base: `php backend/database/migrar.php`. El script corre solo las migraciones que tu base todavía no tiene.
 5. Actualiza `backend.md` §3 si cambió una tabla.
 6. Sube la migración y el código del RF en el **mismo pull request**. Quien revisa comprueba que la migración corre sobre una base limpia.
 
@@ -114,14 +114,14 @@ Si dos personas crean el mismo número al mismo tiempo, la segunda en integrar r
 - Las restricciones que pide el modelo (`UNIQUE`, `CHECK`, `NOT NULL`) van en la migración, no solo en el código.
 - Las reglas que no se pueden expresar en SQL van en los servicios (`backend.md` §3, "Reglas que no alcanzan a cubrir FK ni UNIQUE").
 
-## 6. Qué hace `database/migrar.php`
+## 6. Qué hace `backend/database/migrar.php`
 
 Lo programa la tarea "Esquema de base de datos" de la épica E0. Su comportamiento es fijo, para que todos lo usen igual:
 
 | Comando | Qué hace |
 |---|---|
-| `php database/migrar.php` | Lee `.env`, se conecta con PDO y aplica en orden numérico las migraciones de `database/migrations/` que no estén en la tabla `migracion`. Anota cada una con su fecha. Si una falla, se detiene y muestra el archivo y el error de MySQL. |
-| `… --seeds` | Después de migrar, carga en orden los archivos de `database/seeds/` y crea la cuenta de administrador con `ADMIN_CORREO` y `ADMIN_CONTRASENA` del `.env` (contraseña con `password_hash`). |
+| `php backend/database/migrar.php` | Lee `.env`, se conecta con PDO y aplica en orden numérico las migraciones de `backend/database/migrations/` que no estén en la tabla `migracion`. Anota cada una con su fecha. Si una falla, se detiene y muestra el archivo y el error de MySQL. |
+| `… --seeds` | Después de migrar, carga en orden los archivos de `backend/database/seeds/` y crea la cuenta de administrador con `ADMIN_CORREO` y `ADMIN_CONTRASENA` del `.env` (contraseña con `password_hash`). |
 | `… --desde-cero` | Borra todas las tablas y vuelve a migrar. Se niega a correr si `APP_ENV` no es `local`. |
 | `… --pruebas` | Hace lo mismo sobre `DB_NAME_PRUEBAS`, para PHPUnit. |
 
