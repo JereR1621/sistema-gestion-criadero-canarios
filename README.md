@@ -77,10 +77,12 @@ docs/                     ← todos
      └─ SRS-RF018 [Frontend]: Registro de cruce  area:frontend  → lo programa frontend
   ```
 
-  Los 7 RF sin pantalla (cálculo genético y catálogo) son una sola issue de backend.
+  Los 11 RF sin pantalla (reglas como el aislamiento entre criaderos, cálculo genético y catálogo) son una sola issue de backend.
+
+- **Cada ruta y cada vista las crea una sola issue.** Si un RF necesita algo en una pantalla que crea otro RF, su issue dice «**No crees** … : la crea #NN. Edítala y agrega …» y depende de esa issue. Por ejemplo, el formulario de canarios lo crea RF007, y RF008, RF009, RF010, RF012, RF013 y RF029 le agregan su parte. Así dos personas nunca crean el mismo archivo.
 
 - **5 hitos** (M1 a M5) y **5 revisiones externas**, una por hito, que coordina el PM con QA externo. QA externo entrega su informe y no recibe tareas de implementación.
-- **127 issues** en total: 9 épicas, 39 RF, 64 implementaciones (32 de backend y 32 de frontend), 10 tareas y 5 revisiones.
+- **120 issues**: 9 épicas, 39 RF, 56 implementaciones (28 de backend y 28 de frontend), 11 tareas y 5 revisiones.
 
 | Etiqueta | Para qué sirve |
 |---|---|
