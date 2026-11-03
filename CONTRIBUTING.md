@@ -1,5 +1,7 @@
 # Cómo trabajamos en este repositorio
 
+Estas reglas están en definición por el PM. El SRS v1.0 está preparado para presentarlo al cliente para su aceptación; su aprobación se registra por separado.
+
 ## Ramas
 
 | Rama | Uso | Quién integra |
@@ -7,7 +9,10 @@
 | `main` | Versión entregable (la que se despliega en producción). | Solo por pull request desde `develop`, con revisión interna y autorización del PM basada en la revisión externa del hito. |
 | `develop` | Integración del trabajo terminado. Se despliega en el entorno de pruebas. | Por pull request desde una rama de trabajo, con una revisión. |
 | `feature/RF0xx-descripcion` | Trabajo de un requisito (por ejemplo, `feature/RF023-busqueda-correlativo`). | — |
-| `fix/descripcion` | Corrección de un defecto reportado por QA. | — |
+| `fix/descripcion` | Corrección de un defecto detectado internamente o comunicado por QA externo. | — |
+| `docs/descripcion` | Cambios de documentación y reglas del repositorio. | — |
+
+Las ramas permanentes son `main` y `develop`. Las ramas de trabajo se nombran por el cambio que realizan. No se crea ni se mantiene una rama QA: las revisiones externas se registran mediante informes y las correcciones se realizan en ramas de trabajo del equipo.
 
 Nadie sube cambios directo a `main` ni a `develop`.
 

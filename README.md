@@ -4,6 +4,8 @@ Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno d
 
 Nombre oficial del producto: **TuCriadero**.
 
+Estado actual: SRS v1.0 preparado para presentarlo al cliente para su aceptación, pendiente de registrar su aprobación. El PM está definiendo las reglas del repositorio. La aplicación cuenta con su estructura inicial; la puesta en marcha queda pendiente de la implementación.
+
 ## Documentación
 
 | Documento | Para quién |
