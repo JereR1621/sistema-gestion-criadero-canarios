@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="2005" viewBox="0 0 1700 2005">
+  <rect x="0" y="0" width="1700" height="2005" fill="white"/>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#253957"/>
+    </marker>
+  </defs>
+  <text x="55" y="44" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">TuCriadero · BPMN 2.0 · TEM</text>
+  <text x="55" y="92" font-family="Arial, Liberation Sans, sans-serif" font-size="36" text-anchor="start" fill="#253957" font-weight="bold">Temporada de cría (vista general)</text>
+  <rect x="40" y="150" width="1620" height="1655" fill="white" stroke="#253957" stroke-width="2"/>
+  <rect x="40" y="150" width="60" height="1655" fill="#253957"/>
+  <text transform="translate(79,977.5) rotate(-90)" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="white">TuCriadero · Temporada de cría (vista general)</text>
+  <rect x="100" y="150" width="1560" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="880.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">Criador</text>
+  <line x1="100" y1="150" x2="100" y2="1805" stroke="#253957" stroke-width="2"/>
+  <polyline points="784.0,680 1090,680" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="4 6"/>
+  <polyline points="760,324.0 760,420.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="760,560.0 760,656.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="760,704.0 760,800.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="760,940.0 760,990.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="760,1130.0 760,1216.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="726.0,1250 420,1250 420,490 550.0,490" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="760,1284.0 760,1370.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="753" y1="1296.0" x2="767" y2="1306.0" stroke="#253957" stroke-width="2"/>
+  <polyline points="760,1510.0 760,1606.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <circle cx="760" cy="300" r="24" fill="white" stroke="#253957" stroke-width="2"/>
+  <rect x="550.0" y="420.0" width="420" height="140" rx="14" fill="white" stroke="#253957" stroke-width="6"/>
+  <rect x="749" y="532.0" width="22" height="22" fill="white" stroke="#253957" stroke-width="2"/>
+  <path d="M754,543.0 h12 M760,537.0 v12" stroke="#253957" stroke-width="2"/>
+  <text x="776" y="446.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">Figura 4</text>
+  <text x="770" y="488.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Planificar y registrar un</text>
+  <text x="770" y="516.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">cruce</text>
+  <circle cx="760" cy="680" r="24" fill="white" stroke="#253957" stroke-width="2"/>
+  <circle cx="760" cy="680" r="19" fill="white" stroke="#253957" stroke-width="2"/>
+  <circle cx="760" cy="680" r="12" fill="white" stroke="#253957" stroke-width="1.6"/>
+  <line x1="770.0" y1="680.0" x2="772.0" y2="680.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="768.6602540378444" y1="685.0" x2="770.3923048454133" y2="686.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="765.0" y1="688.6602540378444" x2="766.0" y2="690.3923048454133" stroke="#253957" stroke-width="1.4"/>
+  <line x1="760.0" y1="690.0" x2="760.0" y2="692.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="755.0" y1="688.6602540378444" x2="754.0" y2="690.3923048454133" stroke="#253957" stroke-width="1.4"/>
+  <line x1="751.3397459621556" y1="685.0" x2="749.6076951545867" y2="686.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="750.0" y1="680.0" x2="748.0" y2="680.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="751.3397459621556" y1="675.0" x2="749.6076951545867" y2="674.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="755.0" y1="671.3397459621556" x2="754.0" y2="669.6076951545867" stroke="#253957" stroke-width="1.4"/>
+  <line x1="760.0" y1="670.0" x2="760.0" y2="668.0" stroke="#253957" stroke-width="1.4"/>
+  <line x1="765.0" y1="671.3397459621556" x2="766.0" y2="669.6076951545867" stroke="#253957" stroke-width="1.4"/>
+  <line x1="768.6602540378444" y1="675.0" x2="770.3923048454133" y2="674.0" stroke="#253957" stroke-width="1.4"/>
+  <path d="M760,680 L760,672 M760,680 L766,683" stroke="#253957" stroke-width="1.8" fill="none"/>
+  <rect x="550.0" y="800.0" width="420" height="140" rx="14" fill="white" stroke="#253957" stroke-width="6"/>
+  <rect x="749" y="912.0" width="22" height="22" fill="white" stroke="#253957" stroke-width="2"/>
+  <path d="M754,923.0 h12 M760,917.0 v12" stroke="#253957" stroke-width="2"/>
+  <text x="776" y="826.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">Figura 5</text>
+  <text x="770" y="868.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Registrar los pichones del</text>
+  <text x="770" y="896.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">cruce</text>
+  <rect x="550.0" y="990.0" width="420" height="140" rx="14" fill="white" stroke="#253957" stroke-width="6"/>
+  <rect x="749" y="1102.0" width="22" height="22" fill="white" stroke="#253957" stroke-width="2"/>
+  <path d="M754,1113.0 h12 M760,1107.0 v12" stroke="#253957" stroke-width="2"/>
+  <text x="776" y="1016.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">Figura 6</text>
+  <text x="770" y="1072.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Terminar el cruce</text>
+  <polygon points="760,1216 794,1250 760,1284 726,1250" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M748,1238 L772,1262 M772,1238 L748,1262" stroke="#253957" stroke-width="3"/>
+  <rect x="550.0" y="1370.0" width="420" height="140" rx="14" fill="white" stroke="#253957" stroke-width="6"/>
+  <rect x="749" y="1482.0" width="22" height="22" fill="white" stroke="#253957" stroke-width="2"/>
+  <path d="M754,1493.0 h12 M760,1487.0 v12" stroke="#253957" stroke-width="2"/>
+  <text x="776" y="1396.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">Figura 8</text>
+  <text x="770" y="1438.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Trasladar pichones y</text>
+  <text x="770" y="1466.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">adultos a la jaula grande</text>
+  <circle cx="760" cy="1630" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="1090" y="609.0" width="520" height="142.0" fill="#FBFCFE" stroke="none"/>
+  <path d="M1106,609.0 L1090,609.0 L1090,751.0 L1106,751.0" fill="none" stroke="#475569" stroke-width="2.5"/>
+  <text x="1104" y="637.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Entre el cruce y el anillado ocurren la postura</text>
+  <text x="1104" y="661.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   y la incubación, que no se registran en el</text>
+  <text x="1104" y="685.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   sistema (fuera del alcance).</text>
+  <text x="1104" y="709.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• El criador anilla los pichones entre los 10 y</text>
+  <text x="1104" y="733.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   12 días de vida (glosario, RF021).</text>
+  <rect x="1090" y="1079.0" width="520" height="190.0" fill="#FBFCFE" stroke="none"/>
+  <path d="M1106,1079.0 L1090,1079.0 L1090,1269.0 L1106,1269.0" fill="none" stroke="#475569" stroke-width="2.5"/>
+  <text x="1104" y="1107.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="bold">En cualquier momento, fuera de esta secuencia:</text>
+  <text x="1104" y="1131.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Registrar canarios (Figura 9).</text>
+  <text x="1104" y="1155.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Registrar jaulas (Figura 7).</text>
+  <text x="1104" y="1179.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Buscar y consultar la genealogía (Figura 10).</text>
+  <text x="1104" y="1203.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Dar de baja un canario (Figura 11).</text>
+  <text x="1104" y="1227.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Ingreso (Figura 12); cuentas y catálogo, solo</text>
+  <text x="1104" y="1251.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   el administrador (Figuras 13 y 14).</text>
+  <text x="796" y="308" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">Inicio de la temporada de</text>
+  <text x="796" y="334" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">cría</text>
+  <text x="724.0" y="639" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">Pichones con 10 a 12</text>
+  <text x="724.0" y="664" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">días de vida</text>
+  <text x="806.0" y="1209" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">¿Planifica otro</text>
+  <text x="806.0" y="1234" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">cruce?</text>
+  <text x="760" y="1682" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Fin de la temporada</text>
+  <rect x="684.48" y="1215" width="31.519999999999982" height="29" fill="white"/>
+  <text x="712.0" y="1238" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="768" y="1295.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="772" y="1318.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <text x="55" y="1860" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="start" fill="#253957" font-weight="bold">Reglas y alcance del proceso</text>
+  <text x="55" y="1894" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Vista general: cada caja de borde grueso es un proceso detallado en la figura indicada. Varios cruces pueden avanzar en</text>
+  <text x="55" y="1924" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">   paralelo; cada uno sigue esta secuencia.</text>
+  <text x="55" y="1954" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• La espera de 10 a 12 días la decide el criador: el sistema no programa avisos ni temporizadores automáticos.</text>
+</svg>

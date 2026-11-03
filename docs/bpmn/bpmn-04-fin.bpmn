@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_FIN" name="Terminar un cruce" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida; el cruce es del propio criadero (RF003).
+Terminar el cruce no traslada a sus integrantes: los traslados se registran en la Figura 8. Se conservan padres, pichones e historial (RF022, DAT-004).</bpmn:documentation>
+    <bpmn:laneSet id="FIN_lanes">
+      <bpmn:lane id="FIN_persona" name="Criador">
+        <bpmn:flowNodeRef>FIN_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="FIN_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>FIN_cierre_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cierre_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_cerrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_historial</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>FIN_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="FIN_inicio" name="Terminar un cruce">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>FIN_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="FIN_cierre_datos" name="Abrir el cruce activo e indicar la fecha de fin">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F04</bpmn:incoming>
+      <bpmn:incoming>FIN_F06</bpmn:incoming>
+      <bpmn:outgoing>FIN_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="FIN_cierre_validar" name="Validar el cruce y las fechas">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F01</bpmn:incoming>
+      <bpmn:outgoing>FIN_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="FIN_cierre_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="FIN_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>FIN_F02</bpmn:incoming>
+      <bpmn:outgoing>FIN_F03</bpmn:outgoing>
+      <bpmn:outgoing>FIN_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="FIN_cierre_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="FIN_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>FIN_F03</bpmn:incoming>
+      <bpmn:outgoing>FIN_F04</bpmn:outgoing>
+      <bpmn:outgoing>FIN_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="FIN_cierre_cancelado" name="Cierre cancelado; el cruce sigue activo">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>FIN_F05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="FIN_cerrar" name="Guardar la fecha de fin y retirar el cruce de los activos">
+      <bpmn:documentation>SRS-RF022</bpmn:documentation>
+      <bpmn:incoming>FIN_F07</bpmn:incoming>
+      <bpmn:outgoing>FIN_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="FIN_historial" name="Conservar la ficha de cría y el historial y auditar">
+      <bpmn:documentation>SRS-RF017, SRS-RF022, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>FIN_F08</bpmn:incoming>
+      <bpmn:outgoing>FIN_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="FIN_fin" name="Cruce terminado; historial disponible">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>FIN_F09</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="FIN_F01" sourceRef="FIN_cierre_datos" targetRef="FIN_cierre_validar" name=""/>
+    <bpmn:sequenceFlow id="FIN_F02" sourceRef="FIN_cierre_validar" targetRef="FIN_cierre_valido" name=""/>
+    <bpmn:sequenceFlow id="FIN_F03" sourceRef="FIN_cierre_valido" targetRef="FIN_cierre_corrige" name="No"/>
+    <bpmn:sequenceFlow id="FIN_F04" sourceRef="FIN_cierre_corrige" targetRef="FIN_cierre_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="FIN_F05" sourceRef="FIN_cierre_corrige" targetRef="FIN_cierre_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="FIN_F06" sourceRef="FIN_inicio" targetRef="FIN_cierre_datos" name=""/>
+    <bpmn:sequenceFlow id="FIN_F07" sourceRef="FIN_cierre_valido" targetRef="FIN_cerrar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="FIN_F08" sourceRef="FIN_cerrar" targetRef="FIN_historial" name=""/>
+    <bpmn:sequenceFlow id="FIN_F09" sourceRef="FIN_historial" targetRef="FIN_fin" name=""/>
+    <bpmn:subProcess id="FIN_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="FIN_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>FIN_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="FIN_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="FIN_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>FIN_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>FIN_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="FIN_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>FIN_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="FIN_no_disponible_F1" sourceRef="FIN_no_disponible_inicio" targetRef="FIN_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="FIN_no_disponible_F2" sourceRef="FIN_no_disponible_informar" targetRef="FIN_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="FIN_A_cierre">
+      <bpmn:text>Errores que se informan sin guardar:
+• Fecha de fin anterior a la fecha de inicio (DAT-004).
+• Cruce ya terminado o de otro criadero (RF003, RF022).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="FIN_A_cierre_asoc" sourceRef="FIN_cierre_valido" targetRef="FIN_A_cierre" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_FIN">
+    <bpmn:participant id="Participant_FIN" name="TuCriadero — Terminar un cruce" processRef="Process_FIN"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_FIN" name="Terminar un cruce">
+    <bpmndi:BPMNPlane id="Plane_FIN" bpmnElement="Collaboration_FIN">
+      <bpmndi:BPMNShape id="Participant_FIN_di" bpmnElement="Participant_FIN" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1570"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_persona_di" bpmnElement="FIN_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="1570"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_sistema_di" bpmnElement="FIN_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="1570"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_inicio_di" bpmnElement="FIN_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="217.44000000000005" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_datos_di" bpmnElement="FIN_cierre_datos">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_validar_di" bpmnElement="FIN_cierre_validar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_valido_di" bpmnElement="FIN_cierre_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="640" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_corrige_di" bpmnElement="FIN_cierre_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="615" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cierre_cancelado_di" bpmnElement="FIN_cierre_cancelado">
+        <dc:Bounds x="446.0" y="846.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="342.79999999999995" y="898" width="254.4000000000001" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_cerrar_di" bpmnElement="FIN_cerrar">
+        <dc:Bounds x="850.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_historial_di" bpmnElement="FIN_historial">
+        <dc:Bounds x="850.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_fin_di" bpmnElement="FIN_fin">
+        <dc:Bounds x="1036.0" y="1226.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="932.8" y="1278" width="254.4000000000001" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="FIN_F01_di" bpmnElement="FIN_F01">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F02_di" bpmnElement="FIN_F02">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="646.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F03_di" bpmnElement="FIN_F03">
+        <di:waypoint x="1026.0" y="680"/>
+        <di:waypoint x="504.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="645" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F04_di" bpmnElement="FIN_F04">
+        <di:waypoint x="470" y="646.0"/>
+        <di:waypoint x="470" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="609.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F05_di" bpmnElement="FIN_F05">
+        <di:waypoint x="470" y="714.0"/>
+        <di:waypoint x="470" y="846.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F06_di" bpmnElement="FIN_F06">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F07_di" bpmnElement="FIN_F07">
+        <di:waypoint x="1060" y="714.0"/>
+        <di:waypoint x="1060" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F08_di" bpmnElement="FIN_F08">
+        <di:waypoint x="1060" y="940.0"/>
+        <di:waypoint x="1060" y="990.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_F09_di" bpmnElement="FIN_F09">
+        <di:waypoint x="1060" y="1130.0"/>
+        <di:waypoint x="1060" y="1226.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="FIN_no_disponible_di" bpmnElement="FIN_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1425" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_no_disponible_inicio_di" bpmnElement="FIN_no_disponible_inicio">
+        <dc:Bounds x="926" y="1526" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_no_disponible_informar_di" bpmnElement="FIN_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="1498.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="FIN_no_disponible_fin_di" bpmnElement="FIN_no_disponible_fin">
+        <dc:Bounds x="1486" y="1526" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="FIN_no_disponible_F1_di" bpmnElement="FIN_no_disponible_F1">
+        <di:waypoint x="974" y="1550"/>
+        <di:waypoint x="1065.0" y="1550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="FIN_no_disponible_F2_di" bpmnElement="FIN_no_disponible_F2">
+        <di:waypoint x="1395.0" y="1550"/>
+        <di:waypoint x="1486" y="1550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="FIN_A_cierre_di" bpmnElement="FIN_A_cierre">
+        <dc:Bounds x="1310" y="597.0" width="330" height="166.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="FIN_A_cierre_asoc_di" bpmnElement="FIN_A_cierre_asoc">
+        <di:waypoint x="1094.0" y="680"/>
+        <di:waypoint x="1310" y="680"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

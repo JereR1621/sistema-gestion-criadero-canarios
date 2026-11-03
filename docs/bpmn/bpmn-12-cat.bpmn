@@ -1,0 +1,225 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_CAT" name="Mantener el catálogo de variedades y factores" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 762 variedades, sus factores y su composición vienen precargados (RF028, DAT-005).
+Los cambios aplican para todos los criadores y se auditan (RF032, SEG-003).</bpmn:documentation>
+    <bpmn:laneSet id="CAT_lanes">
+      <bpmn:lane id="CAT_persona" name="Administrador">
+        <bpmn:flowNodeRef>CAT_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_catalogo_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_catalogo_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_catalogo_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="CAT_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>CAT_catalogo_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_catalogo_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAT_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="CAT_inicio" name="Mantener el catálogo">
+      <bpmn:documentation>SRS-RF028, SRS-RF030</bpmn:documentation>
+      <bpmn:outgoing>CAT_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="CAT_catalogo_datos" name="Agregar o corregir una variedad, su composición o un factor">
+      <bpmn:documentation>SRS-RF031, SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>CAT_F04</bpmn:incoming>
+      <bpmn:incoming>CAT_F06</bpmn:incoming>
+      <bpmn:outgoing>CAT_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CAT_catalogo_validar" name="Validar códigos, composición, herencia y uso">
+      <bpmn:documentation>SRS-RF031, SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>CAT_F01</bpmn:incoming>
+      <bpmn:outgoing>CAT_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CAT_catalogo_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="CAT_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAT_F02</bpmn:incoming>
+      <bpmn:outgoing>CAT_F03</bpmn:outgoing>
+      <bpmn:outgoing>CAT_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="CAT_catalogo_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="CAT_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAT_F03</bpmn:incoming>
+      <bpmn:outgoing>CAT_F04</bpmn:outgoing>
+      <bpmn:outgoing>CAT_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="CAT_catalogo_cancelado" name="Catálogo sin cambios">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAT_F05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="CAT_guardar" name="Aplicar el cambio para todos los criadores y auditar">
+      <bpmn:documentation>SRS-RF032</bpmn:documentation>
+      <bpmn:incoming>CAT_F07</bpmn:incoming>
+      <bpmn:outgoing>CAT_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CAT_fin" name="Catálogo actualizado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAT_F08</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="CAT_F01" sourceRef="CAT_catalogo_datos" targetRef="CAT_catalogo_validar" name=""/>
+    <bpmn:sequenceFlow id="CAT_F02" sourceRef="CAT_catalogo_validar" targetRef="CAT_catalogo_valido" name=""/>
+    <bpmn:sequenceFlow id="CAT_F03" sourceRef="CAT_catalogo_valido" targetRef="CAT_catalogo_corrige" name="No"/>
+    <bpmn:sequenceFlow id="CAT_F04" sourceRef="CAT_catalogo_corrige" targetRef="CAT_catalogo_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CAT_F05" sourceRef="CAT_catalogo_corrige" targetRef="CAT_catalogo_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="CAT_F06" sourceRef="CAT_inicio" targetRef="CAT_catalogo_datos" name=""/>
+    <bpmn:sequenceFlow id="CAT_F07" sourceRef="CAT_catalogo_valido" targetRef="CAT_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CAT_F08" sourceRef="CAT_guardar" targetRef="CAT_fin" name=""/>
+    <bpmn:subProcess id="CAT_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="CAT_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>CAT_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="CAT_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="CAT_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>CAT_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>CAT_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="CAT_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>CAT_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="CAT_no_disponible_F1" sourceRef="CAT_no_disponible_inicio" targetRef="CAT_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="CAT_no_disponible_F2" sourceRef="CAT_no_disponible_informar" targetRef="CAT_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="CAT_A_catalogo">
+      <bpmn:text>Errores que se informan sin guardar:
+• Código de variedad duplicado (RF032).
+• Eliminar una variedad asignada a algún canario (RF032).
+• Composición repetida para el mismo sexo (DAT-004).
+• Factor sin tipo de herencia (RF031).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="CAT_A_catalogo_asoc" sourceRef="CAT_catalogo_valido" targetRef="CAT_A_catalogo" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_CAT">
+    <bpmn:participant id="Participant_CAT" name="TuCriadero — Mantener el catálogo de variedades y factores" processRef="Process_CAT"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_CAT" name="Mantener el catálogo de variedades y factores">
+    <bpmndi:BPMNPlane id="Plane_CAT" bpmnElement="Collaboration_CAT">
+      <bpmndi:BPMNShape id="Participant_CAT_di" bpmnElement="Participant_CAT" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_persona_di" bpmnElement="CAT_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_sistema_di" bpmnElement="CAT_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_inicio_di" bpmnElement="CAT_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="254.4000000000001" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_catalogo_datos_di" bpmnElement="CAT_catalogo_datos">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_catalogo_validar_di" bpmnElement="CAT_catalogo_validar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_catalogo_valido_di" bpmnElement="CAT_catalogo_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="640" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_catalogo_corrige_di" bpmnElement="CAT_catalogo_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="615" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_catalogo_cancelado_di" bpmnElement="CAT_catalogo_cancelado">
+        <dc:Bounds x="446.0" y="846.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="342.79999999999995" y="898" width="254.4000000000001" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_guardar_di" bpmnElement="CAT_guardar">
+        <dc:Bounds x="850.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_fin_di" bpmnElement="CAT_fin">
+        <dc:Bounds x="1036.0" y="1036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="932.8" y="1088" width="254.4000000000001" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAT_F01_di" bpmnElement="CAT_F01">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F02_di" bpmnElement="CAT_F02">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="646.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F03_di" bpmnElement="CAT_F03">
+        <di:waypoint x="1026.0" y="680"/>
+        <di:waypoint x="504.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="645" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F04_di" bpmnElement="CAT_F04">
+        <di:waypoint x="470" y="646.0"/>
+        <di:waypoint x="470" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="609.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F05_di" bpmnElement="CAT_F05">
+        <di:waypoint x="470" y="714.0"/>
+        <di:waypoint x="470" y="846.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F06_di" bpmnElement="CAT_F06">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F07_di" bpmnElement="CAT_F07">
+        <di:waypoint x="1060" y="714.0"/>
+        <di:waypoint x="1060" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_F08_di" bpmnElement="CAT_F08">
+        <di:waypoint x="1060" y="940.0"/>
+        <di:waypoint x="1060" y="1036.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CAT_no_disponible_di" bpmnElement="CAT_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1235" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_no_disponible_inicio_di" bpmnElement="CAT_no_disponible_inicio">
+        <dc:Bounds x="926" y="1336" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_no_disponible_informar_di" bpmnElement="CAT_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="1308.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAT_no_disponible_fin_di" bpmnElement="CAT_no_disponible_fin">
+        <dc:Bounds x="1486" y="1336" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAT_no_disponible_F1_di" bpmnElement="CAT_no_disponible_F1">
+        <di:waypoint x="974" y="1360"/>
+        <di:waypoint x="1065.0" y="1360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAT_no_disponible_F2_di" bpmnElement="CAT_no_disponible_F2">
+        <di:waypoint x="1395.0" y="1360"/>
+        <di:waypoint x="1486" y="1360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CAT_A_catalogo_di" bpmnElement="CAT_A_catalogo">
+        <dc:Bounds x="1310" y="537.0" width="330" height="286.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAT_A_catalogo_asoc_di" bpmnElement="CAT_A_catalogo_asoc">
+        <di:waypoint x="1094.0" y="680"/>
+        <di:waypoint x="1310" y="680"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

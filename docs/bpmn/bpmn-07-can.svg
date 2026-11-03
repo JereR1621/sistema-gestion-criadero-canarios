@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="2300" viewBox="0 0 1700 2300">
+  <rect x="0" y="0" width="1700" height="2300" fill="white"/>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#253957"/>
+    </marker>
+  </defs>
+  <text x="55" y="44" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">TuCriadero · BPMN 2.0 · CAN</text>
+  <text x="55" y="92" font-family="Arial, Liberation Sans, sans-serif" font-size="36" text-anchor="start" fill="#253957" font-weight="bold">Registrar o actualizar un canario</text>
+  <rect x="40" y="150" width="1620" height="1950" fill="white" stroke="#253957" stroke-width="2"/>
+  <rect x="40" y="150" width="60" height="1950" fill="#253957"/>
+  <text transform="translate(79,1125.0) rotate(-90)" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="white">TuCriadero · Registrar o actualizar un canario</text>
+  <rect x="100" y="150" width="700" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="450.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">Criador</text>
+  <line x1="100" y1="150" x2="100" y2="2100" stroke="#253957" stroke-width="2"/>
+  <rect x="800" y="150" width="860" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="1230.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">TuCriadero (aplicación web)</text>
+  <line x1="800" y1="150" x2="800" y2="2100" stroke="#253957" stroke-width="2"/>
+  <polyline points="1094.0,680 1310,680" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="4 6"/>
+  <polyline points="680.0,490 850.0,490" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,560.0 1060,646.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1026.0,680 504.0,680" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="1014.0" y1="673" x2="1004.0" y2="687" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,646.0 470,560.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="470,714.0 470,846.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="463" y1="726.0" x2="477" y2="736.0" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,324.0 470,420.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,714.0 1060,800.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,940.0 1060,990.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1130.0 1060,1180.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1320.0 1060,1370.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1510.0 1060,1606.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <circle cx="470" cy="300" r="24" fill="white" stroke="#253957" stroke-width="2"/>
+  <rect x="260.0" y="420.0" width="420" height="140" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="284.0" cy="442.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M273.0,462.0 v-5 q11,-16 22,0 v5 M278.0,462.0 v9 M290.0,462.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="486" y="446.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF007–RF010, RF012, RF013, RF029</text>
+  <text x="480" y="486.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Completar la ficha del</text>
+  <text x="480" y="514.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">canario y los portadores</text>
+  <text x="480" y="542.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">conocidos</text>
+  <rect x="850.0" y="420.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="445.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="445.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="445.0" x2="889.0" y2="445.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="452.0710678118655" x2="884.6066017177982" y2="455.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="455.0" x2="874.0" y2="460.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="452.0710678118655" x2="863.3933982822018" y2="455.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="445.0" x2="859.0" y2="445.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="437.9289321881345" x2="863.3933982822018" y2="434.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="435.0" x2="874.0" y2="430.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="437.9289321881345" x2="884.6066017177982" y2="434.39339828220176" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="446.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF007–RF010, RF012, RF013, RF029</text>
+  <text x="1070" y="486.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Validar anillo, sexo,</text>
+  <text x="1070" y="514.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">variedad, padres y</text>
+  <text x="1070" y="542.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">portadores</text>
+  <polygon points="1060,646 1094,680 1060,714 1026,680" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M1048,668 L1072,692 M1072,668 L1048,692" stroke="#253957" stroke-width="3"/>
+  <polygon points="470,646 504,680 470,714 436,680" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M458,668 L482,692 M482,668 L458,692" stroke="#253957" stroke-width="3"/>
+  <circle cx="470" cy="870" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="850.0" y="800.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="825.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="825.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="825.0" x2="889.0" y2="825.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="832.0710678118655" x2="884.6066017177982" y2="835.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="835.0" x2="874.0" y2="840.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="832.0710678118655" x2="863.3933982822018" y2="835.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="825.0" x2="859.0" y2="825.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="817.9289321881346" x2="863.3933982822018" y2="814.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="815.0" x2="874.0" y2="810.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="817.9289321881345" x2="884.6066017177982" y2="814.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="826.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF007, RF009, RF010</text>
+  <text x="1070" y="880.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Guardar la ficha y los</text>
+  <text x="1070" y="908.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">portadores indicados</text>
+  <rect x="850.0" y="990.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="1015.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="1015.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="1015.0" x2="889.0" y2="1015.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="1022.0710678118655" x2="884.6066017177982" y2="1025.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1025.0" x2="874.0" y2="1030.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="1022.0710678118655" x2="863.3933982822018" y2="1025.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="1015.0" x2="859.0" y2="1015.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="1007.9289321881346" x2="863.3933982822018" y2="1004.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1005.0" x2="874.0" y2="1000.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="1007.9289321881345" x2="884.6066017177982" y2="1004.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="1016.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF033</text>
+  <text x="1070" y="1056.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Obtener los factores</text>
+  <text x="1070" y="1084.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">manifestados desde la</text>
+  <text x="1070" y="1112.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">variedad</text>
+  <rect x="850.0" y="1180.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="1205.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="1205.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="1205.0" x2="889.0" y2="1205.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="1212.0710678118655" x2="884.6066017177982" y2="1215.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1215.0" x2="874.0" y2="1220.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="1212.0710678118655" x2="863.3933982822018" y2="1215.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="1205.0" x2="859.0" y2="1205.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="1197.9289321881345" x2="863.3933982822018" y2="1194.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1195.0" x2="874.0" y2="1190.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="1197.9289321881345" x2="884.6066017177982" y2="1194.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="1206.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF034</text>
+  <text x="1070" y="1246.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Recalcular los portadores</text>
+  <text x="1070" y="1274.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">deducidos del canario y</text>
+  <text x="1070" y="1302.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">sus crías</text>
+  <rect x="850.0" y="1370.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="1395.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="1395.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="1395.0" x2="889.0" y2="1395.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="1402.0710678118655" x2="884.6066017177982" y2="1405.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1405.0" x2="874.0" y2="1410.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="1402.0710678118655" x2="863.3933982822018" y2="1405.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="1395.0" x2="859.0" y2="1395.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="1387.9289321881345" x2="863.3933982822018" y2="1384.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1385.0" x2="874.0" y2="1380.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="1387.9289321881345" x2="884.6066017177982" y2="1384.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="1396.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF024</text>
+  <text x="1070" y="1450.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Registrar auditoría y</text>
+  <text x="1070" y="1478.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">mostrar la ficha</text>
+  <circle cx="1060" cy="1630" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="840" y="1805" width="780" height="250" rx="18" fill="white" stroke="#475569" stroke-width="2.5" stroke-dasharray="10 7"/>
+  <polyline points="974,1930 1065.0,1930" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1395.0,1930 1486,1930" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <circle cx="950" cy="1930" r="24" fill="white" stroke="#A61B1B" stroke-width="2.5"/>
+  <path d="M941,1941 L947,1920 L953,1932 L960,1919 L954,1940 L948,1928 Z" fill="none" stroke="#A61B1B" stroke-width="2"/>
+  <rect x="1065.0" y="1878.0" width="330" height="104" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <text x="1230.0" y="1928" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="middle" fill="#253957" font-weight="normal">Informar el motivo y</text>
+  <text x="1230.0" y="1956" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="middle" fill="#253957" font-weight="normal">no guardar cambios</text>
+  <circle cx="1510" cy="1930" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="1310" y="489.0" width="330" height="382.0" fill="#FBFCFE" stroke="none"/>
+  <path d="M1326,489.0 L1310,489.0 L1310,871.0 L1326,871.0" fill="none" stroke="#475569" stroke-width="2.5"/>
+  <text x="1324" y="517.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="bold">Errores que se informan sin</text>
+  <text x="1324" y="541.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="bold">guardar:</text>
+  <text x="1324" y="565.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Anillo ya usado: se indica</text>
+  <text x="1324" y="589.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   el canario que lo usa</text>
+  <text x="1324" y="613.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   (RF008).</text>
+  <text x="1324" y="637.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Variedad que no corresponde</text>
+  <text x="1324" y="661.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   al sexo (RF012).</text>
+  <text x="1324" y="685.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Hembra portadora de un</text>
+  <text x="1324" y="709.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   factor ligado al sexo</text>
+  <text x="1324" y="733.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   (RF013).</text>
+  <text x="1324" y="757.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Portador de un factor</text>
+  <text x="1324" y="781.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   dominante o de uno que ya</text>
+  <text x="1324" y="805.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   manifiesta (DAT-004).</text>
+  <text x="1324" y="829.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Padre o madre de otro</text>
+  <text x="1324" y="853.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   criadero (DAT-004).</text>
+  <text x="506" y="308" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">Registrar o editar un</text>
+  <text x="506" y="334" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">canario</text>
+  <text x="1106.0" y="664" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">¿Datos válidos?</text>
+  <text x="424.0" y="639" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">¿Corrige los</text>
+  <text x="424.0" y="664" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">datos?</text>
+  <text x="470" y="922" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Edición cancelada; ficha</text>
+  <text x="470" y="948" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">sin cambios</text>
+  <text x="1060" y="1682" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Ficha registrada o</text>
+  <text x="1060" y="1708" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">actualizada</text>
+  <rect x="984.48" y="645" width="31.519999999999982" height="29" fill="white"/>
+  <text x="1012.0" y="668" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="478" y="609.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="632.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="478" y="725.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="748.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="1068" y="725.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="1072" y="748.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <text x="862" y="1839" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="start" fill="#475569" font-weight="bold">Subproceso de evento: puede ocurrir en cualquier paso</text>
+  <text x="950" y="1987" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">Sin conexión,</text>
+  <text x="950" y="2011" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">mantenimiento o</text>
+  <text x="950" y="2035" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">sesión expirada</text>
+  <text x="1510" y="1987" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">Operación no</text>
+  <text x="1510" y="2011" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">realizada; sin</text>
+  <text x="1510" y="2035" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">cambios</text>
+  <text x="55" y="2155" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="start" fill="#253957" font-weight="bold">Reglas y alcance del proceso</text>
+  <text x="55" y="2189" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Precondición: sesión de criador válida; el canario y sus padres, si existen, son del propio criadero (RF003, DAT-004).</text>
+  <text x="55" y="2219" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Un canario comprado puede no tener padres y registra su procedencia. Sexo y variedad admiten "sin determinar"</text>
+  <text x="55" y="2249" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">   (RF007–RF010). Al cambiar sexo, variedad o padres solo se recalculan los portadores deducidos (RF034).</text>
+</svg>

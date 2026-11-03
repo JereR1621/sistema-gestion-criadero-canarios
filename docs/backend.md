@@ -4,7 +4,7 @@ Guía de trabajo para el equipo de backend del **Sistema de Gestión de Criadero
 
 El contrato con frontend (rutas, datos de cada vista y campos de los formularios) está en `docs/contrato-back-front.md`.
 
-Los valores marcados en el SRS como "(Propuesta del equipo, por validar con el cliente)" se implementan tal como están, pero pueden cambiar cuando el cliente firme.
+Todos los valores del SRS, incluidos los numéricos de los requisitos no funcionales, son requisitos: el cliente los valida con su firma (SRS §1.1, CR-014). Si el cliente pide cambiar alguno, el PM lo registra como CR y actualiza los issues afectados.
 
 ## 1. Stack
 
@@ -36,13 +36,22 @@ tests/           → PHPUnit
 
 ## 3. Modelo de datos
 
-Fuente: Figura 1 (`docs/img/modelo-er.png`), DAT-001 y DAT-004 del SRS. Los nombres de tablas y columnas son una propuesta; los tipos son orientativos.
+Fuente: SRS §4.7, DAT-001 y DAT-004. El modelo se presenta en dos niveles:
 
-![Modelo entidad-relación](img/modelo-er.png)
+- **Figura 1 — Modelo entidad-relación conceptual (MER)**, en notación de Chen: entidades, relaciones con nombre, cardinalidad (mín, máx) y atributos clave. No muestra claves foráneas.
+- **Figura 2 — Modelo relacional (MR)**: tablas con su clave primaria (PK), claves foráneas (FK) y columnas opcionales. **Es el que se implementa en las migraciones.**
+
+Los nombres de tablas y columnas de la tabla de abajo son los que se usan en el código; los tipos son orientativos.
+
+![Figura 1 — Modelo entidad-relación conceptual (MER)](img/er-01-mer.png)
+
+![Figura 2 — Modelo relacional (MR)](img/er-02-mr.png)
+
+Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](img/er-02-mr.svg).
 
 | Tabla | Columnas | Claves y restricciones |
 |---|---|---|
-| `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_cierre` solo si estado = cerrada. Socio y club solo para criadores. |
+| `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_registro, fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_registro` la pone el sistema al crear la cuenta (la muestra la administración de cuentas, RF006; es un dato técnico que la Figura 2 no dibuja). `fecha_cierre` solo si estado = cerrada. Socio y club solo para criadores. |
 | `criadero` | id, usuario_id | `usuario_id` UNIQUE (un criadero por criador; el administrador no tiene). |
 | `jaula` | id, criadero_id, numero | UNIQUE (`criadero_id`, `numero`). |
 | `variedad` | codigo (CHAR 3), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
@@ -56,7 +65,7 @@ Fuente: Figura 1 (`docs/img/modelo-er.png`), DAT-001 y DAT-004 del SRS. Los nomb
 | `auditoria` | id, usuario_id, accion, entidad, entidad_id, fecha_hora | Se conserva 1 año (SEG-003). |
 
 Notas del modelo:
-- `padre_id` y `madre_id` son **dos claves foráneas** a `canario`; `macho_id` y `hembra_id` también. El diagrama las dibuja como una sola línea.
+- `padre_id` y `madre_id` son **dos claves foráneas** a `canario`; `macho_id` y `hembra_id` también. En la Figura 2 aparecen como columnas FK separadas.
 - Hay una referencia circular (`canario.cruce_origen_id` → `cruce` y `cruce.macho_id` → `canario`). MySQL la admite: los padres existen antes que el cruce, y el pichón se crea después del cruce.
 - `procedencia` (de dónde se compró un canario) no es lo mismo que `factor_portado.origen` (si el portador lo dedujo el sistema o lo indicó el criador).
 - Los factores que **manifiesta** un canario **no se guardan**: se obtienen de `variedad_factor` según su variedad.

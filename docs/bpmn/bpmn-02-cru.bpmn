@@ -1,0 +1,441 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_CRU" name="Planificar y registrar un cruce" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida; solo se usan registros del propio criadero (RF002–RF003). Una hembra con varios machos, o un macho con varias hembras, se registran repitiendo el proceso para cada pareja (RF019–RF020).
+La vista previa no guarda nada. Los porcentajes siguen SUP-004 (factores independientes, una dosis de los dominantes) y se avisa cuando el resultado es aproximado.</bpmn:documentation>
+    <bpmn:laneSet id="CRU_lanes">
+      <bpmn:lane id="CRU_persona" name="Criador">
+        <bpmn:flowNodeRef>CRU_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_cancelado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_decide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="CRU_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>CRU_propuesta_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_propuesta_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_catalogo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_calcular</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_reglas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_aviso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_mostrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_revalidar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_vigentes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_cambiaron</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CRU_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="CRU_inicio" name="Planificar un cruce">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>CRU_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="CRU_propuesta_datos" name="Elegir macho, hembra, jaula, temporada y fecha de inicio">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F04</bpmn:incoming>
+      <bpmn:incoming>CRU_F06</bpmn:incoming>
+      <bpmn:incoming>CRU_F15</bpmn:incoming>
+      <bpmn:outgoing>CRU_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CRU_propuesta_validar" name="Validar progenitores, sexo, jaula y criadero">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F01</bpmn:incoming>
+      <bpmn:outgoing>CRU_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CRU_propuesta_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="CRU_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F02</bpmn:incoming>
+      <bpmn:outgoing>CRU_F03</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="CRU_propuesta_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="CRU_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F03</bpmn:incoming>
+      <bpmn:outgoing>CRU_F04</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="CRU_propuesta_cancelado" name="Planificación cancelada; sin cruce guardado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="CRU_catalogo" name="Obtener factores manifestados, portados y tipo de herencia">
+      <bpmn:documentation>SRS-RF031, SRS-RF033, SRS-RF034</bpmn:documentation>
+      <bpmn:incoming>CRU_F07</bpmn:incoming>
+      <bpmn:outgoing>CRU_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CRU_calcular" name="Calcular los porcentajes por sexo con las reglas del catálogo">
+      <bpmn:documentation>SRS-RF035, SRS-RF036, SRS-RF037, SRS-RF038</bpmn:documentation>
+      <bpmn:incoming>CRU_F08</bpmn:incoming>
+      <bpmn:outgoing>CRU_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CRU_reglas" name="¿Hay factores sin regla de herencia?" gatewayDirection="Diverging" default="CRU_F12">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F09</bpmn:incoming>
+      <bpmn:outgoing>CRU_F10</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CRU_aviso" name="Agregar el aviso de factores no calculables">
+      <bpmn:documentation>SRS-RF039</bpmn:documentation>
+      <bpmn:incoming>CRU_F10</bpmn:incoming>
+      <bpmn:outgoing>CRU_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CRU_mostrar" name="Mostrar el posible resultado por sexo y los avisos">
+      <bpmn:documentation>SRS-RF035, SRS-RF039</bpmn:documentation>
+      <bpmn:incoming>CRU_F11</bpmn:incoming>
+      <bpmn:incoming>CRU_F12</bpmn:incoming>
+      <bpmn:outgoing>CRU_F13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="CRU_revisar" name="Revisar el posible resultado y decidir">
+      <bpmn:documentation>SRS-RF035</bpmn:documentation>
+      <bpmn:incoming>CRU_F13</bpmn:incoming>
+      <bpmn:outgoing>CRU_F14</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="CRU_decide" name="¿Qué decide?" gatewayDirection="Diverging" default="CRU_F17">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F14</bpmn:incoming>
+      <bpmn:outgoing>CRU_F15</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F16</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="CRU_revalidar" name="Revalidar los datos al confirmar">
+      <bpmn:documentation>SRS-RF018</bpmn:documentation>
+      <bpmn:incoming>CRU_F16</bpmn:incoming>
+      <bpmn:outgoing>CRU_F18</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CRU_cancelado" name="Propuesta cancelada; sin cruce guardado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F17</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="CRU_vigentes" name="¿Datos vigentes?" gatewayDirection="Diverging" default="CRU_F19">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F18</bpmn:incoming>
+      <bpmn:outgoing>CRU_F19</bpmn:outgoing>
+      <bpmn:outgoing>CRU_F20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="CRU_cambiaron" name="No guardado: un progenitor o la jaula cambió">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F19</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="CRU_guardar" name="Registrar el cruce con su fecha de inicio y auditar">
+      <bpmn:documentation>SRS-RF018, SRS-RF019, SRS-RF020</bpmn:documentation>
+      <bpmn:incoming>CRU_F20</bpmn:incoming>
+      <bpmn:outgoing>CRU_F21</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CRU_fin" name="Cruce registrado; ficha de cría disponible">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CRU_F21</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="CRU_F01" sourceRef="CRU_propuesta_datos" targetRef="CRU_propuesta_validar" name=""/>
+    <bpmn:sequenceFlow id="CRU_F02" sourceRef="CRU_propuesta_validar" targetRef="CRU_propuesta_valido" name=""/>
+    <bpmn:sequenceFlow id="CRU_F03" sourceRef="CRU_propuesta_valido" targetRef="CRU_propuesta_corrige" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F04" sourceRef="CRU_propuesta_corrige" targetRef="CRU_propuesta_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F05" sourceRef="CRU_propuesta_corrige" targetRef="CRU_propuesta_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F06" sourceRef="CRU_inicio" targetRef="CRU_propuesta_datos" name=""/>
+    <bpmn:sequenceFlow id="CRU_F07" sourceRef="CRU_propuesta_valido" targetRef="CRU_catalogo" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F08" sourceRef="CRU_catalogo" targetRef="CRU_calcular" name=""/>
+    <bpmn:sequenceFlow id="CRU_F09" sourceRef="CRU_calcular" targetRef="CRU_reglas" name=""/>
+    <bpmn:sequenceFlow id="CRU_F10" sourceRef="CRU_reglas" targetRef="CRU_aviso" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">faltan_reglas</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F11" sourceRef="CRU_aviso" targetRef="CRU_mostrar" name=""/>
+    <bpmn:sequenceFlow id="CRU_F12" sourceRef="CRU_reglas" targetRef="CRU_mostrar" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F13" sourceRef="CRU_mostrar" targetRef="CRU_revisar" name=""/>
+    <bpmn:sequenceFlow id="CRU_F14" sourceRef="CRU_revisar" targetRef="CRU_decide" name=""/>
+    <bpmn:sequenceFlow id="CRU_F15" sourceRef="CRU_decide" targetRef="CRU_propuesta_datos" name="Modificar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">decision = modificar</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F16" sourceRef="CRU_decide" targetRef="CRU_revalidar" name="Confirmar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">decision = confirmar</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F17" sourceRef="CRU_decide" targetRef="CRU_cancelado" name="Cancelar"/>
+    <bpmn:sequenceFlow id="CRU_F18" sourceRef="CRU_revalidar" targetRef="CRU_vigentes" name=""/>
+    <bpmn:sequenceFlow id="CRU_F19" sourceRef="CRU_vigentes" targetRef="CRU_cambiaron" name="No"/>
+    <bpmn:sequenceFlow id="CRU_F20" sourceRef="CRU_vigentes" targetRef="CRU_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_vigentes</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CRU_F21" sourceRef="CRU_guardar" targetRef="CRU_fin" name=""/>
+    <bpmn:subProcess id="CRU_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="CRU_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>CRU_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="CRU_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="CRU_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>CRU_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>CRU_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="CRU_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>CRU_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="CRU_no_disponible_F1" sourceRef="CRU_no_disponible_inicio" targetRef="CRU_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="CRU_no_disponible_F2" sourceRef="CRU_no_disponible_informar" targetRef="CRU_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="CRU_A_propuesta">
+      <bpmn:text>Errores que se informan sin guardar:
+• Macho o hembra sin sexo registrado, o con un sexo que no corresponde (RF018).
+• Canario o jaula de otro criadero (RF003, DAT-004).
+• Falta un dato obligatorio (RF018).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="CRU_A_propuesta_asoc" sourceRef="CRU_propuesta_valido" targetRef="CRU_A_propuesta" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_CRU">
+    <bpmn:participant id="Participant_CRU" name="TuCriadero — Planificar y registrar un cruce" processRef="Process_CRU"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_CRU" name="Planificar y registrar un cruce">
+    <bpmndi:BPMNPlane id="Plane_CRU" bpmnElement="Collaboration_CRU">
+      <bpmndi:BPMNShape id="Participant_CRU_di" bpmnElement="Participant_CRU" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="2900"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_persona_di" bpmnElement="CRU_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="2900"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_sistema_di" bpmnElement="CRU_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="2900"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_inicio_di" bpmnElement="CRU_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="242.08000000000004" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_datos_di" bpmnElement="CRU_propuesta_datos">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_validar_di" bpmnElement="CRU_propuesta_validar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_valido_di" bpmnElement="CRU_propuesta_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="640" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_corrige_di" bpmnElement="CRU_propuesta_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="615" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_propuesta_cancelado_di" bpmnElement="CRU_propuesta_cancelado">
+        <dc:Bounds x="446.0" y="846.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="318.15999999999997" y="898" width="303.67999999999995" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_catalogo_di" bpmnElement="CRU_catalogo">
+        <dc:Bounds x="850.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_calcular_di" bpmnElement="CRU_calcular">
+        <dc:Bounds x="850.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_reglas_di" bpmnElement="CRU_reglas" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="1216.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="788.24" y="1185" width="229.76" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_aviso_di" bpmnElement="CRU_aviso">
+        <dc:Bounds x="850.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_mostrar_di" bpmnElement="CRU_mostrar">
+        <dc:Bounds x="850.0" y="1560.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_revisar_di" bpmnElement="CRU_revisar">
+        <dc:Bounds x="260.0" y="1560.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_decide_di" bpmnElement="CRU_decide" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="1786.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="1780" width="155.84000000000003" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_revalidar_di" bpmnElement="CRU_revalidar">
+        <dc:Bounds x="850.0" y="1940.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_cancelado_di" bpmnElement="CRU_cancelado">
+        <dc:Bounds x="446.0" y="1986.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="318.15999999999997" y="2038" width="303.67999999999995" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_vigentes_di" bpmnElement="CRU_vigentes" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="2166.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="812.88" y="2160" width="205.12" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_cambiaron_di" bpmnElement="CRU_cambiaron">
+        <dc:Bounds x="1456.0" y="2176.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1383.6" y="2228" width="192.79999999999995" height="82"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_guardar_di" bpmnElement="CRU_guardar">
+        <dc:Bounds x="850.0" y="2320.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_fin_di" bpmnElement="CRU_fin">
+        <dc:Bounds x="1036.0" y="2556.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="914.3199999999999" y="2608" width="291.3599999999999" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CRU_F01_di" bpmnElement="CRU_F01">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F02_di" bpmnElement="CRU_F02">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="646.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F03_di" bpmnElement="CRU_F03">
+        <di:waypoint x="1026.0" y="680"/>
+        <di:waypoint x="504.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="645" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F04_di" bpmnElement="CRU_F04">
+        <di:waypoint x="470" y="646.0"/>
+        <di:waypoint x="470" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="609.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F05_di" bpmnElement="CRU_F05">
+        <di:waypoint x="470" y="714.0"/>
+        <di:waypoint x="470" y="846.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F06_di" bpmnElement="CRU_F06">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F07_di" bpmnElement="CRU_F07">
+        <di:waypoint x="1060" y="714.0"/>
+        <di:waypoint x="1060" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F08_di" bpmnElement="CRU_F08">
+        <di:waypoint x="1060" y="940.0"/>
+        <di:waypoint x="1060" y="990.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F09_di" bpmnElement="CRU_F09">
+        <di:waypoint x="1060" y="1130.0"/>
+        <di:waypoint x="1060" y="1216.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F10_di" bpmnElement="CRU_F10">
+        <di:waypoint x="1060" y="1284.0"/>
+        <di:waypoint x="1060" y="1370.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="1295.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F11_di" bpmnElement="CRU_F11">
+        <di:waypoint x="1060" y="1510.0"/>
+        <di:waypoint x="1060" y="1560.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F12_di" bpmnElement="CRU_F12">
+        <di:waypoint x="1094.0" y="1250"/>
+        <di:waypoint x="1290" y="1250"/>
+        <di:waypoint x="1290" y="1630"/>
+        <di:waypoint x="1270.0" y="1630"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1104.0" y="1215" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F13_di" bpmnElement="CRU_F13">
+        <di:waypoint x="850.0" y="1630"/>
+        <di:waypoint x="680.0" y="1630"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F14_di" bpmnElement="CRU_F14">
+        <di:waypoint x="470" y="1700.0"/>
+        <di:waypoint x="470" y="1786.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F15_di" bpmnElement="CRU_F15">
+        <di:waypoint x="436.0" y="1820"/>
+        <di:waypoint x="205" y="1820"/>
+        <di:waypoint x="205" y="490"/>
+        <di:waypoint x="260.0" y="490"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="312.15999999999997" y="1827" width="113.84000000000003" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F16_di" bpmnElement="CRU_F16">
+        <di:waypoint x="504.0" y="1820"/>
+        <di:waypoint x="1060" y="1820"/>
+        <di:waypoint x="1060" y="1940.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="514.0" y="1785" width="113.84000000000003" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F17_di" bpmnElement="CRU_F17">
+        <di:waypoint x="470" y="1854.0"/>
+        <di:waypoint x="470" y="1986.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="1865.0" width="102.08000000000004" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F18_di" bpmnElement="CRU_F18">
+        <di:waypoint x="1060" y="2080.0"/>
+        <di:waypoint x="1060" y="2166.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F19_di" bpmnElement="CRU_F19">
+        <di:waypoint x="1094.0" y="2200"/>
+        <di:waypoint x="1456.0" y="2200"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1104.0" y="2165" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F20_di" bpmnElement="CRU_F20">
+        <di:waypoint x="1060" y="2234.0"/>
+        <di:waypoint x="1060" y="2320.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="2245.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_F21_di" bpmnElement="CRU_F21">
+        <di:waypoint x="1060" y="2460.0"/>
+        <di:waypoint x="1060" y="2556.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CRU_no_disponible_di" bpmnElement="CRU_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="2755" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_no_disponible_inicio_di" bpmnElement="CRU_no_disponible_inicio">
+        <dc:Bounds x="926" y="2856" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_no_disponible_informar_di" bpmnElement="CRU_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="2828.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CRU_no_disponible_fin_di" bpmnElement="CRU_no_disponible_fin">
+        <dc:Bounds x="1486" y="2856" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CRU_no_disponible_F1_di" bpmnElement="CRU_no_disponible_F1">
+        <di:waypoint x="974" y="2880"/>
+        <di:waypoint x="1065.0" y="2880"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CRU_no_disponible_F2_di" bpmnElement="CRU_no_disponible_F2">
+        <di:waypoint x="1395.0" y="2880"/>
+        <di:waypoint x="1486" y="2880"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CRU_A_propuesta_di" bpmnElement="CRU_A_propuesta">
+        <dc:Bounds x="1310" y="561.0" width="330" height="238.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CRU_A_propuesta_asoc_di" bpmnElement="CRU_A_propuesta_asoc">
+        <di:waypoint x="1094.0" y="680"/>
+        <di:waypoint x="1310" y="680"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
