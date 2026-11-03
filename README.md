@@ -12,6 +12,7 @@ Estado actual: SRS v1.0 preparado para presentarlo al cliente para su aceptació
 |---|---|
 | [`docs/srs/`](docs/srs/) | Todos. Especificación de requisitos v1.0 (ISO/IEC/IEEE 29148). **Es la fuente oficial.** |
 | [`docs/backend.md`](docs/backend.md) | Backend: modelo de datos (MER conceptual y modelo relacional con PK y FK), reglas, cálculo genético y seguridad. |
+| [`docs/base-de-datos.md`](docs/base-de-datos.md) | Backend: instalar MySQL y PHP, crear la base local, migraciones y qué se sube a GitHub. |
 | [`docs/frontend.md`](docs/frontend.md) | Frontend: pantallas, mensajes, experiencia de uso en el teléfono. |
 | [`docs/contrato-back-front.md`](docs/contrato-back-front.md) | Backend y frontend: rutas, datos que recibe cada vista, campos de cada formulario y errores. **Preliminar:** se acuerda en la épica E0. |
 | [`docs/bpmn/`](docs/bpmn/) | Todos: doce procesos BPMN 2.0 (vista general de la temporada y once procesos detallados), archivos editables, vistas vectoriales y trazabilidad al SRS. |
@@ -66,4 +67,4 @@ Las etiquetas de área son `area:backend`, `area:frontend`, `area:pruebas` (prue
 
 ## Puesta en marcha local
 
-Pendiente: la completa el equipo de backend cuando exista la primera versión ejecutable (requisitos de PHP y MySQL, variables de entorno, migraciones y seeds).
+Instalación de MySQL y PHP, base local, `.env` y migraciones: [`docs/base-de-datos.md`](docs/base-de-datos.md). El arranque de la aplicación se completa cuando exista la primera versión ejecutable.

@@ -39,6 +39,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 - [ ] Respeta las reglas de integridad y de aislamiento entre criaderos (`docs/backend.md`, §2 y §3).
 - [ ] Se ve bien en un teléfono de 360 px de ancho (si tiene pantalla).
 - [ ] Tiene pruebas PHPUnit (si tiene lógica).
+- [ ] Si cambia la base: migración nueva (nunca editar una ya integrada) y `docs/backend.md` §3 actualizado (`docs/base-de-datos.md`).
 - [ ] Pruebas internas realizadas y evidencias del método de verificación del SRS disponibles.
 - [ ] Código revisado e integrado en `develop`.
 
@@ -66,6 +67,7 @@ Nadie cambia un requisito por su cuenta. Las solicitudes van al PM, que las eval
 
 ## Lo que nunca se sube
 
-- Credenciales (AWS, MySQL): van en variables de entorno o en los *secrets* de GitHub.
+- Credenciales (AWS, MySQL): van en `.env` (local) o en las variables de AWS y los *secrets* de GitHub. Al repositorio solo va `.env.example`.
+- Volcados o respaldos de una base con datos (`mysqldump`).
 - El Excel del cliente: trae datos personales de terceros. Solo se sube el seed generado a partir de él.
 - Datos reales de criadores.

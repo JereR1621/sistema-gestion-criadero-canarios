@@ -11,9 +11,12 @@ config/local.php
 *.xlsx
 *.xls
 
-# Respaldos y volcados de base de datos
+# Respaldos y volcados de base de datos (las migraciones .sql de database/ sí se versionan)
 *.sql.gz
+*.dump
+*.bak
 dumps/
+respaldos/
 
 # Registros y archivos temporales
 *.log
