@@ -12,7 +12,7 @@ Todos los valores del SRS, incluidos los numéricos de los requisitos no funcion
 |---|---|---|
 | Lenguaje | PHP | La versión la define el equipo; se recomienda PHP 8.2 o superior. |
 | Interfaz | HTML embebido en PHP | Las páginas se generan en el servidor. No hay API para un frontend separado. |
-| Base de datos | MySQL | Usar **MySQL 8.0.16 o superior**: antes de esa versión MySQL ignora las restricciones `CHECK` que pide IF-002. |
+| Base de datos | MySQL | Usar **MySQL 8.0.16 o superior** (recomendado 8.4 LTS): antes de esa versión MySQL ignora las restricciones `CHECK` que pide IF-002. Instalación, migraciones y qué se sube a GitHub: [`base-de-datos.md`](base-de-datos.md). |
 | Despliegue | AWS | Entorno de pruebas (staging) y producción. |
 | Pruebas | PHPUnit (código) y Apache JMeter (carga) | Sujetas a cambio, según el SRS. |
 | Repositorio | GitHub | Ver `CONTRIBUTING.md`. |
@@ -27,8 +27,9 @@ app/
   Views/         → HTML de cada pantalla                                             (frontend)
 public/          → punto de entrada (index.php) y archivos públicos
 database/
-  migrations/    → creación de tablas
-  seeds/         → catálogo de variedades, factores y composición; cuenta de administrador
+  migrations/    → NNN_descripcion.sql: creación y cambios de tablas (ver base-de-datos.md)
+  seeds/         → catálogo de variedades, factores y composición; datos de prueba inventados
+  migrar.php     → aplica migraciones y seeds; crea la cuenta de administrador
 tests/           → PHPUnit
 ```
 
