@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_CTA" name="Administrar las cuentas" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de administrador; un criador no accede a esta función. El administrador ve los datos de registro y el estado de las cuentas, nunca los datos de los criaderos (RF006, SEG-001).
+Desactivar una cuenta impide su ingreso y conserva sus datos (RF005). Toda acción administrativa se audita (SEG-003).</bpmn:documentation>
+    <bpmn:laneSet id="CTA_lanes">
+      <bpmn:lane id="CTA_persona" name="Administrador">
+        <bpmn:flowNodeRef>CTA_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_consultar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_estado_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_estado_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_estado_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="CTA_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>CTA_listar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_estado_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_estado_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CTA_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="CTA_inicio" name="Administrar las cuentas">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>CTA_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="CTA_consultar" name="Consultar las cuentas">
+      <bpmn:documentation>SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>CTA_F01</bpmn:incoming>
+      <bpmn:outgoing>CTA_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CTA_listar" name="Listar el registro y el estado de cada cuenta">
+      <bpmn:documentation>SRS-RF006</bpmn:documentation>
+      <bpmn:incoming>CTA_F02</bpmn:incoming>
+      <bpmn:outgoing>CTA_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="CTA_estado_datos" name="Elegir una cuenta y su nuevo estado">
+      <bpmn:documentation>SRS-RF005</bpmn:documentation>
+      <bpmn:incoming>CTA_F06</bpmn:incoming>
+      <bpmn:incoming>CTA_F08</bpmn:incoming>
+      <bpmn:outgoing>CTA_F03</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CTA_estado_validar" name="Validar la cuenta y el cambio de estado">
+      <bpmn:documentation>SRS-RF005</bpmn:documentation>
+      <bpmn:incoming>CTA_F03</bpmn:incoming>
+      <bpmn:outgoing>CTA_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CTA_estado_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="CTA_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CTA_F04</bpmn:incoming>
+      <bpmn:outgoing>CTA_F05</bpmn:outgoing>
+      <bpmn:outgoing>CTA_F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="CTA_estado_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="CTA_F07">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CTA_F05</bpmn:incoming>
+      <bpmn:outgoing>CTA_F06</bpmn:outgoing>
+      <bpmn:outgoing>CTA_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="CTA_estado_cancelado" name="Cuentas sin cambios">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CTA_F07</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="CTA_guardar" name="Guardar el estado sin borrar datos y auditar">
+      <bpmn:documentation>SRS-RF005</bpmn:documentation>
+      <bpmn:incoming>CTA_F09</bpmn:incoming>
+      <bpmn:outgoing>CTA_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CTA_fin" name="Estado de la cuenta actualizado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CTA_F10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="CTA_F01" sourceRef="CTA_inicio" targetRef="CTA_consultar" name=""/>
+    <bpmn:sequenceFlow id="CTA_F02" sourceRef="CTA_consultar" targetRef="CTA_listar" name=""/>
+    <bpmn:sequenceFlow id="CTA_F03" sourceRef="CTA_estado_datos" targetRef="CTA_estado_validar" name=""/>
+    <bpmn:sequenceFlow id="CTA_F04" sourceRef="CTA_estado_validar" targetRef="CTA_estado_valido" name=""/>
+    <bpmn:sequenceFlow id="CTA_F05" sourceRef="CTA_estado_valido" targetRef="CTA_estado_corrige" name="No"/>
+    <bpmn:sequenceFlow id="CTA_F06" sourceRef="CTA_estado_corrige" targetRef="CTA_estado_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CTA_F07" sourceRef="CTA_estado_corrige" targetRef="CTA_estado_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="CTA_F08" sourceRef="CTA_listar" targetRef="CTA_estado_datos" name=""/>
+    <bpmn:sequenceFlow id="CTA_F09" sourceRef="CTA_estado_valido" targetRef="CTA_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CTA_F10" sourceRef="CTA_guardar" targetRef="CTA_fin" name=""/>
+    <bpmn:subProcess id="CTA_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="CTA_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>CTA_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="CTA_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="CTA_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>CTA_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>CTA_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="CTA_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>CTA_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="CTA_no_disponible_F1" sourceRef="CTA_no_disponible_inicio" targetRef="CTA_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="CTA_no_disponible_F2" sourceRef="CTA_no_disponible_informar" targetRef="CTA_no_disponible_fin"/>
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_CTA">
+    <bpmn:participant id="Participant_CTA" name="TuCriadero — Administrar las cuentas" processRef="Process_CTA"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_CTA" name="Administrar las cuentas">
+    <bpmndi:BPMNPlane id="Plane_CTA" bpmnElement="Collaboration_CTA">
+      <bpmndi:BPMNShape id="Participant_CTA_di" bpmnElement="Participant_CTA" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1570"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_persona_di" bpmnElement="CTA_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="1570"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_sistema_di" bpmnElement="CTA_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="1570"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_inicio_di" bpmnElement="CTA_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="291.36" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_consultar_di" bpmnElement="CTA_consultar">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_listar_di" bpmnElement="CTA_listar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_estado_datos_di" bpmnElement="CTA_estado_datos">
+        <dc:Bounds x="260.0" y="610.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_estado_validar_di" bpmnElement="CTA_estado_validar">
+        <dc:Bounds x="850.0" y="610.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_estado_valido_di" bpmnElement="CTA_estado_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="836.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="830" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_estado_corrige_di" bpmnElement="CTA_estado_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="836.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="805" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_estado_cancelado_di" bpmnElement="CTA_estado_cancelado">
+        <dc:Bounds x="446.0" y="1036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="348.96" y="1088" width="242.07999999999998" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_guardar_di" bpmnElement="CTA_guardar">
+        <dc:Bounds x="850.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_fin_di" bpmnElement="CTA_fin">
+        <dc:Bounds x="1036.0" y="1226.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="938.96" y="1278" width="242.07999999999993" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CTA_F01_di" bpmnElement="CTA_F01">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F02_di" bpmnElement="CTA_F02">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F03_di" bpmnElement="CTA_F03">
+        <di:waypoint x="680.0" y="680"/>
+        <di:waypoint x="850.0" y="680"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F04_di" bpmnElement="CTA_F04">
+        <di:waypoint x="1060" y="750.0"/>
+        <di:waypoint x="1060" y="836.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F05_di" bpmnElement="CTA_F05">
+        <di:waypoint x="1026.0" y="870"/>
+        <di:waypoint x="504.0" y="870"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="835" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F06_di" bpmnElement="CTA_F06">
+        <di:waypoint x="470" y="836.0"/>
+        <di:waypoint x="470" y="750.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="799.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F07_di" bpmnElement="CTA_F07">
+        <di:waypoint x="470" y="904.0"/>
+        <di:waypoint x="470" y="1036.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="915.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F08_di" bpmnElement="CTA_F08">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="582.0"/>
+        <di:waypoint x="470" y="582.0"/>
+        <di:waypoint x="470" y="610.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F09_di" bpmnElement="CTA_F09">
+        <di:waypoint x="1060" y="904.0"/>
+        <di:waypoint x="1060" y="990.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="915.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_F10_di" bpmnElement="CTA_F10">
+        <di:waypoint x="1060" y="1130.0"/>
+        <di:waypoint x="1060" y="1226.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CTA_no_disponible_di" bpmnElement="CTA_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1425" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_no_disponible_inicio_di" bpmnElement="CTA_no_disponible_inicio">
+        <dc:Bounds x="926" y="1526" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_no_disponible_informar_di" bpmnElement="CTA_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="1498.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CTA_no_disponible_fin_di" bpmnElement="CTA_no_disponible_fin">
+        <dc:Bounds x="1486" y="1526" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CTA_no_disponible_F1_di" bpmnElement="CTA_no_disponible_F1">
+        <di:waypoint x="974" y="1550"/>
+        <di:waypoint x="1065.0" y="1550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CTA_no_disponible_F2_di" bpmnElement="CTA_no_disponible_F2">
+        <di:waypoint x="1395.0" y="1550"/>
+        <di:waypoint x="1486" y="1550"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

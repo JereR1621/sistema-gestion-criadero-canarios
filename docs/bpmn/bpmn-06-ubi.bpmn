@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_UBI" name="Asignar o trasladar un canario" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida; canario y jaula del propio criadero (RF003, DAT-004).
+La jaula grande es la ubicación sin número. Cada canario tiene como máximo una ubicación abierta: el traslado cierra la anterior (RF015, RF016, DAT-004).</bpmn:documentation>
+    <bpmn:laneSet id="UBI_lanes">
+      <bpmn:lane id="UBI_persona" name="Criador">
+        <bpmn:flowNodeRef>UBI_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_mover_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_mover_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_mover_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="UBI_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>UBI_mover_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_mover_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_mover</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>UBI_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="UBI_inicio" name="Asignar o trasladar un canario">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>UBI_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="UBI_mover_datos" name="Elegir el canario, el destino y la fecha del movimiento">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>UBI_F04</bpmn:incoming>
+      <bpmn:incoming>UBI_F06</bpmn:incoming>
+      <bpmn:outgoing>UBI_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="UBI_mover_validar" name="Validar el canario, el destino y el criadero">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>UBI_F01</bpmn:incoming>
+      <bpmn:outgoing>UBI_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="UBI_mover_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="UBI_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>UBI_F02</bpmn:incoming>
+      <bpmn:outgoing>UBI_F03</bpmn:outgoing>
+      <bpmn:outgoing>UBI_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="UBI_mover_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="UBI_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>UBI_F03</bpmn:incoming>
+      <bpmn:outgoing>UBI_F04</bpmn:outgoing>
+      <bpmn:outgoing>UBI_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="UBI_mover_cancelado" name="Movimiento cancelado; ubicación sin cambios">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>UBI_F05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="UBI_mover" name="Cerrar la ubicación anterior y abrir la nueva">
+      <bpmn:documentation>SRS-RF015, SRS-RF016</bpmn:documentation>
+      <bpmn:incoming>UBI_F07</bpmn:incoming>
+      <bpmn:outgoing>UBI_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="UBI_fin" name="Canario ubicado; historial de la jaula actualizado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>UBI_F08</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="UBI_F01" sourceRef="UBI_mover_datos" targetRef="UBI_mover_validar" name=""/>
+    <bpmn:sequenceFlow id="UBI_F02" sourceRef="UBI_mover_validar" targetRef="UBI_mover_valido" name=""/>
+    <bpmn:sequenceFlow id="UBI_F03" sourceRef="UBI_mover_valido" targetRef="UBI_mover_corrige" name="No"/>
+    <bpmn:sequenceFlow id="UBI_F04" sourceRef="UBI_mover_corrige" targetRef="UBI_mover_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="UBI_F05" sourceRef="UBI_mover_corrige" targetRef="UBI_mover_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="UBI_F06" sourceRef="UBI_inicio" targetRef="UBI_mover_datos" name=""/>
+    <bpmn:sequenceFlow id="UBI_F07" sourceRef="UBI_mover_valido" targetRef="UBI_mover" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="UBI_F08" sourceRef="UBI_mover" targetRef="UBI_fin" name=""/>
+    <bpmn:subProcess id="UBI_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="UBI_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>UBI_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="UBI_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="UBI_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>UBI_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>UBI_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="UBI_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>UBI_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="UBI_no_disponible_F1" sourceRef="UBI_no_disponible_inicio" targetRef="UBI_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="UBI_no_disponible_F2" sourceRef="UBI_no_disponible_informar" targetRef="UBI_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="UBI_A_mover">
+      <bpmn:text>Errores que se informan sin guardar:
+• Canario o jaula de otro criadero (RF003, DAT-004).
+• Falta el canario, el destino o la fecha (RF015).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="UBI_A_mover_asoc" sourceRef="UBI_mover_valido" targetRef="UBI_A_mover" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_UBI">
+    <bpmn:participant id="Participant_UBI" name="TuCriadero — Asignar o trasladar un canario" processRef="Process_UBI"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_UBI" name="Asignar o trasladar un canario">
+    <bpmndi:BPMNPlane id="Plane_UBI" bpmnElement="Collaboration_UBI">
+      <bpmndi:BPMNShape id="Participant_UBI_di" bpmnElement="Participant_UBI" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_persona_di" bpmnElement="UBI_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_sistema_di" bpmnElement="UBI_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_inicio_di" bpmnElement="UBI_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="279.03999999999996" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_mover_datos_di" bpmnElement="UBI_mover_datos">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_mover_validar_di" bpmnElement="UBI_mover_validar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_mover_valido_di" bpmnElement="UBI_mover_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="640" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_mover_corrige_di" bpmnElement="UBI_mover_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="615" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_mover_cancelado_di" bpmnElement="UBI_mover_cancelado">
+        <dc:Bounds x="446.0" y="846.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="336.64" y="898" width="266.72" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_mover_di" bpmnElement="UBI_mover">
+        <dc:Bounds x="850.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_fin_di" bpmnElement="UBI_fin">
+        <dc:Bounds x="1036.0" y="1036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="926.64" y="1088" width="266.72000000000014" height="82"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="UBI_F01_di" bpmnElement="UBI_F01">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F02_di" bpmnElement="UBI_F02">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="646.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F03_di" bpmnElement="UBI_F03">
+        <di:waypoint x="1026.0" y="680"/>
+        <di:waypoint x="504.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="645" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F04_di" bpmnElement="UBI_F04">
+        <di:waypoint x="470" y="646.0"/>
+        <di:waypoint x="470" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="609.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F05_di" bpmnElement="UBI_F05">
+        <di:waypoint x="470" y="714.0"/>
+        <di:waypoint x="470" y="846.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F06_di" bpmnElement="UBI_F06">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F07_di" bpmnElement="UBI_F07">
+        <di:waypoint x="1060" y="714.0"/>
+        <di:waypoint x="1060" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_F08_di" bpmnElement="UBI_F08">
+        <di:waypoint x="1060" y="940.0"/>
+        <di:waypoint x="1060" y="1036.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UBI_no_disponible_di" bpmnElement="UBI_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1235" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_no_disponible_inicio_di" bpmnElement="UBI_no_disponible_inicio">
+        <dc:Bounds x="926" y="1336" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_no_disponible_informar_di" bpmnElement="UBI_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="1308.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UBI_no_disponible_fin_di" bpmnElement="UBI_no_disponible_fin">
+        <dc:Bounds x="1486" y="1336" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="UBI_no_disponible_F1_di" bpmnElement="UBI_no_disponible_F1">
+        <di:waypoint x="974" y="1360"/>
+        <di:waypoint x="1065.0" y="1360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="UBI_no_disponible_F2_di" bpmnElement="UBI_no_disponible_F2">
+        <di:waypoint x="1395.0" y="1360"/>
+        <di:waypoint x="1486" y="1360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UBI_A_mover_di" bpmnElement="UBI_A_mover">
+        <dc:Bounds x="1310" y="597.0" width="330" height="166.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="UBI_A_mover_asoc_di" bpmnElement="UBI_A_mover_asoc">
+        <di:waypoint x="1094.0" y="680"/>
+        <di:waypoint x="1310" y="680"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

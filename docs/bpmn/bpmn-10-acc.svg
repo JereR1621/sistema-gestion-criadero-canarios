@@ -1,0 +1,263 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="3630" viewBox="0 0 1700 3630">
+  <rect x="0" y="0" width="1700" height="3630" fill="white"/>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#253957"/>
+    </marker>
+  </defs>
+  <text x="55" y="44" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="bold">TuCriadero · BPMN 2.0 · ACC</text>
+  <text x="55" y="92" font-family="Arial, Liberation Sans, sans-serif" font-size="36" text-anchor="start" fill="#253957" font-weight="bold">Acceder a TuCriadero y completar el perfil</text>
+  <rect x="40" y="150" width="1620" height="3280" fill="white" stroke="#253957" stroke-width="2"/>
+  <rect x="40" y="150" width="60" height="3280" fill="#253957"/>
+  <text transform="translate(79,1790.0) rotate(-90)" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="white">TuCriadero · Acceder a TuCriadero y completar el perfil</text>
+  <rect x="100" y="150" width="700" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="450.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">Criador</text>
+  <line x1="100" y1="150" x2="100" y2="3430" stroke="#253957" stroke-width="2"/>
+  <rect x="800" y="150" width="860" height="65" fill="#EEF5FC" stroke="#253957" stroke-width="2"/>
+  <text x="1230.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="28" text-anchor="middle" fill="#253957" font-weight="bold">TuCriadero (aplicación web)</text>
+  <line x1="800" y1="150" x2="800" y2="3430" stroke="#253957" stroke-width="2"/>
+  <polyline points="1094.0,870 1310,870" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="4 6"/>
+  <polyline points="470,324.0 470,456.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="680.0,680 850.0,680" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,750.0 1060,836.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1026.0,870 504.0,870" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="1014.0" y1="863" x2="1004.0" y2="877" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,836.0 470,750.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="470,904.0 470,1036.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="463" y1="916.0" x2="477" y2="926.0" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,524.0 470,610.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="463" y1="536.0" x2="477" y2="546.0" stroke="#253957" stroke-width="2"/>
+  <polyline points="1060,904.0 1060,990.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1130.0 1060,1342.0 470,1342.0 470,1370.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="436.0,490 205,490 205,1440 260.0,1440" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="680.0,1440 850.0,1440" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1510.0 1060,1596.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1026.0,1630 504.0,1630" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="1014.0" y1="1623" x2="1004.0" y2="1637" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,1596.0 470,1510.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="470,1664.0 470,1796.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="463" y1="1676.0" x2="477" y2="1686.0" stroke="#253957" stroke-width="2"/>
+  <polyline points="1094.0,1630 1456.0,1630" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1664.0 1060,1750.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,1890.0 1060,2138.0 470,2138.0 470,2166.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="680.0,2390 850.0,2390" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,2460.0 1060,2546.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1026.0,2580 504.0,2580" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="1014.0" y1="2573" x2="1004.0" y2="2587" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,2546.0 470,2460.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="470,2614.0 470,2746.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="463" y1="2626.0" x2="477" y2="2636.0" stroke="#253957" stroke-width="2"/>
+  <polyline points="470,2234.0 470,2320.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,2614.0 1060,2700.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1060,2840.0 1060,2936.0" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="504.0,2200 1345,2200 1345,2960 1084.0,2960" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="516.0" y1="2193" x2="526.0" y2="2207" stroke="#253957" stroke-width="2"/>
+  <circle cx="470" cy="300" r="24" fill="white" stroke="#253957" stroke-width="2"/>
+  <polygon points="470,456 504,490 470,524 436,490" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M458,478 L482,502 M482,478 L458,502" stroke="#253957" stroke-width="3"/>
+  <rect x="260.0" y="610.0" width="420" height="140" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="284.0" cy="632.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M273.0,652.0 v-5 q11,-16 22,0 v5 M278.0,652.0 v9 M290.0,652.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="486" y="636.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF001</text>
+  <text x="480" y="690.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Ingresar nombre, correo y</text>
+  <text x="480" y="718.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">contraseña</text>
+  <rect x="850.0" y="610.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="635.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="635.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="635.0" x2="889.0" y2="635.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="642.0710678118655" x2="884.6066017177982" y2="645.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="645.0" x2="874.0" y2="650.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="642.0710678118655" x2="863.3933982822018" y2="645.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="635.0" x2="859.0" y2="635.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="627.9289321881346" x2="863.3933982822018" y2="624.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="625.0" x2="874.0" y2="620.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="627.9289321881345" x2="884.6066017177982" y2="624.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="636.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF001</text>
+  <text x="1070" y="690.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Validar los datos del</text>
+  <text x="1070" y="718.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">registro</text>
+  <polygon points="1060,836 1094,870 1060,904 1026,870" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M1048,858 L1072,882 M1072,858 L1048,882" stroke="#253957" stroke-width="3"/>
+  <polygon points="470,836 504,870 470,904 436,870" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M458,858 L482,882 M482,858 L458,882" stroke="#253957" stroke-width="3"/>
+  <circle cx="470" cy="1060" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="850.0" y="990.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="1015.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="1015.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="1015.0" x2="889.0" y2="1015.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="1022.0710678118655" x2="884.6066017177982" y2="1025.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1025.0" x2="874.0" y2="1030.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="1022.0710678118655" x2="863.3933982822018" y2="1025.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="1015.0" x2="859.0" y2="1015.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="1007.9289321881346" x2="863.3933982822018" y2="1004.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1005.0" x2="874.0" y2="1000.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="1007.9289321881345" x2="884.6066017177982" y2="1004.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="1016.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF001</text>
+  <text x="1070" y="1070.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Crear la cuenta de criador</text>
+  <text x="1070" y="1098.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">y su criadero vacío</text>
+  <rect x="260.0" y="1370.0" width="420" height="140" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="284.0" cy="1392.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M273.0,1412.0 v-5 q11,-16 22,0 v5 M278.0,1412.0 v9 M290.0,1412.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="486" y="1396.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF002, RF003</text>
+  <text x="480" y="1450.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Ingresar el correo y la</text>
+  <text x="480" y="1478.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">contraseña</text>
+  <rect x="850.0" y="1370.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="1395.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="1395.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="1395.0" x2="889.0" y2="1395.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="1402.0710678118655" x2="884.6066017177982" y2="1405.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1405.0" x2="874.0" y2="1410.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="1402.0710678118655" x2="863.3933982822018" y2="1405.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="1395.0" x2="859.0" y2="1395.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="1387.9289321881345" x2="863.3933982822018" y2="1384.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1385.0" x2="874.0" y2="1380.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="1387.9289321881345" x2="884.6066017177982" y2="1384.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="1396.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF002, RF003, RF005</text>
+  <text x="1070" y="1450.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Validar las credenciales y</text>
+  <text x="1070" y="1478.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">el estado de la cuenta</text>
+  <polygon points="1060,1596 1094,1630 1060,1664 1026,1630" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M1048,1618 L1072,1642 M1072,1618 L1048,1642" stroke="#253957" stroke-width="3"/>
+  <polygon points="470,1596 504,1630 470,1664 436,1630" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M458,1618 L482,1642 M482,1618 L458,1642" stroke="#253957" stroke-width="3"/>
+  <circle cx="470" cy="1820" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <circle cx="1480" cy="1630" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="850.0" y="1750.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="1775.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="1775.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="1775.0" x2="889.0" y2="1775.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="1782.0710678118655" x2="884.6066017177982" y2="1785.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1785.0" x2="874.0" y2="1790.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="1782.0710678118655" x2="863.3933982822018" y2="1785.6066017177982" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="1775.0" x2="859.0" y2="1775.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="1767.9289321881345" x2="863.3933982822018" y2="1764.3933982822018" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="1765.0" x2="874.0" y2="1760.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="1767.9289321881345" x2="884.6066017177982" y2="1764.3933982822018" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="1776.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF002, RF003</text>
+  <text x="1070" y="1830.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Abrir la sesión con el rol</text>
+  <text x="1070" y="1858.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">y el criadero autorizados</text>
+  <polygon points="470,2166 504,2200 470,2234 436,2200" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M458,2188 L482,2212 M482,2188 L458,2212" stroke="#253957" stroke-width="3"/>
+  <rect x="260.0" y="2320.0" width="420" height="140" rx="14" fill="white" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="284.0" cy="2342.0" r="6" fill="none" stroke="#253957" stroke-width="2"/>
+  <path d="M273.0,2362.0 v-5 q11,-16 22,0 v5 M278.0,2362.0 v9 M290.0,2362.0 v9" fill="none" stroke="#253957" stroke-width="2"/>
+  <text x="486" y="2346.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF004</text>
+  <text x="480" y="2400.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Ingresar el número de</text>
+  <text x="480" y="2428.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">socio y el club</text>
+  <rect x="850.0" y="2320.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="2345.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="2345.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="2345.0" x2="889.0" y2="2345.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="2352.0710678118653" x2="884.6066017177982" y2="2355.606601717798" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="2355.0" x2="874.0" y2="2360.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="2352.0710678118653" x2="863.3933982822018" y2="2355.606601717798" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="2345.0" x2="859.0" y2="2345.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="2337.9289321881347" x2="863.3933982822018" y2="2334.393398282202" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="2335.0" x2="874.0" y2="2330.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="2337.9289321881347" x2="884.6066017177982" y2="2334.393398282202" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="2346.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF004</text>
+  <text x="1070" y="2400.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Validar los datos del</text>
+  <text x="1070" y="2428.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">perfil</text>
+  <polygon points="1060,2546 1094,2580 1060,2614 1026,2580" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M1048,2568 L1072,2592 M1072,2568 L1048,2592" stroke="#253957" stroke-width="3"/>
+  <polygon points="470,2546 504,2580 470,2614 436,2580" fill="white" stroke="#253957" stroke-width="2.5"/>
+  <path d="M458,2568 L482,2592 M482,2568 L458,2592" stroke="#253957" stroke-width="3"/>
+  <circle cx="470" cy="2770" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="850.0" y="2700.0" width="420" height="140" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <circle cx="874.0" cy="2725.0" r="10" fill="none" stroke="#253957" stroke-width="2"/>
+  <circle cx="874.0" cy="2725.0" r="4" fill="none" stroke="#253957" stroke-width="2"/>
+  <line x1="884.0" y1="2725.0" x2="889.0" y2="2725.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118655" y1="2732.0710678118653" x2="884.6066017177982" y2="2735.606601717798" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="2735.0" x2="874.0" y2="2740.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881346" y1="2732.0710678118653" x2="863.3933982822018" y2="2735.606601717798" stroke="#253957" stroke-width="3"/>
+  <line x1="864.0" y1="2725.0" x2="859.0" y2="2725.0" stroke="#253957" stroke-width="3"/>
+  <line x1="866.9289321881345" y1="2717.9289321881347" x2="863.3933982822018" y2="2714.393398282202" stroke="#253957" stroke-width="3"/>
+  <line x1="874.0" y1="2715.0" x2="874.0" y2="2710.0" stroke="#253957" stroke-width="3"/>
+  <line x1="881.0710678118654" y1="2717.9289321881347" x2="884.6066017177982" y2="2714.393398282202" stroke="#253957" stroke-width="3"/>
+  <text x="1076" y="2726.0" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal">RF004</text>
+  <text x="1070" y="2780.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">Guardar socio y club como</text>
+  <text x="1070" y="2808.0" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="middle" fill="#253957" font-weight="normal">valores por defecto</text>
+  <circle cx="1060" cy="2960" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="840" y="3135" width="780" height="250" rx="18" fill="white" stroke="#475569" stroke-width="2.5" stroke-dasharray="10 7"/>
+  <polyline points="974,3260 1065.0,3260" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <polyline points="1395.0,3260 1486,3260" fill="none" stroke="#253957" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <circle cx="950" cy="3260" r="24" fill="white" stroke="#A61B1B" stroke-width="2.5"/>
+  <path d="M941,3271 L947,3250 L953,3262 L960,3249 L954,3270 L948,3258 Z" fill="none" stroke="#A61B1B" stroke-width="2"/>
+  <rect x="1065.0" y="3208.0" width="330" height="104" rx="14" fill="#EEF5FC" stroke="#356CA0" stroke-width="2.5"/>
+  <text x="1230.0" y="3258" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="middle" fill="#253957" font-weight="normal">Informar el motivo y</text>
+  <text x="1230.0" y="3286" font-family="Arial, Liberation Sans, sans-serif" font-size="23" text-anchor="middle" fill="#253957" font-weight="normal">no guardar cambios</text>
+  <circle cx="1510" cy="3260" r="24" fill="white" stroke="#253957" stroke-width="5"/>
+  <rect x="1310" y="763.0" width="330" height="214.0" fill="#FBFCFE" stroke="none"/>
+  <path d="M1326,763.0 L1310,763.0 L1310,977.0 L1326,977.0" fill="none" stroke="#475569" stroke-width="2.5"/>
+  <text x="1324" y="791.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="bold">Errores que se informan sin</text>
+  <text x="1324" y="815.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="bold">guardar:</text>
+  <text x="1324" y="839.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Contraseña de menos de 8</text>
+  <text x="1324" y="863.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   caracteres (SEG-001).</text>
+  <text x="1324" y="887.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Correo ya registrado</text>
+  <text x="1324" y="911.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   (RF002).</text>
+  <text x="1324" y="935.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">• Falta el nombre, el correo o</text>
+  <text x="1324" y="959.0" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal">   la contraseña (RF001).</text>
+  <text x="506" y="308" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">Acceder a TuCriadero</text>
+  <text x="516.0" y="474" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">¿Tiene cuenta?</text>
+  <text x="1106.0" y="854" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">¿Datos válidos?</text>
+  <text x="424.0" y="829" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">¿Corrige los</text>
+  <text x="424.0" y="854" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">datos?</text>
+  <text x="470" y="1112" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Registro cancelado; sin</text>
+  <text x="470" y="1138" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">cuenta nueva</text>
+  <text x="1106.0" y="1614" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">¿Resultado?</text>
+  <text x="424.0" y="1614" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">¿Intenta de nuevo?</text>
+  <text x="470" y="1872" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Ingreso cancelado</text>
+  <text x="1480" y="1682" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Acceso rechazado:</text>
+  <text x="1480" y="1708" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">cuenta desactivada</text>
+  <text x="424.0" y="2159" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">¿Actualiza el</text>
+  <text x="424.0" y="2184" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">socio y el club?</text>
+  <text x="1106.0" y="2564" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#253957" font-weight="normal">¿Datos válidos?</text>
+  <text x="424.0" y="2539" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">¿Corrige los</text>
+  <text x="424.0" y="2564" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="end" fill="#253957" font-weight="normal">datos?</text>
+  <text x="470" y="2822" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Perfil sin cambios;</text>
+  <text x="470" y="2848" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">acceso disponible</text>
+  <text x="1060" y="3012" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">Acceso disponible con</text>
+  <text x="1060" y="3038" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="middle" fill="#253957" font-weight="normal">sesión autorizada</text>
+  <rect x="984.48" y="835" width="31.519999999999982" height="29" fill="white"/>
+  <text x="1012.0" y="858" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="478" y="799.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="822.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="478" y="915.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="938.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="478" y="535.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="558.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="1068" y="915.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="1072" y="938.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="394.48" y="455" width="31.519999999999982" height="29" fill="white"/>
+  <text x="422.0" y="478" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="725.76" y="1595" width="290.24" height="29" fill="white"/>
+  <text x="1012.0" y="1618" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold">Credenciales incorrectas</text>
+  <rect x="478" y="1559.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="1582.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="478" y="1675.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="1698.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="1104.0" y="1637" width="137.36000000000013" height="29" fill="white"/>
+  <text x="1108.0" y="1660" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Desactivada</text>
+  <rect x="1068" y="1675.0" width="90.31999999999994" height="29.0" fill="white"/>
+  <text x="1072" y="1698.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Válidas</text>
+  <rect x="984.48" y="2545" width="31.519999999999982" height="29" fill="white"/>
+  <text x="1012.0" y="2568" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="478" y="2509.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="2532.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="478" y="2625.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="2648.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <rect x="478" y="2245.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="482" y="2268.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="1068" y="2625.0" width="31.519999999999982" height="29.0" fill="white"/>
+  <text x="1072" y="2648.0" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">Sí</text>
+  <rect x="514.0" y="2165" width="31.519999999999982" height="29" fill="white"/>
+  <text x="518.0" y="2188" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold">No</text>
+  <text x="862" y="3169" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="start" fill="#475569" font-weight="bold">Subproceso de evento: puede ocurrir en cualquier paso</text>
+  <text x="950" y="3317" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">Sin conexión o</text>
+  <text x="950" y="3341" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">mantenimiento</text>
+  <text x="1510" y="3317" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">Operación no</text>
+  <text x="1510" y="3341" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">realizada; sin</text>
+  <text x="1510" y="3365" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">cambios</text>
+  <text x="55" y="3485" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="start" fill="#253957" font-weight="bold">Reglas y alcance del proceso</text>
+  <text x="55" y="3519" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• El autorregistro crea solo cuentas de criador; la cuenta de administrador la crea el equipo (RF001, SEG-001).</text>
+  <text x="55" y="3549" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• La sesión queda limitada al criadero del usuario (RF002–RF003), expira tras 7 días de inactividad y puede cerrarse en</text>
+  <text x="55" y="3579" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">   cualquier momento (SEG-004). Socio y club se proponen por defecto al anillar (RF004).</text>
+</svg>

@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:process id="Process_TEM" name="Temporada de cría (vista general)" isExecutable="false">
+    <bpmn:documentation>Vista general: cada caja de borde grueso es un proceso detallado en la figura indicada. Varios cruces pueden avanzar en paralelo; cada uno sigue esta secuencia.
+La espera de 10 a 12 días la decide el criador: el sistema no programa avisos ni temporizadores automáticos.</bpmn:documentation>
+    <bpmn:laneSet id="TEM_lanes">
+      <bpmn:lane id="TEM_persona" name="Criador">
+        <bpmn:flowNodeRef>TEM_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_cru</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_espera</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_pic</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_otro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_ubi</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TEM_fin_temporada</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="TEM_inicio" name="Inicio de la temporada de cría">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>TEM_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="TEM_cru" name="Planificar y registrar un cruce" calledElement="Process_CRU">
+      <bpmn:documentation>Detalle en la Figura 4.</bpmn:documentation>
+      <bpmn:incoming>TEM_F01</bpmn:incoming>
+      <bpmn:incoming>TEM_F06</bpmn:incoming>
+      <bpmn:outgoing>TEM_F02</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:intermediateCatchEvent id="TEM_espera" name="Pichones con 10 a 12 días de vida">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>TEM_F02</bpmn:incoming>
+      <bpmn:outgoing>TEM_F03</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TEM_espera_def">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P10D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:callActivity id="TEM_pic" name="Registrar los pichones del cruce" calledElement="Process_PIC">
+      <bpmn:documentation>Detalle en la Figura 5.</bpmn:documentation>
+      <bpmn:incoming>TEM_F03</bpmn:incoming>
+      <bpmn:outgoing>TEM_F04</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="TEM_fin" name="Terminar el cruce" calledElement="Process_FIN">
+      <bpmn:documentation>Detalle en la Figura 6.</bpmn:documentation>
+      <bpmn:incoming>TEM_F04</bpmn:incoming>
+      <bpmn:outgoing>TEM_F05</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="TEM_otro" name="¿Planifica otro cruce?" gatewayDirection="Diverging" default="TEM_F07">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>TEM_F05</bpmn:incoming>
+      <bpmn:outgoing>TEM_F06</bpmn:outgoing>
+      <bpmn:outgoing>TEM_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="TEM_ubi" name="Trasladar pichones y adultos a la jaula grande" calledElement="Process_UBI">
+      <bpmn:documentation>Detalle en la Figura 8.</bpmn:documentation>
+      <bpmn:incoming>TEM_F07</bpmn:incoming>
+      <bpmn:outgoing>TEM_F08</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="TEM_fin_temporada" name="Fin de la temporada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>TEM_F08</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="TEM_F01" sourceRef="TEM_inicio" targetRef="TEM_cru" name=""/>
+    <bpmn:sequenceFlow id="TEM_F02" sourceRef="TEM_cru" targetRef="TEM_espera" name=""/>
+    <bpmn:sequenceFlow id="TEM_F03" sourceRef="TEM_espera" targetRef="TEM_pic" name=""/>
+    <bpmn:sequenceFlow id="TEM_F04" sourceRef="TEM_pic" targetRef="TEM_fin" name=""/>
+    <bpmn:sequenceFlow id="TEM_F05" sourceRef="TEM_fin" targetRef="TEM_otro" name=""/>
+    <bpmn:sequenceFlow id="TEM_F06" sourceRef="TEM_otro" targetRef="TEM_cru" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">otro_cruce</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="TEM_F07" sourceRef="TEM_otro" targetRef="TEM_ubi" name="No"/>
+    <bpmn:sequenceFlow id="TEM_F08" sourceRef="TEM_ubi" targetRef="TEM_fin_temporada" name=""/>
+    <bpmn:textAnnotation id="TEM_A_espera">
+      <bpmn:text>• Entre el cruce y el anillado ocurren la postura y la incubación, que no se registran en el sistema (fuera del alcance).
+• El criador anilla los pichones entre los 10 y 12 días de vida (glosario, RF021).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="TEM_A_espera_asoc" sourceRef="TEM_espera" targetRef="TEM_A_espera" associationDirection="None"/>
+    <bpmn:textAnnotation id="TEM_A_cualquier">
+      <bpmn:text>En cualquier momento, fuera de esta secuencia:
+• Registrar canarios (Figura 9).
+• Registrar jaulas (Figura 7).
+• Buscar y consultar la genealogía (Figura 10).
+• Dar de baja un canario (Figura 11).
+• Ingreso (Figura 12); cuentas y catálogo, solo el administrador (Figuras 13 y 14).</bpmn:text>
+    </bpmn:textAnnotation>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_TEM">
+    <bpmn:participant id="Participant_TEM" name="TuCriadero — Temporada de cría (vista general)" processRef="Process_TEM"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_TEM" name="Temporada de cría (vista general)">
+    <bpmndi:BPMNPlane id="Plane_TEM" bpmnElement="Collaboration_TEM">
+      <bpmndi:BPMNShape id="Participant_TEM_di" bpmnElement="Participant_TEM" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1655"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_persona_di" bpmnElement="TEM_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="1560" height="1655"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_inicio_di" bpmnElement="TEM_inicio">
+        <dc:Bounds x="736.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="792" y="284" width="316.0" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_cru_di" bpmnElement="TEM_cru">
+        <dc:Bounds x="550.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_espera_di" bpmnElement="TEM_espera">
+        <dc:Bounds x="736.0" y="656.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="473.59999999999997" y="615" width="254.40000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_pic_di" bpmnElement="TEM_pic">
+        <dc:Bounds x="550.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_fin_di" bpmnElement="TEM_fin">
+        <dc:Bounds x="550.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_otro_di" bpmnElement="TEM_otro" isMarkerVisible="true">
+        <dc:Bounds x="726.0" y="1216.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="802.0" y="1185" width="192.79999999999995" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_ubi_di" bpmnElement="TEM_ubi">
+        <dc:Bounds x="550.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TEM_fin_temporada_di" bpmnElement="TEM_fin_temporada">
+        <dc:Bounds x="736.0" y="1606.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="638.96" y="1658" width="242.08000000000004" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="TEM_F01_di" bpmnElement="TEM_F01">
+        <di:waypoint x="760" y="324.0"/>
+        <di:waypoint x="760" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F02_di" bpmnElement="TEM_F02">
+        <di:waypoint x="760" y="560.0"/>
+        <di:waypoint x="760" y="656.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F03_di" bpmnElement="TEM_F03">
+        <di:waypoint x="760" y="704.0"/>
+        <di:waypoint x="760" y="800.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F04_di" bpmnElement="TEM_F04">
+        <di:waypoint x="760" y="940.0"/>
+        <di:waypoint x="760" y="990.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F05_di" bpmnElement="TEM_F05">
+        <di:waypoint x="760" y="1130.0"/>
+        <di:waypoint x="760" y="1216.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F06_di" bpmnElement="TEM_F06">
+        <di:waypoint x="726.0" y="1250"/>
+        <di:waypoint x="420" y="1250"/>
+        <di:waypoint x="420" y="490"/>
+        <di:waypoint x="550.0" y="490"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="684.48" y="1215" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F07_di" bpmnElement="TEM_F07">
+        <di:waypoint x="760" y="1284.0"/>
+        <di:waypoint x="760" y="1370.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="768" y="1295.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="TEM_F08_di" bpmnElement="TEM_F08">
+        <di:waypoint x="760" y="1510.0"/>
+        <di:waypoint x="760" y="1606.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TEM_A_espera_di" bpmnElement="TEM_A_espera">
+        <dc:Bounds x="1090" y="609.0" width="520" height="142.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="TEM_A_espera_asoc_di" bpmnElement="TEM_A_espera_asoc">
+        <di:waypoint x="784.0" y="680"/>
+        <di:waypoint x="1090" y="680"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TEM_A_cualquier_di" bpmnElement="TEM_A_cualquier">
+        <dc:Bounds x="1090" y="1079.0" width="520" height="190.0"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

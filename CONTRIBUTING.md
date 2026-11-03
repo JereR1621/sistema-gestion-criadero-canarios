@@ -1,13 +1,18 @@
 # Cómo trabajamos en este repositorio
 
+Estas reglas están en definición por el PM. El SRS v1.0 está preparado para presentarlo al cliente para su aceptación; su aprobación se registra por separado.
+
 ## Ramas
 
 | Rama | Uso | Quién integra |
 |---|---|---|
-| `main` | Versión entregable (la que se despliega en producción). | Solo por pull request desde `develop`, aprobado por QA. |
+| `main` | Versión entregable (la que se despliega en producción). | Solo por pull request desde `develop`, con revisión interna y autorización del PM basada en la revisión externa del hito. |
 | `develop` | Integración del trabajo terminado. Se despliega en el entorno de pruebas. | Por pull request desde una rama de trabajo, con una revisión. |
 | `feature/RF0xx-descripcion` | Trabajo de un requisito (por ejemplo, `feature/RF023-busqueda-correlativo`). | — |
-| `fix/descripcion` | Corrección de un defecto reportado por QA. | — |
+| `fix/descripcion` | Corrección de un defecto detectado internamente o comunicado por QA externo. | — |
+| `docs/descripcion` | Cambios de documentación y reglas del repositorio. | — |
+
+Las ramas permanentes son `main` y `develop`. Las ramas de trabajo se nombran por el cambio que realizan. No se crea ni se mantiene una rama QA: las revisiones externas se registran mediante informes y las correcciones se realizan en ramas de trabajo del equipo.
 
 Nadie sube cambios directo a `main` ni a `develop`.
 
@@ -22,10 +27,11 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 
 ## Pull requests
 
-1. Una rama y un pull request por sub-issue (nunca por épica). El PR dice `Cierra #NN` para enlazar el issue. Una épica se cierra cuando todos sus sub-issues están cerrados.
+1. Una rama y un pull request por sub-issue (nunca por épica). El PR dice `Closes #NN` para enlazar el issue: GitHub solo reconoce palabras en inglés (`Closes`, `Fixes`, `Resolves`) y cierra el issue al integrar el PR en `develop`, la rama por defecto. Una épica se cierra cuando todos sus sub-issues están cerrados.
 2. Completar la plantilla: qué RF cubre, cómo se probó y capturas si cambia una pantalla.
 3. Un integrante del equipo revisa el código antes de unir a `develop`.
-4. Para pasar de `develop` a `main`, QA aprueba después de probar en el entorno de pruebas.
+4. Para pasar de `develop` a `main`, el PM comprueba la revisión externa del hito y autoriza la entrega; un integrante del equipo revisa el PR. QA externo no tiene que aprobar PR ni operar GitHub.
+5. Los PR del PM los integra el propio PM: GitHub no deja aprobar un PR propio, por eso el administrador del repositorio tiene una excepción en las reglas, válida solo al integrar un PR. Nadie sube cambios directo a `main` ni a `develop`.
 
 ## Cuándo se cierra un issue (definición de terminado)
 
@@ -33,11 +39,22 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 - [ ] Respeta las reglas de integridad y de aislamiento entre criaderos (`docs/backend.md`, §2 y §3).
 - [ ] Se ve bien en un teléfono de 360 px de ancho (si tiene pantalla).
 - [ ] Tiene pruebas PHPUnit (si tiene lógica).
-- [ ] QA lo probó y lo aprobó.
+- [ ] Pruebas internas realizadas y evidencias del método de verificación del SRS disponibles.
+- [ ] Código revisado e integrado en `develop`.
+
+Cerrar una implementación significa que está lista para revisión externa; no equivale a aprobar la entrega. Las tareas documentales se cierran con el entregable revisado por el equipo y la conformidad del PM. Las épicas se cierran al terminar sus entregables, respetando las dependencias técnicas; la entrega beta además exige las revisiones externas previstas.
+
+## QA externo y aprobación de entregas
+
+Boris Barrios y José Barraza forman el equipo QA externo. Revisan el proyecto y entregan sus observaciones por correo al PM. No son responsables de implementar funcionalidades, ejecutar las pruebas internas del equipo ni mantener el tablero.
+
+Hay una issue `Revisión externa QA: M1` a `M5` por hito, con `tipo:revision` y `area:gestion`. La coordina el PM y registra la versión revisada, las evidencias, el informe de QA y las correcciones. Las tareas de pruebas internas usan `area:pruebas` y se asignan al equipo de desarrollo. No se asignan issues a QA externo por defecto.
+
+La revisión de M5 se realiza en el entorno de pruebas después de seguridad, respaldos, carga y usabilidad, antes del despliegue beta. La aceptación final del cliente tras el periodo beta se registra después, sin darla por completada al desplegar.
 
 ## Defectos
 
-QA los registra con la plantilla **Defecto**, indicando el RF afectado, los pasos para reproducirlo y la severidad (alta, media o baja). Un defecto de severidad alta bloquea la entrega (SRS §7.1).
+El PM registra los hallazgos recibidos de QA externo con la plantilla **Defecto**; el equipo también registra los detectados internamente. Se indica el RF afectado, la referencia del informe (si corresponde), los pasos para reproducirlo y la severidad (alta, media o baja). La corrección se asigna a desarrollo. Un defecto alto bloquea la entrega; uno medio requiere mitigación acordada con el cliente (SRS §8.2 del documento completo; §7.1 de la versión cliente). El PM registra la verificación posterior y el resultado de QA en la revisión del hito.
 
 ## Contrato backend–frontend
 

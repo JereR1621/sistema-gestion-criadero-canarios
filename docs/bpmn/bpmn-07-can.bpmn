@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_CAN" name="Registrar o actualizar un canario" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida; el canario y sus padres, si existen, son del propio criadero (RF003, DAT-004).
+Un canario comprado puede no tener padres y registra su procedencia. Sexo y variedad admiten "sin determinar" (RF007–RF010). Al cambiar sexo, variedad o padres solo se recalculan los portadores deducidos (RF034).</bpmn:documentation>
+    <bpmn:laneSet id="CAN_lanes">
+      <bpmn:lane id="CAN_persona" name="Criador">
+        <bpmn:flowNodeRef>CAN_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="CAN_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>CAN_ficha_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_ficha_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_guardar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_manifestados</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_deducidos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_mostrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CAN_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="CAN_inicio" name="Registrar o editar un canario">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>CAN_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="CAN_ficha_datos" name="Completar la ficha del canario y los portadores conocidos">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF009, SRS-RF010, SRS-RF012, SRS-RF013, SRS-RF029</bpmn:documentation>
+      <bpmn:incoming>CAN_F04</bpmn:incoming>
+      <bpmn:incoming>CAN_F06</bpmn:incoming>
+      <bpmn:outgoing>CAN_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="CAN_ficha_validar" name="Validar anillo, sexo, variedad, padres y portadores">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF009, SRS-RF010, SRS-RF012, SRS-RF013, SRS-RF029</bpmn:documentation>
+      <bpmn:incoming>CAN_F01</bpmn:incoming>
+      <bpmn:outgoing>CAN_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="CAN_ficha_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="CAN_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAN_F02</bpmn:incoming>
+      <bpmn:outgoing>CAN_F03</bpmn:outgoing>
+      <bpmn:outgoing>CAN_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="CAN_ficha_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="CAN_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAN_F03</bpmn:incoming>
+      <bpmn:outgoing>CAN_F04</bpmn:outgoing>
+      <bpmn:outgoing>CAN_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="CAN_ficha_cancelado" name="Edición cancelada; ficha sin cambios">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAN_F05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="CAN_guardar" name="Guardar la ficha y los portadores indicados">
+      <bpmn:documentation>SRS-RF007, SRS-RF009, SRS-RF010</bpmn:documentation>
+      <bpmn:incoming>CAN_F07</bpmn:incoming>
+      <bpmn:outgoing>CAN_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CAN_manifestados" name="Obtener los factores manifestados desde la variedad">
+      <bpmn:documentation>SRS-RF033</bpmn:documentation>
+      <bpmn:incoming>CAN_F08</bpmn:incoming>
+      <bpmn:outgoing>CAN_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CAN_deducidos" name="Recalcular los portadores deducidos del canario y sus crías">
+      <bpmn:documentation>SRS-RF034</bpmn:documentation>
+      <bpmn:incoming>CAN_F09</bpmn:incoming>
+      <bpmn:outgoing>CAN_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="CAN_mostrar" name="Registrar auditoría y mostrar la ficha">
+      <bpmn:documentation>SRS-RF024</bpmn:documentation>
+      <bpmn:incoming>CAN_F10</bpmn:incoming>
+      <bpmn:outgoing>CAN_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="CAN_fin" name="Ficha registrada o actualizada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>CAN_F11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="CAN_F01" sourceRef="CAN_ficha_datos" targetRef="CAN_ficha_validar" name=""/>
+    <bpmn:sequenceFlow id="CAN_F02" sourceRef="CAN_ficha_validar" targetRef="CAN_ficha_valido" name=""/>
+    <bpmn:sequenceFlow id="CAN_F03" sourceRef="CAN_ficha_valido" targetRef="CAN_ficha_corrige" name="No"/>
+    <bpmn:sequenceFlow id="CAN_F04" sourceRef="CAN_ficha_corrige" targetRef="CAN_ficha_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CAN_F05" sourceRef="CAN_ficha_corrige" targetRef="CAN_ficha_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="CAN_F06" sourceRef="CAN_inicio" targetRef="CAN_ficha_datos" name=""/>
+    <bpmn:sequenceFlow id="CAN_F07" sourceRef="CAN_ficha_valido" targetRef="CAN_guardar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CAN_F08" sourceRef="CAN_guardar" targetRef="CAN_manifestados" name=""/>
+    <bpmn:sequenceFlow id="CAN_F09" sourceRef="CAN_manifestados" targetRef="CAN_deducidos" name=""/>
+    <bpmn:sequenceFlow id="CAN_F10" sourceRef="CAN_deducidos" targetRef="CAN_mostrar" name=""/>
+    <bpmn:sequenceFlow id="CAN_F11" sourceRef="CAN_mostrar" targetRef="CAN_fin" name=""/>
+    <bpmn:subProcess id="CAN_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="CAN_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>CAN_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="CAN_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="CAN_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>CAN_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>CAN_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="CAN_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>CAN_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="CAN_no_disponible_F1" sourceRef="CAN_no_disponible_inicio" targetRef="CAN_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="CAN_no_disponible_F2" sourceRef="CAN_no_disponible_informar" targetRef="CAN_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="CAN_A_ficha">
+      <bpmn:text>Errores que se informan sin guardar:
+• Anillo ya usado: se indica el canario que lo usa (RF008).
+• Variedad que no corresponde al sexo (RF012).
+• Hembra portadora de un factor ligado al sexo (RF013).
+• Portador de un factor dominante o de uno que ya manifiesta (DAT-004).
+• Padre o madre de otro criadero (DAT-004).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="CAN_A_ficha_asoc" sourceRef="CAN_ficha_valido" targetRef="CAN_A_ficha" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_CAN">
+    <bpmn:participant id="Participant_CAN" name="TuCriadero — Registrar o actualizar un canario" processRef="Process_CAN"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_CAN" name="Registrar o actualizar un canario">
+    <bpmndi:BPMNPlane id="Plane_CAN" bpmnElement="Collaboration_CAN">
+      <bpmndi:BPMNShape id="Participant_CAN_di" bpmnElement="Participant_CAN" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1950"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_persona_di" bpmnElement="CAN_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="1950"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_sistema_di" bpmnElement="CAN_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="1950"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_inicio_di" bpmnElement="CAN_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="266.72" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_datos_di" bpmnElement="CAN_ficha_datos">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_validar_di" bpmnElement="CAN_ficha_validar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_valido_di" bpmnElement="CAN_ficha_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="640" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_corrige_di" bpmnElement="CAN_ficha_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="615" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_ficha_cancelado_di" bpmnElement="CAN_ficha_cancelado">
+        <dc:Bounds x="446.0" y="846.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="318.15999999999997" y="898" width="303.67999999999995" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_guardar_di" bpmnElement="CAN_guardar">
+        <dc:Bounds x="850.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_manifestados_di" bpmnElement="CAN_manifestados">
+        <dc:Bounds x="850.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_deducidos_di" bpmnElement="CAN_deducidos">
+        <dc:Bounds x="850.0" y="1180.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_mostrar_di" bpmnElement="CAN_mostrar">
+        <dc:Bounds x="850.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_fin_di" bpmnElement="CAN_fin">
+        <dc:Bounds x="1036.0" y="1606.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="945.12" y="1658" width="229.7600000000001" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAN_F01_di" bpmnElement="CAN_F01">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F02_di" bpmnElement="CAN_F02">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="646.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F03_di" bpmnElement="CAN_F03">
+        <di:waypoint x="1026.0" y="680"/>
+        <di:waypoint x="504.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="645" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F04_di" bpmnElement="CAN_F04">
+        <di:waypoint x="470" y="646.0"/>
+        <di:waypoint x="470" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="609.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F05_di" bpmnElement="CAN_F05">
+        <di:waypoint x="470" y="714.0"/>
+        <di:waypoint x="470" y="846.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F06_di" bpmnElement="CAN_F06">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F07_di" bpmnElement="CAN_F07">
+        <di:waypoint x="1060" y="714.0"/>
+        <di:waypoint x="1060" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F08_di" bpmnElement="CAN_F08">
+        <di:waypoint x="1060" y="940.0"/>
+        <di:waypoint x="1060" y="990.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F09_di" bpmnElement="CAN_F09">
+        <di:waypoint x="1060" y="1130.0"/>
+        <di:waypoint x="1060" y="1180.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F10_di" bpmnElement="CAN_F10">
+        <di:waypoint x="1060" y="1320.0"/>
+        <di:waypoint x="1060" y="1370.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_F11_di" bpmnElement="CAN_F11">
+        <di:waypoint x="1060" y="1510.0"/>
+        <di:waypoint x="1060" y="1606.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CAN_no_disponible_di" bpmnElement="CAN_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1805" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_no_disponible_inicio_di" bpmnElement="CAN_no_disponible_inicio">
+        <dc:Bounds x="926" y="1906" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_no_disponible_informar_di" bpmnElement="CAN_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="1878.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CAN_no_disponible_fin_di" bpmnElement="CAN_no_disponible_fin">
+        <dc:Bounds x="1486" y="1906" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAN_no_disponible_F1_di" bpmnElement="CAN_no_disponible_F1">
+        <di:waypoint x="974" y="1930"/>
+        <di:waypoint x="1065.0" y="1930"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CAN_no_disponible_F2_di" bpmnElement="CAN_no_disponible_F2">
+        <di:waypoint x="1395.0" y="1930"/>
+        <di:waypoint x="1486" y="1930"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CAN_A_ficha_di" bpmnElement="CAN_A_ficha">
+        <dc:Bounds x="1310" y="489.0" width="330" height="382.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CAN_A_ficha_asoc_di" bpmnElement="CAN_A_ficha_asoc">
+        <di:waypoint x="1094.0" y="680"/>
+        <di:waypoint x="1310" y="680"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

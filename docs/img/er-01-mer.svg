@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2420" height="2000" viewBox="0 0 2420 2000">
+  <rect x="0" y="0" width="2420" height="2000" fill="white"/>
+  <defs/>
+  <g>
+    <polyline points="280,191 280,258" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1040,191 1040,258" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1980,191 1980,258" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="280,834 280,762" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="190,1314 190,1242" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="280,1774 280,1702" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="2205,1060 2130,1060" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1355,1700 1285,1700" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1060,1304 1060,1250" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="660,1774 660,1706" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1420,436 1420,472 1462,472 1462,496" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1650,436 1650,472 1558,472 1558,496" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="405,300 565,300" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="915,300 755,300" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="280,342 280,464" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="280,678 280,556" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1165,300 1415,300" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1855,300 1605,300" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1040,342 1040,574" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1040,870 1040,666" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1980,342 1980,594" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1980,870 1980,686" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1170,870 1170,520 1415,520" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1900,342 1900,520 1605,520" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1200,930 1415,930" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1830,930 1605,930" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1200,1060 1415,1060" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1830,1060 1605,1060" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1200,1190 1415,1190" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1830,1190 1605,1190" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="880,1200 755,1200" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="405,1200 565,1200" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="280,1242 280,1394" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="280,1618 280,1486" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="960,1250 960,1660 755,1660" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="405,1660 565,1660" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1160,1250 1160,1404" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1160,1658 1160,1496" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="880,960 695,960" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="880,1030 600,1030 600,1006" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="960,870 960,800 755,800" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="880,1110 470,1110 470,800 565,800" fill="none" stroke="#253957" stroke-width="2.5"/>
+  </g>
+  <g>
+    <rect x="155.0" y="258.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="280" y="309" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Usuario</text>
+    <rect x="155.0" y="678.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="280" y="715" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Registro de</text>
+    <text x="280" y="743" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">auditoría</text>
+    <rect x="915.0" y="258.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="1040" y="309" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Criadero</text>
+    <rect x="1855.0" y="258.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="1980" y="309" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Jaula</text>
+    <rect x="880.0" y="870.0" width="320" height="380" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="1040" y="1069" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Canario</text>
+    <rect x="1830.0" y="870.0" width="300" height="380" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="1980" y="1069" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Cruce</text>
+    <rect x="155.0" y="1158.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="280" y="1209" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Variedad de color</text>
+    <rect x="155.0" y="1618.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="280" y="1669" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Factor genético</text>
+    <rect x="1035.0" y="1658.0" width="250" height="84" fill="#EEF5FC" stroke="#253957" stroke-width="3"/>
+    <text x="1160" y="1709" font-family="Arial, Liberation Sans, sans-serif" font-size="25" text-anchor="middle" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">Baja</text>
+    <ellipse cx="280" cy="165" rx="73.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="280" y="172" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_usuario</text>
+    <ellipse cx="1040" cy="165" rx="78.60000000000001" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="1040" y="172" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_criadero</text>
+    <ellipse cx="1980" cy="165" rx="65.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="1980" y="172" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_jaula</text>
+    <ellipse cx="280" cy="860" rx="78.60000000000001" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="280" y="867" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_registro</text>
+    <ellipse cx="190" cy="1340" rx="65.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="190" y="1347" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">código</text>
+    <ellipse cx="280" cy="1800" rx="67.4" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="280" y="1807" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_factor</text>
+    <ellipse cx="2270" cy="1060" rx="65.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="2270" y="1067" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_cruce</text>
+    <ellipse cx="1420" cy="1700" rx="65.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="1420" y="1707" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id_baja</text>
+    <ellipse cx="1060" cy="1330" rx="65.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="1060" y="1337" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">anillo</text>
+    <polygon points="660,254.0 755.0,300 660,346.0 565.0,300" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="660" y="307" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">posee</text>
+    <polygon points="280,464.0 375.0,510 280,556.0 185.0,510" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="280" y="517" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">realiza</text>
+    <polygon points="1510,254.0 1605.0,300 1510,346.0 1415.0,300" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1510" y="307" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">contiene</text>
+    <polygon points="1040,574.0 1135.0,620 1040,666.0 945.0,620" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1040" y="627" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">registra</text>
+    <polygon points="1980,594.0 2075.0,640 1980,686.0 1885.0,640" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1980" y="635" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">se realiza</text>
+    <text x="1980" y="659" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">en</text>
+    <polygon points="1510,474.0 1605.0,520 1510,566.0 1415.0,520" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1510" y="527" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">se ubica en</text>
+    <polygon points="1510,884.0 1605.0,930 1510,976.0 1415.0,930" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1510" y="937" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">es macho de</text>
+    <polygon points="1510,1014.0 1605.0,1060 1510,1106.0 1415.0,1060" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1510" y="1067" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">es hembra de</text>
+    <polygon points="1510,1144.0 1605.0,1190 1510,1236.0 1415.0,1190" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1510" y="1197" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">origina</text>
+    <polygon points="660,1154.0 755.0,1200 660,1246.0 565.0,1200" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="660" y="1207" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">es de</text>
+    <polygon points="280,1394.0 375.0,1440 280,1486.0 185.0,1440" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="280" y="1435" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">se compone</text>
+    <text x="280" y="1459" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">de</text>
+    <polygon points="660,1614.0 755.0,1660 660,1706.0 565.0,1660" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="660" y="1667" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">porta</text>
+    <polygon points="1160,1404.0 1255.0,1450 1160,1496.0 1065.0,1450" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="1160" y="1457" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">tiene</text>
+    <polygon points="600,914.0 695.0,960 600,1006.0 505.0,960" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="600" y="967" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">es padre de</text>
+    <polygon points="660,754.0 755.0,800 660,846.0 565.0,800" fill="white" stroke="#253957" stroke-width="2.5"/>
+    <text x="660" y="807" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">es madre de</text>
+    <ellipse cx="660" cy="1800" rx="65.0" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="660" y="1807" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">origen</text>
+    <ellipse cx="1420" cy="410" rx="78.60000000000001" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="1420" y="417" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha desde</text>
+    <ellipse cx="1650" cy="410" rx="78.60000000000001" ry="26" fill="white" stroke="#253957" stroke-width="2"/>
+    <text x="1650" y="417" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha hasta</text>
+  </g>
+  <g>
+    <text x="50" y="52" font-family="Arial, Liberation Sans, sans-serif" font-size="34" text-anchor="start" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">TuCriadero · Modelo entidad-relación conceptual (MER)</text>
+    <text x="50" y="90" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="normal" font-style="normal" text-decoration="none">Notación de Chen: entidades, relaciones con nombre, cardinalidad (mín, máx) y atributos clave (subrayados). Sin claves foráneas.</text>
+    <text x="417" y="290" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,1)</text>
+    <text x="903" y="290" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="290" y="380" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="290" y="648" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="1177" y="290" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1843" y="290" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="1050" y="380" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1050" y="840" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="1990" y="380" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1990" y="840" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="1180" y="840" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1890" y="380" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1212" y="920" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1818" y="920" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="1212" y="1050" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1818" y="1050" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="1212" y="1180" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,1)</text>
+    <text x="1818" y="1180" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="868" y="1190" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,1)</text>
+    <text x="417" y="1190" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="290" y="1280" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,N)</text>
+    <text x="290" y="1588" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="950" y="1288" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="417" y="1650" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N)</text>
+    <text x="1170" y="1288" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,1)</text>
+    <text x="1170" y="1628" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(1,1)</text>
+    <text x="868" y="950" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,1) hijo</text>
+    <text x="868" y="1058" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N) padre</text>
+    <text x="950" y="840" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,1) hijo</text>
+    <text x="868" y="1100" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">(0,N) madre</text>
+    <text x="60" y="1890" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">Cómo leer: (mín, máx) junto a una entidad indica en cuántas ocurrencias de la relación participa cada</text>
+    <text x="60" y="1916" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">ejemplar de esa entidad. Ej.: cada Canario «es de» (0,1) Variedad (puede quedar sin determinar);</text>
+    <text x="60" y="1942" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">cada Variedad (0,N) Canarios. El anillo se compone de socio, año, correlativo y club.</text>
+    <text x="60" y="1968" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">Sin jaula asignada, el canario está en la jaula grande. El modelo relacional está en la Figura 2.</text>
+  </g>
+</svg>

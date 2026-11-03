@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1640" viewBox="0 0 2400 1640">
+  <rect x="0" y="0" width="2400" height="1640" fill="white"/>
+  <defs/>
+  <g>
+    <polyline points="560,200 440,200" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="980,200 1120,200" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1500,200 1660,200" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1200,248 1200,470 900,470 900,560" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1420,248 1420,560" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1760,275 1760,680 1700,680" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="2000,275 2000,820" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="250,620 250,520 620,520 620,560" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1040,674 1260,674" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1040,713 1260,713" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1300,832 1300,944 1040,944" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="1040,1006 1920,1006" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="980,1021 980,1160 1400,1160 1400,1240" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="760,1021 760,1240" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="440,1300 560,1300" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="250,757 250,920" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="250,1220 250,1030" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="560,890 515,890 515,627 560,627" fill="none" stroke="#253957" stroke-width="2.5"/>
+    <polyline points="560,917 470,917 470,613 560,613" fill="none" stroke="#253957" stroke-width="2.5"/>
+  </g>
+  <g>
+    <rect x="60" y="140" width="380" height="191" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="60" y="140" width="380" height="40" fill="#253957" rx="4"/>
+    <text x="250.0" y="168" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Registro de auditoría</text>
+    <text x="72" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="138" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="72" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="138" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">usuario → Usuario</text>
+    <text x="138" y="260" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">acción</text>
+    <text x="138" y="287" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">registro afectado</text>
+    <text x="138" y="314" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha y hora</text>
+    <rect x="560" y="140" width="420" height="299" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="560" y="140" width="420" height="40" fill="#253957" rx="4"/>
+    <text x="770.0" y="168" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Usuario</text>
+    <text x="572" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="638" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="638" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">nombre</text>
+    <text x="638" y="260" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">correo electrónico</text>
+    <text x="970" y="260" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">único</text>
+    <text x="638" y="287" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">contraseña (hash)</text>
+    <text x="638" y="314" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">rol (criador / administrador)</text>
+    <text x="638" y="341" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">estado de la cuenta</text>
+    <text x="638" y="368" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha de cierre</text>
+    <text x="970" y="368" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="638" y="395" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">número de socio</text>
+    <text x="970" y="395" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="638" y="422" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">club</text>
+    <text x="970" y="422" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <rect x="1120" y="140" width="380" height="110" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="1120" y="140" width="380" height="40" fill="#253957" rx="4"/>
+    <text x="1310.0" y="168" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Criadero</text>
+    <text x="1132" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="1198" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="1132" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1198" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">usuario → Usuario</text>
+    <text x="1490" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">único</text>
+    <rect x="1660" y="140" width="400" height="137" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="1660" y="140" width="400" height="40" fill="#253957" rx="4"/>
+    <text x="1860.0" y="168" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Jaula</text>
+    <text x="1672" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="1738" y="206" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="1672" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1738" y="233" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">criadero → Criadero</text>
+    <text x="1738" y="260" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">número</text>
+    <text x="2050" y="260" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">único por criadero</text>
+    <rect x="60" y="620" width="380" height="137" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="60" y="620" width="380" height="40" fill="#253957" rx="4"/>
+    <text x="250.0" y="648" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Variedad de color</text>
+    <text x="72" y="686" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="138" y="686" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">código</text>
+    <text x="138" y="713" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">nombre</text>
+    <text x="138" y="740" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">sexo</text>
+    <text x="430" y="740" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <rect x="560" y="560" width="480" height="461" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="560" y="560" width="480" height="40" fill="#253957" rx="4"/>
+    <text x="800.0" y="588" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Canario</text>
+    <text x="572" y="626" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="638" y="626" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="572" y="653" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="638" y="653" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">criadero → Criadero</text>
+    <text x="638" y="680" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">anillo: socio</text>
+    <text x="638" y="707" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">anillo: año</text>
+    <text x="638" y="734" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">anillo: correlativo</text>
+    <text x="638" y="761" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">anillo: club</text>
+    <text x="638" y="788" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha de anillado</text>
+    <text x="638" y="815" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha de nacimiento</text>
+    <text x="1030" y="815" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="638" y="842" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">sexo</text>
+    <text x="572" y="869" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="638" y="869" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">variedad → Variedad de color</text>
+    <text x="1030" y="869" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="572" y="896" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="638" y="896" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">padre → Canario</text>
+    <text x="1030" y="896" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="572" y="923" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="638" y="923" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">madre → Canario</text>
+    <text x="1030" y="923" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="572" y="950" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="638" y="950" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">cruce de origen → Cruce</text>
+    <text x="1030" y="950" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="638" y="977" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">procedencia</text>
+    <text x="1030" y="977" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="638" y="1004" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">estado</text>
+    <rect x="1260" y="560" width="440" height="272" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="1260" y="560" width="440" height="40" fill="#253957" rx="4"/>
+    <text x="1480.0" y="588" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Cruce</text>
+    <text x="1272" y="626" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="1338" y="626" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="1272" y="653" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1338" y="653" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">criadero → Criadero</text>
+    <text x="1272" y="680" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1338" y="680" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">macho → Canario</text>
+    <text x="1272" y="707" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1338" y="707" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">hembra → Canario</text>
+    <text x="1272" y="734" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1338" y="734" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">jaula → Jaula</text>
+    <text x="1338" y="761" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">temporada</text>
+    <text x="1338" y="788" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha de inicio</text>
+    <text x="1338" y="815" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha de fin</text>
+    <text x="1690" y="815" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <rect x="1920" y="820" width="420" height="191" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="1920" y="820" width="420" height="40" fill="#253957" rx="4"/>
+    <text x="2130.0" y="848" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Ubicación</text>
+    <text x="1932" y="886" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="1998" y="886" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="1932" y="913" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1998" y="913" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">canario → Canario</text>
+    <text x="1932" y="940" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1998" y="940" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">jaula → Jaula</text>
+    <text x="2330" y="940" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <text x="1998" y="967" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha desde</text>
+    <text x="1998" y="994" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha hasta</text>
+    <text x="2330" y="994" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">opcional</text>
+    <rect x="60" y="920" width="380" height="110" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="60" y="920" width="380" height="40" fill="#253957" rx="4"/>
+    <text x="250.0" y="948" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Composición de variedad</text>
+    <text x="72" y="986" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK FK</text>
+    <text x="138" y="986" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">variedad → Variedad</text>
+    <text x="72" y="1013" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK FK</text>
+    <text x="138" y="1013" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">factor → Factor genético</text>
+    <rect x="60" y="1220" width="380" height="137" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="60" y="1220" width="380" height="40" fill="#253957" rx="4"/>
+    <text x="250.0" y="1248" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Factor genético</text>
+    <text x="72" y="1286" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="138" y="1286" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="138" y="1313" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">nombre</text>
+    <text x="430" y="1313" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">único</text>
+    <text x="138" y="1340" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">tipo de herencia</text>
+    <rect x="560" y="1240" width="480" height="137" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="560" y="1240" width="480" height="40" fill="#253957" rx="4"/>
+    <text x="800.0" y="1268" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Factor portado</text>
+    <text x="572" y="1306" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK FK</text>
+    <text x="638" y="1306" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">canario → Canario</text>
+    <text x="572" y="1333" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK FK</text>
+    <text x="638" y="1333" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">factor → Factor genético</text>
+    <text x="638" y="1360" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">origen (deducido / criador)</text>
+    <rect x="1260" y="1240" width="440" height="164" fill="white" stroke="#253957" stroke-width="2.5" rx="4"/>
+    <rect x="1260" y="1240" width="440" height="40" fill="#253957" rx="4"/>
+    <text x="1480.0" y="1268" font-family="Arial, Liberation Sans, sans-serif" font-size="21" text-anchor="middle" fill="white" font-weight="bold" font-style="normal" text-decoration="none">Baja</text>
+    <text x="1272" y="1306" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">PK</text>
+    <text x="1338" y="1306" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="underline">id</text>
+    <text x="1272" y="1333" font-family="Arial, Liberation Sans, sans-serif" font-size="16" text-anchor="start" fill="#1D4E89" font-weight="bold" font-style="normal" text-decoration="none">FK</text>
+    <text x="1338" y="1333" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">canario → Canario</text>
+    <text x="1690" y="1333" font-family="Arial, Liberation Sans, sans-serif" font-size="15" text-anchor="end" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">único</text>
+    <text x="1338" y="1360" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">motivo</text>
+    <text x="1338" y="1387" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#253957" font-weight="normal" font-style="normal" text-decoration="none">fecha</text>
+  </g>
+  <g>
+    <text x="50" y="52" font-family="Arial, Liberation Sans, sans-serif" font-size="34" text-anchor="start" fill="#253957" font-weight="bold" font-style="normal" text-decoration="none">TuCriadero · Modelo relacional (MR)</text>
+    <text x="50" y="90" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#356CA0" font-weight="normal" font-style="normal" text-decoration="none">Tablas con clave primaria (PK) y claves foráneas (FK). "opcional" = admite vacío. Implementación en MySQL (IF-002).</text>
+    <text x="550" y="191" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="450" y="191" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="990" y="191" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1110" y="191" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">0..1</text>
+    <text x="1510" y="191" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1650" y="191" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="1209" y="278" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="909" y="536" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="1429" y="278" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1429" y="536" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="1769" y="305" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1710" y="671" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="2009" y="305" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">0..1</text>
+    <text x="2009" y="796" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="259" y="596" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">0..1</text>
+    <text x="629" y="536" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="1050" y="665" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1250" y="665" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <rect x="1123.2" y="681" width="53.59999999999991" height="23" fill="white"/>
+    <text x="1150" y="698" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">macho</text>
+    <text x="1050" y="704" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1250" y="704" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <rect x="1118.44" y="720" width="63.11999999999989" height="23" fill="white"/>
+    <text x="1150" y="737" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">hembra</text>
+    <text x="1309" y="862" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">0..1</text>
+    <text x="1050" y="935" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <rect x="1075.6" y="951" width="148.79999999999995" height="23" fill="white"/>
+    <text x="1150" y="968" font-family="Arial, Liberation Sans, sans-serif" font-size="17" text-anchor="middle" fill="#475569" font-weight="normal" font-style="italic" text-decoration="none">cruce de origen</text>
+    <text x="1050" y="997" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1910" y="997" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="989" y="1051" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="1409" y="1216" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">0..1</text>
+    <text x="769" y="1051" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="769" y="1216" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="450" y="1291" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="550" y="1291" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="end" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="259" y="787" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="259" y="896" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="259" y="1196" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">1</text>
+    <text x="259" y="1060" font-family="Arial, Liberation Sans, sans-serif" font-size="19" text-anchor="start" fill="#356CA0" font-weight="bold" font-style="normal" text-decoration="none">N</text>
+    <text x="1100" y="1480" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">Cómo leer: cada línea une una clave foránea (FK) con la clave primaria (PK) de la tabla a la que apunta.</text>
+    <text x="1100" y="1507" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">1 / 0..1 / N junto a una tabla: cuántas filas de esa tabla se relacionan con una fila de la otra. Ej.: un Criadero (1)</text>
+    <text x="1100" y="1534" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">tiene N Canarios; un Canario tiene una Variedad (0..1) o ninguna, si aún no se determina.</text>
+    <text x="1100" y="1561" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">Los lazos de Canario son padre y madre: apuntan al id del mismo Canario (cada uno, 0..1 por canario; N hijos).</text>
+    <text x="1100" y="1588" font-family="Arial, Liberation Sans, sans-serif" font-size="18" text-anchor="start" fill="#475569" font-weight="normal" font-style="normal" text-decoration="none">Las reglas de integridad que no expresan las claves (mismo criadero, una sola ubicación abierta, etc.) están en DAT-004.</text>
+  </g>
+</svg>

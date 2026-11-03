@@ -1,17 +1,20 @@
-# Sistema de Gestión de Criadero de Canarios
+# TuCriadero — Sistema de Gestión de Criadero de Canarios
 
 Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno de crías por un registro digital, usable desde el teléfono: canarios identificados por su anillo, jaulas, cruces, pichones, genealogía, bajas y previsualización de los resultados de un cruce según la tabla de Mendel.
 
-Nombre comercial tentativo: TuCriadero (por confirmar con el cliente).
+Nombre oficial del producto: **TuCriadero**.
+
+Estado actual: SRS v1.0 preparado para presentarlo al cliente para su aceptación, pendiente de registrar su aprobación. El PM está definiendo las reglas del repositorio. La aplicación cuenta con su estructura inicial; la puesta en marcha queda pendiente de la implementación.
 
 ## Documentación
 
 | Documento | Para quién |
 |---|---|
 | [`docs/srs/`](docs/srs/) | Todos. Especificación de requisitos v1.0 (ISO/IEC/IEEE 29148). **Es la fuente oficial.** |
-| [`docs/backend.md`](docs/backend.md) | Backend: modelo de datos, reglas, cálculo genético y seguridad. |
+| [`docs/backend.md`](docs/backend.md) | Backend: modelo de datos (MER conceptual y modelo relacional con PK y FK), reglas, cálculo genético y seguridad. |
 | [`docs/frontend.md`](docs/frontend.md) | Frontend: pantallas, mensajes, experiencia de uso en el teléfono. |
 | [`docs/contrato-back-front.md`](docs/contrato-back-front.md) | Backend y frontend: rutas, datos que recibe cada vista, campos de cada formulario y errores. **Preliminar:** se acuerda en la épica E0. |
+| [`docs/bpmn/`](docs/bpmn/) | Todos: doce procesos BPMN 2.0 (vista general de la temporada y once procesos detallados), archivos editables, vistas vectoriales y trazabilidad al SRS. |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Todos: ramas, commits, pull requests y cómo cerrar un issue. |
 
 ## Stack
@@ -38,23 +41,27 @@ docs/                 SRS y resúmenes por equipo
 
 El trabajo está en los [issues](../../issues), en dos niveles:
 
-- **9 épicas** (`tipo:epica`), una por etapa. Forman una cadena: cada una depende solo de la anterior.
+- **9 épicas** (`tipo:epica`), una por etapa, con dependencias técnicas explícitas.
 
   ```
-  E0 Base técnica ─┬─ E1 Cuentas ── E3 Canarios ── E4 Jaulas ── E5 Libro de crías ─┬─ E6 Búsqueda y genealogía ─┬─ E8 Beta
-                   └─ E2 Catálogo                                                   └─ E7 Genética y cruces ───────┘
+  E0 → E1 Cuentas y E2 Catálogo → E3 Canarios → E4 Jaulas → E5 Libro de crías
+  E5 → E6 Búsqueda y genealogía y E7 Genética → E8 Beta
   ```
 
-- Dentro de cada épica, sus **sub-issues** (un RF del SRS o una tarea) son independientes entre sí: se pueden repartir y trabajar en paralelo en cuanto la épica anterior está cerrada.
+- Dentro de cada épica, sus **sub-issues** (un RF del SRS o una tarea) pueden diseñarse en paralelo; la integración y verificación respetan las dependencias indicadas en cada issue.
 
-Cada issue tiene etiquetas de área (`area:backend`, `area:frontend`, `area:qa`), de módulo y de prioridad, y pertenece a un hito (M1 a M5).
+- **5 revisiones externas**, una por hito, coordinadas por el PM. QA externo entrega su informe y no recibe tareas de implementación ni de pruebas internas.
+
+Plan actual: **63 issues** (9 épicas, 39 RF, 10 tareas y 5 revisiones externas). La tarea de entrega beta incluye despliegue, documentación y capacitación del SRS. Las revisiones no son sub-issues de implementación y su cierre no se confunde con la aceptación final del cliente.
+
+Las etiquetas de área son `area:backend`, `area:frontend`, `area:pruebas` (pruebas internas del equipo) y `area:gestion` (coordinación del PM). Las issues pertenecen a un hito (M1 a M5); los RF además indican módulo y prioridad.
 
 ## Equipo
 
 | Rol | Integrantes |
 |---|---|
 | Jefe de Proyecto (PM) | Jeremy Edgardo Rojas Herrera |
-| QA | Boris Barrios, José Barraza |
+| QA externo | Boris Barrios, José Barraza |
 | Desarrollo | Equipo A |
 
 ## Puesta en marcha local

@@ -1,6 +1,6 @@
 ## Qué cambia
 
-Cierra #
+Closes #
 
 **Requisito(s) del SRS:** SRS-RF0__
 

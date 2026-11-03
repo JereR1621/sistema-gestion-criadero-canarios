@@ -1,0 +1,330 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_PIC" name="Registrar pichones de un cruce" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida; el cruce y sus progenitores son del propio criadero (RF003, DAT-004). Se registra cuando los pichones tienen entre 10 y 12 días (Figura 3).
+Sexo y variedad pueden quedar sin determinar y la fecha de nacimiento es opcional (RF007, RF021). Registrar pichones no termina el cruce (RF022).</bpmn:documentation>
+    <bpmn:laneSet id="PIC_lanes">
+      <bpmn:lane id="PIC_persona" name="Criador">
+        <bpmn:flowNodeRef>PIC_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_elegir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_cancelado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_mas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="PIC_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>PIC_cruce</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_anillos_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_fichas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_factores</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_mostrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PIC_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="PIC_inicio" name="Registrar pichones">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>PIC_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="PIC_elegir" name="Elegir un cruce activo y abrir su ficha de cría">
+      <bpmn:documentation>SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F01</bpmn:incoming>
+      <bpmn:outgoing>PIC_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="PIC_cruce" name="Obtener el cruce, sus progenitores y los datos por defecto">
+      <bpmn:documentation>SRS-RF004, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F02</bpmn:incoming>
+      <bpmn:outgoing>PIC_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="PIC_anillos_datos" name="Ingresar los anillos y las fechas de los pichones">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF012, SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F06</bpmn:incoming>
+      <bpmn:incoming>PIC_F08</bpmn:incoming>
+      <bpmn:incoming>PIC_F14</bpmn:incoming>
+      <bpmn:outgoing>PIC_F03</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="PIC_anillos_validar" name="Validar anillos, sexo, variedad y fechas">
+      <bpmn:documentation>SRS-RF007, SRS-RF008, SRS-RF012, SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F03</bpmn:incoming>
+      <bpmn:outgoing>PIC_F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="PIC_anillos_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="PIC_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F04</bpmn:incoming>
+      <bpmn:outgoing>PIC_F05</bpmn:outgoing>
+      <bpmn:outgoing>PIC_F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="PIC_anillos_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="PIC_F07">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F05</bpmn:incoming>
+      <bpmn:outgoing>PIC_F06</bpmn:outgoing>
+      <bpmn:outgoing>PIC_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="PIC_anillos_cancelado" name="Registro cancelado; sin pichones nuevos">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F07</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="PIC_fichas" name="Crear las fichas con padre, madre y cruce de origen">
+      <bpmn:documentation>SRS-RF021</bpmn:documentation>
+      <bpmn:incoming>PIC_F09</bpmn:incoming>
+      <bpmn:outgoing>PIC_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="PIC_factores" name="Obtener los factores manifestados y deducir los portadores">
+      <bpmn:documentation>SRS-RF033, SRS-RF034</bpmn:documentation>
+      <bpmn:incoming>PIC_F10</bpmn:incoming>
+      <bpmn:outgoing>PIC_F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="PIC_mostrar" name="Actualizar la ficha de cría y registrar auditoría">
+      <bpmn:documentation>SRS-RF021, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F11</bpmn:incoming>
+      <bpmn:outgoing>PIC_F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="PIC_revisar" name="Revisar las fichas creadas">
+      <bpmn:documentation>SRS-RF021, SRS-RF027</bpmn:documentation>
+      <bpmn:incoming>PIC_F12</bpmn:incoming>
+      <bpmn:outgoing>PIC_F13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="PIC_mas" name="¿Registra más pichones?" gatewayDirection="Diverging" default="PIC_F15">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F13</bpmn:incoming>
+      <bpmn:outgoing>PIC_F14</bpmn:outgoing>
+      <bpmn:outgoing>PIC_F15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="PIC_fin" name="Pichones registrados; el cruce sigue activo">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>PIC_F15</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="PIC_F01" sourceRef="PIC_inicio" targetRef="PIC_elegir" name=""/>
+    <bpmn:sequenceFlow id="PIC_F02" sourceRef="PIC_elegir" targetRef="PIC_cruce" name=""/>
+    <bpmn:sequenceFlow id="PIC_F03" sourceRef="PIC_anillos_datos" targetRef="PIC_anillos_validar" name=""/>
+    <bpmn:sequenceFlow id="PIC_F04" sourceRef="PIC_anillos_validar" targetRef="PIC_anillos_valido" name=""/>
+    <bpmn:sequenceFlow id="PIC_F05" sourceRef="PIC_anillos_valido" targetRef="PIC_anillos_corrige" name="No"/>
+    <bpmn:sequenceFlow id="PIC_F06" sourceRef="PIC_anillos_corrige" targetRef="PIC_anillos_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="PIC_F07" sourceRef="PIC_anillos_corrige" targetRef="PIC_anillos_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="PIC_F08" sourceRef="PIC_cruce" targetRef="PIC_anillos_datos" name=""/>
+    <bpmn:sequenceFlow id="PIC_F09" sourceRef="PIC_anillos_valido" targetRef="PIC_fichas" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="PIC_F10" sourceRef="PIC_fichas" targetRef="PIC_factores" name=""/>
+    <bpmn:sequenceFlow id="PIC_F11" sourceRef="PIC_factores" targetRef="PIC_mostrar" name=""/>
+    <bpmn:sequenceFlow id="PIC_F12" sourceRef="PIC_mostrar" targetRef="PIC_revisar" name=""/>
+    <bpmn:sequenceFlow id="PIC_F13" sourceRef="PIC_revisar" targetRef="PIC_mas" name=""/>
+    <bpmn:sequenceFlow id="PIC_F14" sourceRef="PIC_mas" targetRef="PIC_anillos_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">mas_pichones</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="PIC_F15" sourceRef="PIC_mas" targetRef="PIC_fin" name="No"/>
+    <bpmn:subProcess id="PIC_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="PIC_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>PIC_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="PIC_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="PIC_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>PIC_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>PIC_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="PIC_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>PIC_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="PIC_no_disponible_F1" sourceRef="PIC_no_disponible_inicio" targetRef="PIC_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="PIC_no_disponible_F2" sourceRef="PIC_no_disponible_informar" targetRef="PIC_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="PIC_A_anillos">
+      <bpmn:text>Errores que se informan sin guardar:
+• Anillo ya usado en el criadero o repetido en el envío: se indica el canario que lo usa (RF008).
+• Variedad que no corresponde al sexo (RF012).
+• Falta la fecha de anillado (RF021).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="PIC_A_anillos_asoc" sourceRef="PIC_anillos_valido" targetRef="PIC_A_anillos" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_PIC">
+    <bpmn:participant id="Participant_PIC" name="TuCriadero — Registrar pichones de un cruce" processRef="Process_PIC"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_PIC" name="Registrar pichones de un cruce">
+    <bpmndi:BPMNPlane id="Plane_PIC" bpmnElement="Collaboration_PIC">
+      <bpmndi:BPMNShape id="Participant_PIC_di" bpmnElement="Participant_PIC" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="2140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_persona_di" bpmnElement="PIC_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="2140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_sistema_di" bpmnElement="PIC_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="2140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_inicio_di" bpmnElement="PIC_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="229.76" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_elegir_di" bpmnElement="PIC_elegir">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_cruce_di" bpmnElement="PIC_cruce">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_datos_di" bpmnElement="PIC_anillos_datos">
+        <dc:Bounds x="260.0" y="610.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_validar_di" bpmnElement="PIC_anillos_validar">
+        <dc:Bounds x="850.0" y="610.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_valido_di" bpmnElement="PIC_anillos_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="836.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="830" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_corrige_di" bpmnElement="PIC_anillos_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="836.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="805" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_anillos_cancelado_di" bpmnElement="PIC_anillos_cancelado">
+        <dc:Bounds x="446.0" y="1036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="324.32" y="1088" width="291.36000000000007" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_fichas_di" bpmnElement="PIC_fichas">
+        <dc:Bounds x="850.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_factores_di" bpmnElement="PIC_factores">
+        <dc:Bounds x="850.0" y="1180.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_mostrar_di" bpmnElement="PIC_mostrar">
+        <dc:Bounds x="850.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_revisar_di" bpmnElement="PIC_revisar">
+        <dc:Bounds x="260.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_mas_di" bpmnElement="PIC_mas" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="1596.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="259.84" y="1565" width="168.16000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_fin_di" bpmnElement="PIC_fin">
+        <dc:Bounds x="446.0" y="1796.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="318.15999999999997" y="1848" width="303.67999999999995" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="PIC_F01_di" bpmnElement="PIC_F01">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F02_di" bpmnElement="PIC_F02">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F03_di" bpmnElement="PIC_F03">
+        <di:waypoint x="680.0" y="680"/>
+        <di:waypoint x="850.0" y="680"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F04_di" bpmnElement="PIC_F04">
+        <di:waypoint x="1060" y="750.0"/>
+        <di:waypoint x="1060" y="836.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F05_di" bpmnElement="PIC_F05">
+        <di:waypoint x="1026.0" y="870"/>
+        <di:waypoint x="504.0" y="870"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="835" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F06_di" bpmnElement="PIC_F06">
+        <di:waypoint x="470" y="836.0"/>
+        <di:waypoint x="470" y="750.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="799.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F07_di" bpmnElement="PIC_F07">
+        <di:waypoint x="470" y="904.0"/>
+        <di:waypoint x="470" y="1036.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="915.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F08_di" bpmnElement="PIC_F08">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="582.0"/>
+        <di:waypoint x="470" y="582.0"/>
+        <di:waypoint x="470" y="610.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F09_di" bpmnElement="PIC_F09">
+        <di:waypoint x="1060" y="904.0"/>
+        <di:waypoint x="1060" y="990.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="915.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F10_di" bpmnElement="PIC_F10">
+        <di:waypoint x="1060" y="1130.0"/>
+        <di:waypoint x="1060" y="1180.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F11_di" bpmnElement="PIC_F11">
+        <di:waypoint x="1060" y="1320.0"/>
+        <di:waypoint x="1060" y="1370.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F12_di" bpmnElement="PIC_F12">
+        <di:waypoint x="850.0" y="1440"/>
+        <di:waypoint x="680.0" y="1440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F13_di" bpmnElement="PIC_F13">
+        <di:waypoint x="470" y="1510.0"/>
+        <di:waypoint x="470" y="1596.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F14_di" bpmnElement="PIC_F14">
+        <di:waypoint x="436.0" y="1630"/>
+        <di:waypoint x="205" y="1630"/>
+        <di:waypoint x="205" y="680"/>
+        <di:waypoint x="260.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="394.48" y="1637" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_F15_di" bpmnElement="PIC_F15">
+        <di:waypoint x="470" y="1664.0"/>
+        <di:waypoint x="470" y="1796.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="1675.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="PIC_no_disponible_di" bpmnElement="PIC_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1995" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_no_disponible_inicio_di" bpmnElement="PIC_no_disponible_inicio">
+        <dc:Bounds x="926" y="2096" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_no_disponible_informar_di" bpmnElement="PIC_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="2068.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PIC_no_disponible_fin_di" bpmnElement="PIC_no_disponible_fin">
+        <dc:Bounds x="1486" y="2096" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="PIC_no_disponible_F1_di" bpmnElement="PIC_no_disponible_F1">
+        <di:waypoint x="974" y="2120"/>
+        <di:waypoint x="1065.0" y="2120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PIC_no_disponible_F2_di" bpmnElement="PIC_no_disponible_F2">
+        <di:waypoint x="1395.0" y="2120"/>
+        <di:waypoint x="1486" y="2120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="PIC_A_anillos_di" bpmnElement="PIC_A_anillos">
+        <dc:Bounds x="1310" y="739.0" width="330" height="262.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="PIC_A_anillos_asoc_di" bpmnElement="PIC_A_anillos_asoc">
+        <di:waypoint x="1094.0" y="870"/>
+        <di:waypoint x="1310" y="870"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,221 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_JAU" name="Registrar una jaula" isExecutable="false">
+    <bpmn:documentation>Precondición: sesión de criador válida. El número de jaula es único dentro del criadero (RF014, DAT-004). La jaula grande no se registra: es la ubicación sin número (RF016).</bpmn:documentation>
+    <bpmn:laneSet id="JAU_lanes">
+      <bpmn:lane id="JAU_persona" name="Criador">
+        <bpmn:flowNodeRef>JAU_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="JAU_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>JAU_nueva_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_nueva_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_alta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>JAU_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="JAU_inicio" name="Registrar una jaula">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>JAU_F06</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="JAU_nueva_datos" name="Ingresar el número de la nueva jaula">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F04</bpmn:incoming>
+      <bpmn:incoming>JAU_F06</bpmn:incoming>
+      <bpmn:outgoing>JAU_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="JAU_nueva_validar" name="Validar que el número no exista en el criadero">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F01</bpmn:incoming>
+      <bpmn:outgoing>JAU_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="JAU_nueva_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="JAU_F03">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F02</bpmn:incoming>
+      <bpmn:outgoing>JAU_F03</bpmn:outgoing>
+      <bpmn:outgoing>JAU_F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="JAU_nueva_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="JAU_F05">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F03</bpmn:incoming>
+      <bpmn:outgoing>JAU_F04</bpmn:outgoing>
+      <bpmn:outgoing>JAU_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="JAU_nueva_cancelado" name="Registro cancelado; sin jaula nueva">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="JAU_alta" name="Registrar la jaula numerada">
+      <bpmn:documentation>SRS-RF014</bpmn:documentation>
+      <bpmn:incoming>JAU_F07</bpmn:incoming>
+      <bpmn:outgoing>JAU_F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="JAU_fin" name="Jaula registrada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>JAU_F08</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="JAU_F01" sourceRef="JAU_nueva_datos" targetRef="JAU_nueva_validar" name=""/>
+    <bpmn:sequenceFlow id="JAU_F02" sourceRef="JAU_nueva_validar" targetRef="JAU_nueva_valido" name=""/>
+    <bpmn:sequenceFlow id="JAU_F03" sourceRef="JAU_nueva_valido" targetRef="JAU_nueva_corrige" name="No"/>
+    <bpmn:sequenceFlow id="JAU_F04" sourceRef="JAU_nueva_corrige" targetRef="JAU_nueva_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="JAU_F05" sourceRef="JAU_nueva_corrige" targetRef="JAU_nueva_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="JAU_F06" sourceRef="JAU_inicio" targetRef="JAU_nueva_datos" name=""/>
+    <bpmn:sequenceFlow id="JAU_F07" sourceRef="JAU_nueva_valido" targetRef="JAU_alta" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="JAU_F08" sourceRef="JAU_alta" targetRef="JAU_fin" name=""/>
+    <bpmn:subProcess id="JAU_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" triggeredByEvent="true">
+      <bpmn:startEvent id="JAU_no_disponible_inicio" name="Sin conexión, mantenimiento o sesión expirada" isInterrupting="true">
+        <bpmn:outgoing>JAU_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="JAU_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="JAU_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>JAU_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>JAU_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="JAU_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>JAU_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="JAU_no_disponible_F1" sourceRef="JAU_no_disponible_inicio" targetRef="JAU_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="JAU_no_disponible_F2" sourceRef="JAU_no_disponible_informar" targetRef="JAU_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="JAU_A_nueva">
+      <bpmn:text>Errores que se informan sin guardar:
+• Número de jaula ya registrado en el criadero (RF014).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="JAU_A_nueva_asoc" sourceRef="JAU_nueva_valido" targetRef="JAU_A_nueva" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_JAU">
+    <bpmn:participant id="Participant_JAU" name="TuCriadero — Registrar una jaula" processRef="Process_JAU"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_JAU" name="Registrar una jaula">
+    <bpmndi:BPMNPlane id="Plane_JAU" bpmnElement="Collaboration_JAU">
+      <bpmndi:BPMNShape id="Participant_JAU_di" bpmnElement="Participant_JAU" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_persona_di" bpmnElement="JAU_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_sistema_di" bpmnElement="JAU_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="1380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_inicio_di" bpmnElement="JAU_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="242.08000000000004" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_datos_di" bpmnElement="JAU_nueva_datos">
+        <dc:Bounds x="260.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_validar_di" bpmnElement="JAU_nueva_validar">
+        <dc:Bounds x="850.0" y="420.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_valido_di" bpmnElement="JAU_nueva_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="640" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_corrige_di" bpmnElement="JAU_nueva_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="646.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="615" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_nueva_cancelado_di" bpmnElement="JAU_nueva_cancelado">
+        <dc:Bounds x="446.0" y="846.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="324.32" y="898" width="291.36000000000007" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_alta_di" bpmnElement="JAU_alta">
+        <dc:Bounds x="850.0" y="800.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_fin_di" bpmnElement="JAU_fin">
+        <dc:Bounds x="1036.0" y="1036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="957.44" y="1088" width="205.1199999999999" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="JAU_F01_di" bpmnElement="JAU_F01">
+        <di:waypoint x="680.0" y="490"/>
+        <di:waypoint x="850.0" y="490"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F02_di" bpmnElement="JAU_F02">
+        <di:waypoint x="1060" y="560.0"/>
+        <di:waypoint x="1060" y="646.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F03_di" bpmnElement="JAU_F03">
+        <di:waypoint x="1026.0" y="680"/>
+        <di:waypoint x="504.0" y="680"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="645" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F04_di" bpmnElement="JAU_F04">
+        <di:waypoint x="470" y="646.0"/>
+        <di:waypoint x="470" y="560.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="609.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F05_di" bpmnElement="JAU_F05">
+        <di:waypoint x="470" y="714.0"/>
+        <di:waypoint x="470" y="846.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F06_di" bpmnElement="JAU_F06">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="420.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F07_di" bpmnElement="JAU_F07">
+        <di:waypoint x="1060" y="714.0"/>
+        <di:waypoint x="1060" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="725.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_F08_di" bpmnElement="JAU_F08">
+        <di:waypoint x="1060" y="940.0"/>
+        <di:waypoint x="1060" y="1036.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="JAU_no_disponible_di" bpmnElement="JAU_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="1235" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_no_disponible_inicio_di" bpmnElement="JAU_no_disponible_inicio">
+        <dc:Bounds x="926" y="1336" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_no_disponible_informar_di" bpmnElement="JAU_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="1308.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="JAU_no_disponible_fin_di" bpmnElement="JAU_no_disponible_fin">
+        <dc:Bounds x="1486" y="1336" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="JAU_no_disponible_F1_di" bpmnElement="JAU_no_disponible_F1">
+        <di:waypoint x="974" y="1360"/>
+        <di:waypoint x="1065.0" y="1360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="JAU_no_disponible_F2_di" bpmnElement="JAU_no_disponible_F2">
+        <di:waypoint x="1395.0" y="1360"/>
+        <di:waypoint x="1486" y="1360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="JAU_A_nueva_di" bpmnElement="JAU_A_nueva">
+        <dc:Bounds x="1310" y="609.0" width="330" height="142.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="JAU_A_nueva_asoc_di" bpmnElement="JAU_A_nueva_asoc">
+        <di:waypoint x="1094.0" y="680"/>
+        <di:waypoint x="1310" y="680"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

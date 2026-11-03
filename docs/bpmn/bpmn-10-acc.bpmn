@@ -1,0 +1,550 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
+  <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
+  <bpmn:process id="Process_ACC" name="Acceder a TuCriadero y completar el perfil" isExecutable="false">
+    <bpmn:documentation>El autorregistro crea solo cuentas de criador; la cuenta de administrador la crea el equipo (RF001, SEG-001).
+La sesión queda limitada al criadero del usuario (RF002–RF003), expira tras 7 días de inactividad y puede cerrarse en cualquier momento (SEG-004). Socio y club se proponen por defecto al anillar (RF004).</bpmn:documentation>
+    <bpmn:laneSet id="ACC_lanes">
+      <bpmn:lane id="ACC_persona" name="Criador">
+        <bpmn:flowNodeRef>ACC_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_cuenta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_cancelado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_reintenta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_cancelado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil_datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil_corrige</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil_cancelado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="ACC_sistema" name="TuCriadero (aplicación web)">
+        <bpmn:flowNodeRef>ACC_registro_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_registro_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_crear</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_ingreso_resultado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_rechazado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_sesion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil_validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_perfil_valido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_guardar_perfil</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ACC_no_disponible</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ACC_inicio" name="Acceder a TuCriadero">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:outgoing>ACC_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="ACC_cuenta" name="¿Tiene cuenta?" gatewayDirection="Diverging" default="ACC_F07">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F01</bpmn:incoming>
+      <bpmn:outgoing>ACC_F07</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="ACC_registro_datos" name="Ingresar nombre, correo y contraseña">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F05</bpmn:incoming>
+      <bpmn:incoming>ACC_F07</bpmn:incoming>
+      <bpmn:outgoing>ACC_F02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_registro_validar" name="Validar los datos del registro">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F02</bpmn:incoming>
+      <bpmn:outgoing>ACC_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_registro_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ACC_F04">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F03</bpmn:incoming>
+      <bpmn:outgoing>ACC_F04</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ACC_registro_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="ACC_F06">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F04</bpmn:incoming>
+      <bpmn:outgoing>ACC_F05</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F06</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="ACC_registro_cancelado" name="Registro cancelado; sin cuenta nueva">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F06</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ACC_crear" name="Crear la cuenta de criador y su criadero vacío">
+      <bpmn:documentation>SRS-RF001</bpmn:documentation>
+      <bpmn:incoming>ACC_F08</bpmn:incoming>
+      <bpmn:outgoing>ACC_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="ACC_ingreso_datos" name="Ingresar el correo y la contraseña">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F09</bpmn:incoming>
+      <bpmn:incoming>ACC_F10</bpmn:incoming>
+      <bpmn:incoming>ACC_F14</bpmn:incoming>
+      <bpmn:outgoing>ACC_F11</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_ingreso_validar" name="Validar las credenciales y el estado de la cuenta">
+      <bpmn:documentation>SRS-RF002, SRS-RF003, SRS-RF005</bpmn:documentation>
+      <bpmn:incoming>ACC_F11</bpmn:incoming>
+      <bpmn:outgoing>ACC_F12</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_ingreso_resultado" name="¿Resultado?" gatewayDirection="Diverging" default="ACC_F13">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F12</bpmn:incoming>
+      <bpmn:outgoing>ACC_F13</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F16</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F17</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ACC_ingreso_reintenta" name="¿Intenta de nuevo?" gatewayDirection="Diverging" default="ACC_F15">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F13</bpmn:incoming>
+      <bpmn:outgoing>ACC_F14</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="ACC_ingreso_cancelado" name="Ingreso cancelado">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F15</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="ACC_rechazado" name="Acceso rechazado: cuenta desactivada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ACC_sesion" name="Abrir la sesión con el rol y el criadero autorizados">
+      <bpmn:documentation>SRS-RF002, SRS-RF003</bpmn:documentation>
+      <bpmn:incoming>ACC_F17</bpmn:incoming>
+      <bpmn:outgoing>ACC_F18</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_perfil" name="¿Actualiza el socio y el club?" gatewayDirection="Diverging" default="ACC_F27">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F18</bpmn:incoming>
+      <bpmn:outgoing>ACC_F24</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="ACC_perfil_datos" name="Ingresar el número de socio y el club">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F22</bpmn:incoming>
+      <bpmn:incoming>ACC_F24</bpmn:incoming>
+      <bpmn:outgoing>ACC_F19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="ACC_perfil_validar" name="Validar los datos del perfil">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F19</bpmn:incoming>
+      <bpmn:outgoing>ACC_F20</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ACC_perfil_valido" name="¿Datos válidos?" gatewayDirection="Diverging" default="ACC_F21">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F20</bpmn:incoming>
+      <bpmn:outgoing>ACC_F21</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F25</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="ACC_perfil_corrige" name="¿Corrige los datos?" gatewayDirection="Diverging" default="ACC_F23">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F21</bpmn:incoming>
+      <bpmn:outgoing>ACC_F22</bpmn:outgoing>
+      <bpmn:outgoing>ACC_F23</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="ACC_perfil_cancelado" name="Perfil sin cambios; acceso disponible">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F23</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ACC_guardar_perfil" name="Guardar socio y club como valores por defecto">
+      <bpmn:documentation>SRS-RF004</bpmn:documentation>
+      <bpmn:incoming>ACC_F25</bpmn:incoming>
+      <bpmn:outgoing>ACC_F26</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="ACC_fin" name="Acceso disponible con sesión autorizada">
+      <bpmn:documentation></bpmn:documentation>
+      <bpmn:incoming>ACC_F26</bpmn:incoming>
+      <bpmn:incoming>ACC_F27</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="ACC_F01" sourceRef="ACC_inicio" targetRef="ACC_cuenta" name=""/>
+    <bpmn:sequenceFlow id="ACC_F02" sourceRef="ACC_registro_datos" targetRef="ACC_registro_validar" name=""/>
+    <bpmn:sequenceFlow id="ACC_F03" sourceRef="ACC_registro_validar" targetRef="ACC_registro_valido" name=""/>
+    <bpmn:sequenceFlow id="ACC_F04" sourceRef="ACC_registro_valido" targetRef="ACC_registro_corrige" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F05" sourceRef="ACC_registro_corrige" targetRef="ACC_registro_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F06" sourceRef="ACC_registro_corrige" targetRef="ACC_registro_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F07" sourceRef="ACC_cuenta" targetRef="ACC_registro_datos" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F08" sourceRef="ACC_registro_valido" targetRef="ACC_crear" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F09" sourceRef="ACC_crear" targetRef="ACC_ingreso_datos" name=""/>
+    <bpmn:sequenceFlow id="ACC_F10" sourceRef="ACC_cuenta" targetRef="ACC_ingreso_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">tiene_cuenta</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F11" sourceRef="ACC_ingreso_datos" targetRef="ACC_ingreso_validar" name=""/>
+    <bpmn:sequenceFlow id="ACC_F12" sourceRef="ACC_ingreso_validar" targetRef="ACC_ingreso_resultado" name=""/>
+    <bpmn:sequenceFlow id="ACC_F13" sourceRef="ACC_ingreso_resultado" targetRef="ACC_ingreso_reintenta" name="Credenciales incorrectas"/>
+    <bpmn:sequenceFlow id="ACC_F14" sourceRef="ACC_ingreso_reintenta" targetRef="ACC_ingreso_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">reintenta</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F15" sourceRef="ACC_ingreso_reintenta" targetRef="ACC_ingreso_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F16" sourceRef="ACC_ingreso_resultado" targetRef="ACC_rechazado" name="Desactivada">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">cuenta = desactivada</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F17" sourceRef="ACC_ingreso_resultado" targetRef="ACC_sesion" name="Válidas">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">credenciales_validas</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F18" sourceRef="ACC_sesion" targetRef="ACC_perfil" name=""/>
+    <bpmn:sequenceFlow id="ACC_F19" sourceRef="ACC_perfil_datos" targetRef="ACC_perfil_validar" name=""/>
+    <bpmn:sequenceFlow id="ACC_F20" sourceRef="ACC_perfil_validar" targetRef="ACC_perfil_valido" name=""/>
+    <bpmn:sequenceFlow id="ACC_F21" sourceRef="ACC_perfil_valido" targetRef="ACC_perfil_corrige" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F22" sourceRef="ACC_perfil_corrige" targetRef="ACC_perfil_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">corrige</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F23" sourceRef="ACC_perfil_corrige" targetRef="ACC_perfil_cancelado" name="No"/>
+    <bpmn:sequenceFlow id="ACC_F24" sourceRef="ACC_perfil" targetRef="ACC_perfil_datos" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">actualizar_perfil</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F25" sourceRef="ACC_perfil_valido" targetRef="ACC_guardar_perfil" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_validos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="ACC_F26" sourceRef="ACC_guardar_perfil" targetRef="ACC_fin" name=""/>
+    <bpmn:sequenceFlow id="ACC_F27" sourceRef="ACC_perfil" targetRef="ACC_fin" name="No"/>
+    <bpmn:subProcess id="ACC_no_disponible" name="Sin conexión o mantenimiento" triggeredByEvent="true">
+      <bpmn:startEvent id="ACC_no_disponible_inicio" name="Sin conexión o mantenimiento" isInterrupting="true">
+        <bpmn:outgoing>ACC_no_disponible_F1</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ACC_no_disponible_err" errorRef="Error_no_disponible"/>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="ACC_no_disponible_informar" name="Informar el motivo y no guardar cambios">
+        <bpmn:documentation>SRS §2.5 (modo degradado y mantenimiento) y SEG-004 (sesión).</bpmn:documentation>
+        <bpmn:incoming>ACC_no_disponible_F1</bpmn:incoming>
+        <bpmn:outgoing>ACC_no_disponible_F2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="ACC_no_disponible_fin" name="Operación no realizada; sin cambios">
+        <bpmn:incoming>ACC_no_disponible_F2</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="ACC_no_disponible_F1" sourceRef="ACC_no_disponible_inicio" targetRef="ACC_no_disponible_informar"/>
+      <bpmn:sequenceFlow id="ACC_no_disponible_F2" sourceRef="ACC_no_disponible_informar" targetRef="ACC_no_disponible_fin"/>
+    </bpmn:subProcess>
+    <bpmn:textAnnotation id="ACC_A_registro">
+      <bpmn:text>Errores que se informan sin guardar:
+• Contraseña de menos de 8 caracteres (SEG-001).
+• Correo ya registrado (RF002).
+• Falta el nombre, el correo o la contraseña (RF001).</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="ACC_A_registro_asoc" sourceRef="ACC_registro_valido" targetRef="ACC_A_registro" associationDirection="None"/>
+  </bpmn:process>
+  <bpmn:collaboration id="Collaboration_ACC">
+    <bpmn:participant id="Participant_ACC" name="TuCriadero — Acceder a TuCriadero y completar el perfil" processRef="Process_ACC"/>
+  </bpmn:collaboration>
+  <bpmndi:BPMNDiagram id="Diagram_ACC" name="Acceder a TuCriadero y completar el perfil">
+    <bpmndi:BPMNPlane id="Plane_ACC" bpmnElement="Collaboration_ACC">
+      <bpmndi:BPMNShape id="Participant_ACC_di" bpmnElement="Participant_ACC" isHorizontal="false">
+        <dc:Bounds x="40" y="150" width="1620" height="3280"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_persona_di" bpmnElement="ACC_persona" isHorizontal="false">
+        <dc:Bounds x="100" y="150" width="700" height="3280"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_sistema_di" bpmnElement="ACC_sistema" isHorizontal="false">
+        <dc:Bounds x="800" y="150" width="860" height="3280"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_inicio_di" bpmnElement="ACC_inicio">
+        <dc:Bounds x="446.0" y="276.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="284" width="254.4000000000001" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_cuenta_di" bpmnElement="ACC_cuenta" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="456.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512.0" y="450" width="180.48000000000002" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_datos_di" bpmnElement="ACC_registro_datos">
+        <dc:Bounds x="260.0" y="610.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_validar_di" bpmnElement="ACC_registro_validar">
+        <dc:Bounds x="850.0" y="610.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_valido_di" bpmnElement="ACC_registro_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="836.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="830" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_corrige_di" bpmnElement="ACC_registro_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="836.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="805" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_registro_cancelado_di" bpmnElement="ACC_registro_cancelado">
+        <dc:Bounds x="446.0" y="1036.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="324.32" y="1088" width="291.36000000000007" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_crear_di" bpmnElement="ACC_crear">
+        <dc:Bounds x="850.0" y="990.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_datos_di" bpmnElement="ACC_ingreso_datos">
+        <dc:Bounds x="260.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_validar_di" bpmnElement="ACC_ingreso_validar">
+        <dc:Bounds x="850.0" y="1370.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_resultado_di" bpmnElement="ACC_ingreso_resultado" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="1596.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="1590" width="143.51999999999998" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_reintenta_di" bpmnElement="ACC_ingreso_reintenta" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="1596.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="198.23999999999998" y="1590" width="229.76000000000002" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_ingreso_cancelado_di" bpmnElement="ACC_ingreso_cancelado">
+        <dc:Bounds x="446.0" y="1796.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="361.28" y="1848" width="217.44000000000005" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_rechazado_di" bpmnElement="ACC_rechazado">
+        <dc:Bounds x="1456.0" y="1606.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1365.12" y="1658" width="229.76" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_sesion_di" bpmnElement="ACC_sesion">
+        <dc:Bounds x="850.0" y="1750.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_di" bpmnElement="ACC_perfil" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="2166.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="222.88" y="2135" width="205.12" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_datos_di" bpmnElement="ACC_perfil_datos">
+        <dc:Bounds x="260.0" y="2320.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_validar_di" bpmnElement="ACC_perfil_validar">
+        <dc:Bounds x="850.0" y="2320.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_valido_di" bpmnElement="ACC_perfil_valido" isMarkerVisible="true">
+        <dc:Bounds x="1026.0" y="2546.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1102.0" y="2540" width="192.79999999999995" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_corrige_di" bpmnElement="ACC_perfil_corrige" isMarkerVisible="true">
+        <dc:Bounds x="436.0" y="2546.0" width="68" height="68"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272.15999999999997" y="2515" width="155.84000000000003" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_perfil_cancelado_di" bpmnElement="ACC_perfil_cancelado">
+        <dc:Bounds x="446.0" y="2746.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="348.96" y="2798" width="242.07999999999998" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_guardar_perfil_di" bpmnElement="ACC_guardar_perfil">
+        <dc:Bounds x="850.0" y="2700.0" width="420" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_fin_di" bpmnElement="ACC_fin">
+        <dc:Bounds x="1036.0" y="2936.0" width="48" height="48"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="926.64" y="2988" width="266.72000000000014" height="56"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ACC_F01_di" bpmnElement="ACC_F01">
+        <di:waypoint x="470" y="324.0"/>
+        <di:waypoint x="470" y="456.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F02_di" bpmnElement="ACC_F02">
+        <di:waypoint x="680.0" y="680"/>
+        <di:waypoint x="850.0" y="680"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F03_di" bpmnElement="ACC_F03">
+        <di:waypoint x="1060" y="750.0"/>
+        <di:waypoint x="1060" y="836.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F04_di" bpmnElement="ACC_F04">
+        <di:waypoint x="1026.0" y="870"/>
+        <di:waypoint x="504.0" y="870"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="835" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F05_di" bpmnElement="ACC_F05">
+        <di:waypoint x="470" y="836.0"/>
+        <di:waypoint x="470" y="750.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="799.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F06_di" bpmnElement="ACC_F06">
+        <di:waypoint x="470" y="904.0"/>
+        <di:waypoint x="470" y="1036.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="915.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F07_di" bpmnElement="ACC_F07">
+        <di:waypoint x="470" y="524.0"/>
+        <di:waypoint x="470" y="610.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="535.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F08_di" bpmnElement="ACC_F08">
+        <di:waypoint x="1060" y="904.0"/>
+        <di:waypoint x="1060" y="990.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="915.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F09_di" bpmnElement="ACC_F09">
+        <di:waypoint x="1060" y="1130.0"/>
+        <di:waypoint x="1060" y="1342.0"/>
+        <di:waypoint x="470" y="1342.0"/>
+        <di:waypoint x="470" y="1370.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F10_di" bpmnElement="ACC_F10">
+        <di:waypoint x="436.0" y="490"/>
+        <di:waypoint x="205" y="490"/>
+        <di:waypoint x="205" y="1440"/>
+        <di:waypoint x="260.0" y="1440"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="394.48" y="455" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F11_di" bpmnElement="ACC_F11">
+        <di:waypoint x="680.0" y="1440"/>
+        <di:waypoint x="850.0" y="1440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F12_di" bpmnElement="ACC_F12">
+        <di:waypoint x="1060" y="1510.0"/>
+        <di:waypoint x="1060" y="1596.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F13_di" bpmnElement="ACC_F13">
+        <di:waypoint x="1026.0" y="1630"/>
+        <di:waypoint x="504.0" y="1630"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="725.76" y="1595" width="290.24" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F14_di" bpmnElement="ACC_F14">
+        <di:waypoint x="470" y="1596.0"/>
+        <di:waypoint x="470" y="1510.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="1559.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F15_di" bpmnElement="ACC_F15">
+        <di:waypoint x="470" y="1664.0"/>
+        <di:waypoint x="470" y="1796.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="1675.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F16_di" bpmnElement="ACC_F16">
+        <di:waypoint x="1094.0" y="1630"/>
+        <di:waypoint x="1456.0" y="1630"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1104.0" y="1637" width="137.36000000000013" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F17_di" bpmnElement="ACC_F17">
+        <di:waypoint x="1060" y="1664.0"/>
+        <di:waypoint x="1060" y="1750.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="1675.0" width="90.31999999999994" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F18_di" bpmnElement="ACC_F18">
+        <di:waypoint x="1060" y="1890.0"/>
+        <di:waypoint x="1060" y="2138.0"/>
+        <di:waypoint x="470" y="2138.0"/>
+        <di:waypoint x="470" y="2166.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F19_di" bpmnElement="ACC_F19">
+        <di:waypoint x="680.0" y="2390"/>
+        <di:waypoint x="850.0" y="2390"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F20_di" bpmnElement="ACC_F20">
+        <di:waypoint x="1060" y="2460.0"/>
+        <di:waypoint x="1060" y="2546.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F21_di" bpmnElement="ACC_F21">
+        <di:waypoint x="1026.0" y="2580"/>
+        <di:waypoint x="504.0" y="2580"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984.48" y="2545" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F22_di" bpmnElement="ACC_F22">
+        <di:waypoint x="470" y="2546.0"/>
+        <di:waypoint x="470" y="2460.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="2509.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F23_di" bpmnElement="ACC_F23">
+        <di:waypoint x="470" y="2614.0"/>
+        <di:waypoint x="470" y="2746.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="2625.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F24_di" bpmnElement="ACC_F24">
+        <di:waypoint x="470" y="2234.0"/>
+        <di:waypoint x="470" y="2320.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="478" y="2245.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F25_di" bpmnElement="ACC_F25">
+        <di:waypoint x="1060" y="2614.0"/>
+        <di:waypoint x="1060" y="2700.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="2625.0" width="31.519999999999982" height="29.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F26_di" bpmnElement="ACC_F26">
+        <di:waypoint x="1060" y="2840.0"/>
+        <di:waypoint x="1060" y="2936.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_F27_di" bpmnElement="ACC_F27">
+        <di:waypoint x="504.0" y="2200"/>
+        <di:waypoint x="1345" y="2200"/>
+        <di:waypoint x="1345" y="2960"/>
+        <di:waypoint x="1084.0" y="2960"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="514.0" y="2165" width="31.519999999999982" height="29"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ACC_no_disponible_di" bpmnElement="ACC_no_disponible" isExpanded="true">
+        <dc:Bounds x="840" y="3135" width="780" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_no_disponible_inicio_di" bpmnElement="ACC_no_disponible_inicio">
+        <dc:Bounds x="926" y="3236" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_no_disponible_informar_di" bpmnElement="ACC_no_disponible_informar">
+        <dc:Bounds x="1065.0" y="3208.0" width="330" height="104"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ACC_no_disponible_fin_di" bpmnElement="ACC_no_disponible_fin">
+        <dc:Bounds x="1486" y="3236" width="48" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ACC_no_disponible_F1_di" bpmnElement="ACC_no_disponible_F1">
+        <di:waypoint x="974" y="3260"/>
+        <di:waypoint x="1065.0" y="3260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ACC_no_disponible_F2_di" bpmnElement="ACC_no_disponible_F2">
+        <di:waypoint x="1395.0" y="3260"/>
+        <di:waypoint x="1486" y="3260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ACC_A_registro_di" bpmnElement="ACC_A_registro">
+        <dc:Bounds x="1310" y="763.0" width="330" height="214.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ACC_A_registro_asoc_di" bpmnElement="ACC_A_registro_asoc">
+        <di:waypoint x="1094.0" y="870"/>
+        <di:waypoint x="1310" y="870"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
