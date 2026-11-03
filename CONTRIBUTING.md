@@ -27,7 +27,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 
 ## Pull requests
 
-1. Una rama y un pull request por sub-issue (nunca por épica). El PR dice `Cierra #NN` para enlazar el issue. Una épica se cierra cuando todos sus sub-issues están cerrados.
+1. Una rama y un pull request por sub-issue (nunca por épica). El PR dice `Closes #NN` para enlazar el issue: GitHub solo reconoce palabras en inglés (`Closes`, `Fixes`, `Resolves`) y cierra el issue al integrar el PR en `develop`, la rama por defecto. Una épica se cierra cuando todos sus sub-issues están cerrados.
 2. Completar la plantilla: qué RF cubre, cómo se probó y capturas si cambia una pantalla.
 3. Un integrante del equipo revisa el código antes de unir a `develop`.
 4. Para pasar de `develop` a `main`, el PM comprueba la revisión externa del hito y autoriza la entrega; un integrante del equipo revisa el PR. QA externo no tiene que aprobar PR ni operar GitHub.
