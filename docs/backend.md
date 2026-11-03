@@ -20,17 +20,17 @@ Todos los valores del SRS, incluidos los numéricos de los requisitos no funcion
 ## 2. Arquitectura propuesta
 
 ```
-app/
-  Controllers/   → reciben la petición, validan permisos y llaman a los servicios   (backend)
-  Services/      → reglas de negocio; Services/Genetica para el cálculo de cruces   (backend)
-  Models/        → acceso a datos con PDO y consultas preparadas                    (backend)
-  Views/         → HTML de cada pantalla                                             (frontend)
-public/          → punto de entrada (index.php) y archivos públicos
-database/
-  migrations/    → NNN_descripcion.sql: creación y cambios de tablas (ver base-de-datos.md)
-  seeds/         → catálogo de variedades, factores y composición; datos de prueba inventados
-  migrar.php     → aplica migraciones y seeds; crea la cuenta de administrador
-tests/           → PHPUnit
+backend/                → todo lo de esta guía
+  Controllers/          → reciben la petición, validan permisos y llaman a los servicios
+  Services/             → reglas de negocio; Services/Genetica para el cálculo de cruces
+  Models/               → acceso a datos con PDO y consultas preparadas
+  database/
+    migrations/         → NNN_descripcion.sql: creación y cambios de tablas (ver base-de-datos.md)
+    seeds/              → catálogo de variedades, factores y composición; datos de prueba inventados
+    migrar.php          → aplica migraciones y seeds; crea la cuenta de administrador
+  tests/                → PHPUnit
+frontend/               → vistas y estilos (ver frontend.md)
+public/index.php        → punto de entrada: solo carga el backend
 ```
 
 **Regla de oro del aislamiento (RF003, SEG-001, SEG-005):** el `criadero_id` se toma **siempre de la sesión**, nunca de un parámetro del formulario o de la URL. Toda consulta a canarios, jaulas, cruces, ubicaciones, bajas y factores portados filtra por ese criadero. Pedir el ID de un registro de otro criadero debe responder como si no existiera.
@@ -157,6 +157,6 @@ Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100
 
 ## 9. Pruebas
 
-- PHPUnit para los servicios, en especial `Services/Genetica`: un caso por regla (RF036 a RF038), la excepción de las hembras en RF034 y el aviso de RF039.
+- PHPUnit para los servicios, en especial `backend/Services/Genetica`: un caso por regla (RF036 a RF038), la excepción de las hembras en RF034 y el aviso de RF039.
 - Cada RF tiene su issue en GitHub. Se cierra con pruebas internas y revisión de código; QA externo revisa por hito y el PM registra su informe y las correcciones (ver `CONTRIBUTING.md`).
 - Prueba de acceso cruzado entre dos cuentas (SEG-001) antes de cada entrega.

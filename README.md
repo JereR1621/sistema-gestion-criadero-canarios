@@ -1,61 +1,87 @@
-# TuCriadero — Sistema de Gestión de Criadero de Canarios
+# TuCriadero
 
-Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno de crías por un registro digital, usable desde el teléfono: canarios identificados por su anillo, jaulas, cruces, pichones, genealogía, bajas y previsualización de los resultados de un cruce según la tabla de Mendel.
+Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno de crías por un registro digital que se usa desde el teléfono: canarios identificados por su anillo, jaulas, cruces, pichones, genealogía, bajas y la previsualización de lo que puede salir de un cruce según la tabla de Mendel.
 
-Nombre oficial del producto: **TuCriadero**.
-
-Estado actual: SRS v1.0 preparado para presentarlo al cliente para su aceptación, pendiente de registrar su aprobación. El PM está definiendo las reglas del repositorio. La aplicación cuenta con su estructura inicial; la puesta en marcha queda pendiente de la implementación.
-
-## Documentación
-
-| Documento | Para quién |
+| | |
 |---|---|
-| [`docs/srs/`](docs/srs/) | Todos. Especificación de requisitos v1.0 (ISO/IEC/IEEE 29148). **Es la fuente oficial.** |
-| [`docs/backend.md`](docs/backend.md) | Backend: modelo de datos (MER conceptual y modelo relacional con PK y FK), reglas, cálculo genético y seguridad. |
-| [`docs/base-de-datos.md`](docs/base-de-datos.md) | Backend: instalar MySQL y PHP, crear la base local, migraciones y qué se sube a GitHub. |
-| [`docs/frontend.md`](docs/frontend.md) | Frontend: pantallas, mensajes, experiencia de uso en el teléfono. |
-| [`docs/contrato-back-front.md`](docs/contrato-back-front.md) | Backend y frontend: rutas, datos que recibe cada vista, campos de cada formulario y errores. **Preliminar:** se acuerda en la épica E0. |
-| [`docs/bpmn/`](docs/bpmn/) | Todos: doce procesos BPMN 2.0 (vista general de la temporada y once procesos detallados), archivos editables, vistas vectoriales y trazabilidad al SRS. |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Todos: ramas, commits, pull requests y cómo cerrar un issue. |
+| **Estado** | SRS v1.0 listo para la aceptación del cliente (todavía sin aprobar). El código está por empezar: hay estructura, sin implementación. |
+| **Stack** | PHP con HTML embebido · MySQL 8 · AWS · PHPUnit · Apache JMeter · Figma |
+| **Requisitos** | [`docs/srs/`](docs/srs/), SRS v1.0 (ISO/IEC/IEEE 29148): **es la fuente oficial.** Si un documento o una issue no coincide con el SRS, manda el SRS. |
 
-## Stack
+## Empieza aquí
 
-PHP con HTML embebido · MySQL 8.0.16 o superior · Amazon Web Services · PHPUnit · Apache JMeter · Figma
+Lee en este orden, según tu equipo:
 
-## Estructura
+| Si eres de… | 1. Lee | 2. Prepara tu computador | 3. Toma una issue |
+|---|---|---|---|
+| **Backend** | [`backend/README.md`](backend/README.md) y [`docs/backend.md`](docs/backend.md) | [`docs/base-de-datos.md`](docs/base-de-datos.md): MySQL, PHP y tu base local | [Issues con `area:backend`](../../issues?q=is%3Aopen+label%3Aarea%3Abackend) |
+| **Frontend** | [`frontend/README.md`](frontend/README.md) y [`docs/frontend.md`](docs/frontend.md) | PHP (sección 3 de [`docs/base-de-datos.md`](docs/base-de-datos.md)) | [Issues con `area:frontend`](../../issues?q=is%3Aopen+label%3Aarea%3Afrontend) |
+| **Los dos** | [`docs/contrato-back-front.md`](docs/contrato-back-front.md): qué datos recibe cada vista y cómo se llaman los campos | — | — |
+
+Antes de tu primer cambio, lee [`CONTRIBUTING.md`](CONTRIBUTING.md): ramas, commits, pull requests y cuándo se cierra una issue.
+
+## Estructura del repositorio
 
 ```
-app/
-  Controllers/        backend
-  Services/           backend (Services/Genetica: cálculo de cruces)
-  Models/             backend
-  Views/              frontend
-public/               punto de entrada (index.php)
-database/
-  migrations/         tablas
-  seeds/              catálogo de variedades, factores y composición
-tests/                PHPUnit
-docs/                 SRS y resúmenes por equipo
+backend/                  ← equipo de backend
+  Controllers/            reciben la petición, validan permisos y llaman a los servicios
+  Services/               reglas de negocio (Services/Genetica: cálculo de cruces)
+  Models/                 acceso a MySQL con PDO y consultas preparadas
+  database/
+    migrations/           cambios de tablas: 001_crear_usuario.sql, 002_…
+    seeds/                catálogo de 762 variedades y datos de prueba inventados
+    migrar.php            aplica migraciones y seeds
+  tests/                  pruebas PHPUnit
+frontend/                 ← equipo de frontend
+  views/                  una carpeta por módulo: views/cruces/formulario.php, …
+  css/                    estilos (si se acuerda un archivo aparte)
+public/
+  index.php               punto de entrada de la web: solo carga el backend
+docs/                     ← todos
+  srs/                    SRS v1.0 (PDF)
+  backend.md              modelo de datos, reglas, genética y seguridad
+  base-de-datos.md        MySQL: instalación, migraciones y qué se sube a GitHub
+  frontend.md             pantallas, mensajes y uso en el teléfono
+  contrato-back-front.md  rutas, datos de cada vista y campos (preliminar: se acuerda en la épica E0)
+  bpmn/                   12 procesos BPMN 2.0 con su trazabilidad al SRS
+  img/                    modelo de datos: MER (Figura 1) y modelo relacional con PK y FK (Figura 2)
 ```
 
-## Cómo se organiza el trabajo
+**Frontera entre los dos equipos:** el backend prepara los datos y se los pasa a la vista; la vista solo los muestra. Una vista **nunca** consulta la base de datos. Si una pantalla necesita un dato que no está en el contrato, se pide un cambio al contrato; no se inventa en la vista.
 
-El trabajo está en los [issues](../../issues), en dos niveles:
+## Cómo se trabaja
 
-- **9 épicas** (`tipo:epica`), una por etapa, con dependencias técnicas explícitas.
+1. Elige una issue de tu área en el hito actual y asígnatela.
+2. Lee la issue completa. Todas tienen las mismas secciones: **qué hacer, por qué, qué incluye y qué no, detalle de backend y de frontend, criterios de aceptación y definición de terminado**.
+3. Crea tu rama desde `develop`, por ejemplo `feature/RF023-busqueda-correlativo`.
+4. Programa, prueba (PHPUnit y teléfono de 360 px) y sube tus cambios.
+5. Abre un pull request hacia `develop` con `Closes #NN`. Claude lo revisa automáticamente y un integrante del equipo lo aprueba.
+6. Si algo no está en la issue ni en el SRS, **no lo inventes**: pregunta al PM en un comentario de la issue.
+
+## Cómo están organizadas las issues
+
+- **9 épicas** (`tipo:epica`), una por etapa. Cada una agrupa sus sub-issues: un RF del SRS o una tarea.
 
   ```
-  E0 → E1 Cuentas y E2 Catálogo → E3 Canarios → E4 Jaulas → E5 Libro de crías
+  E0 Base técnica → E1 Cuentas y E2 Catálogo → E3 Canarios → E4 Jaulas → E5 Libro de crías
   E5 → E6 Búsqueda y genealogía y E7 Genética → E8 Beta
   ```
 
-- Dentro de cada épica, sus **sub-issues** (un RF del SRS o una tarea) pueden diseñarse en paralelo; la integración y verificación respetan las dependencias indicadas en cada issue.
+- **5 hitos** (M1 a M5) y **5 revisiones externas**, una por hito, que coordina el PM con QA externo. QA externo entrega su informe y no recibe tareas de implementación.
+- **63 issues** en total: 9 épicas, 39 RF, 10 tareas y 5 revisiones.
+- **Etiquetas:** `area:backend`, `area:frontend`, `area:pruebas` y `area:gestion`; los RF además llevan módulo y prioridad.
 
-- **5 revisiones externas**, una por hito, coordinadas por el PM. QA externo entrega su informe y no recibe tareas de implementación ni de pruebas internas.
+Cerrar una issue significa que está implementada y revisada por el equipo; no equivale a la aprobación de la entrega.
 
-Plan actual: **63 issues** (9 épicas, 39 RF, 10 tareas y 5 revisiones externas). La tarea de entrega beta incluye despliegue, documentación y capacitación del SRS. Las revisiones no son sub-issues de implementación y su cierre no se confunde con la aceptación final del cliente.
+## Lo que nunca se sube
 
-Las etiquetas de área son `area:backend`, `area:frontend`, `area:pruebas` (pruebas internas del equipo) y `area:gestion` (coordinación del PM). Las issues pertenecen a un hito (M1 a M5); los RF además indican módulo y prioridad.
+- `.env` y cualquier credencial de MySQL o AWS: al repositorio solo va `.env.example`.
+- El Excel del cliente: trae datos personales de un tercero. Solo se sube el seed generado.
+- Volcados de bases con datos y datos reales de criadores.
+
+## Puesta en marcha local
+
+La base de datos se prepara con [`docs/base-de-datos.md`](docs/base-de-datos.md). El comando para levantar la aplicación lo agrega la tarea de estructura base cuando exista la primera versión ejecutable.
 
 ## Equipo
 
@@ -64,7 +90,3 @@ Las etiquetas de área son `area:backend`, `area:frontend`, `area:pruebas` (prue
 | Jefe de Proyecto (PM) | Jeremy Edgardo Rojas Herrera |
 | QA externo | Boris Barrios, José Barraza |
 | Desarrollo | Equipo A |
-
-## Puesta en marcha local
-
-Instalación de MySQL y PHP, base local, `.env` y migraciones: [`docs/base-de-datos.md`](docs/base-de-datos.md). El arranque de la aplicación se completa cuando exista la primera versión ejecutable.

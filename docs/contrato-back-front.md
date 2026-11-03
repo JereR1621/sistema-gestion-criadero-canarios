@@ -11,7 +11,7 @@ El stack es PHP con HTML embebido, así que **no hay una API JSON**. El contrato
 ```
 Navegador ──GET/POST──▶ public/index.php ──▶ Controlador ──▶ Servicios / Modelos
                                                   │
-                                                  └──▶ render('modulo/vista', $datos) ──▶ app/Views/modulo/vista.php
+                                                  └──▶ render('modulo/vista', $datos) ──▶ frontend/views/modulo/vista.php
 ```
 
 | Responsabilidad | Backend | Frontend |
