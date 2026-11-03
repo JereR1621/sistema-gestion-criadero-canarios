@@ -27,7 +27,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 
 ## Pull requests
 
-1. Una rama y un pull request por sub-issue (nunca por épica). El PR dice `Closes #NN` para enlazar el issue: GitHub solo reconoce palabras en inglés (`Closes`, `Fixes`, `Resolves`) y cierra el issue al integrar el PR en `develop`, la rama por defecto. Una épica se cierra cuando todos sus sub-issues están cerrados.
+1. Una rama y un pull request por issue de implementación o tarea (nunca por épica ni por el RF padre). El PR dice `Closes #NN` para enlazar el issue: GitHub solo reconoce palabras en inglés (`Closes`, `Fixes`, `Resolves`) y cierra el issue al integrar el PR en `develop`, la rama por defecto. Una épica se cierra cuando todos sus sub-issues están cerrados.
 2. Completar la plantilla: qué RF cubre, cómo se probó y capturas si cambia una pantalla.
 3. Un integrante del equipo revisa el código antes de unir a `develop`.
 4. Para pasar de `develop` a `main`, el PM comprueba la revisión externa del hito y autoriza la entrega; un integrante del equipo revisa el PR. QA externo no tiene que aprobar PR ni operar GitHub.
@@ -43,7 +43,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 - [ ] Pruebas internas realizadas y evidencias del método de verificación del SRS disponibles.
 - [ ] Código revisado e integrado en `develop`.
 
-Cerrar una implementación significa que está lista para revisión externa; no equivale a aprobar la entrega. Las tareas documentales se cierran con el entregable revisado por el equipo y la conformidad del PM. Las épicas se cierran al terminar sus entregables, respetando las dependencias técnicas; la entrega beta además exige las revisiones externas previstas.
+Cerrar una implementación significa que está lista para revisión externa; no equivale a aprobar la entrega. Las tareas documentales se cierran con el entregable revisado por el equipo y la conformidad del PM. Un RF con pantalla se cierra cuando sus issues de backend y frontend están cerradas y el RF completo se comprobó en el entorno de pruebas. Las épicas se cierran al terminar sus entregables, respetando las dependencias técnicas; la entrega beta además exige las revisiones externas previstas.
 
 ## QA externo y aprobación de entregas
 

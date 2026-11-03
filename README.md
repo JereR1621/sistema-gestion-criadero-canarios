@@ -60,16 +60,38 @@ docs/                     ← todos
 
 ## Cómo están organizadas las issues
 
-- **9 épicas** (`tipo:epica`), una por etapa. Cada una agrupa sus sub-issues: un RF del SRS o una tarea.
+- **9 épicas** (`tipo:epica`), una por etapa. Cada una agrupa sus RF y sus tareas.
 
   ```
   E0 Base técnica → E1 Cuentas y E2 Catálogo → E3 Canarios → E4 Jaulas → E5 Libro de crías
   E5 → E6 Búsqueda y genealogía y E7 Genética → E8 Beta
   ```
 
+- **Cada RF con pantalla se divide en dos** (divide y vencerás):
+
+  ```
+  Épica E5: Libro de crías
+  └─ SRS-RF018: Registro de cruce              tipo:requisito   → no se programa: se valida completo
+     ├─ SRS-RF018 [Backend]: Registro de cruce   area:backend   → lo programa backend
+     └─ SRS-RF018 [Frontend]: Registro de cruce  area:frontend  → lo programa frontend
+  ```
+
+  Los 7 RF sin pantalla (cálculo genético y catálogo) son una sola issue de backend.
+
 - **5 hitos** (M1 a M5) y **5 revisiones externas**, una por hito, que coordina el PM con QA externo. QA externo entrega su informe y no recibe tareas de implementación.
-- **63 issues** en total: 9 épicas, 39 RF, 10 tareas y 5 revisiones.
-- **Etiquetas:** `area:backend`, `area:frontend`, `area:pruebas` y `area:gestion`; los RF además llevan módulo y prioridad.
+- **127 issues** en total: 9 épicas, 39 RF, 64 implementaciones (32 de backend y 32 de frontend), 10 tareas y 5 revisiones.
+
+| Etiqueta | Para qué sirve |
+|---|---|
+| `tipo:epica` | Agrupa una etapa. No se programa. |
+| `tipo:requisito` | Un RF del SRS. Si tiene pantalla, agrupa su backend y su frontend y se cierra al validarlo completo. |
+| `tipo:implementacion` | La parte de backend o de frontend de un RF. **Es lo que se programa.** |
+| `tipo:tarea` | Trabajo técnico que no es un RF (estructura, esquema, seguridad, despliegue…). |
+| `tipo:revision` / `tipo:defecto` | Revisión externa de un hito / defecto a corregir. |
+| `area:backend`, `area:frontend`, `area:pruebas`, `area:gestion` | **Quién la hace.** Cada issue que se programa tiene una sola área. |
+| `modulo:…` y `prioridad:…` | Módulo del SRS y prioridad del RF. |
+
+**Para encontrar tu trabajo**, filtra por tu área: [backend](../../issues?q=is%3Aopen+label%3Aarea%3Abackend), [frontend](../../issues?q=is%3Aopen+label%3Aarea%3Afrontend).
 
 Cerrar una issue significa que está implementada y revisada por el equipo; no equivale a la aprobación de la entrega.
 
