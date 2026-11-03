@@ -31,6 +31,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 2. Completar la plantilla: qué RF cubre, cómo se probó y capturas si cambia una pantalla.
 3. Un integrante del equipo revisa el código antes de unir a `develop`.
 4. Para pasar de `develop` a `main`, el PM comprueba la revisión externa del hito y autoriza la entrega; un integrante del equipo revisa el PR. QA externo no tiene que aprobar PR ni operar GitHub.
+5. Los PR del PM los integra el propio PM: GitHub no deja aprobar un PR propio, por eso el administrador del repositorio tiene una excepción en las reglas, válida solo al integrar un PR. Nadie sube cambios directo a `main` ni a `develop`.
 
 ## Cuándo se cierra un issue (definición de terminado)
 
