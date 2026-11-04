@@ -114,4 +114,4 @@ La base de datos se prepara con [`docs/base-de-datos.md`](docs/base-de-datos.md)
 |---|---|
 | Jefe de Proyecto (PM) | Jeremy Edgardo Rojas Herrera |
 | QA externo | Boris Barrios, José Barraza |
-| Desarrollo | Equipo A |
+| Desarrollo | Equipo B |
