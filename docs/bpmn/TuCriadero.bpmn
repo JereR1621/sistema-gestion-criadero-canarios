@@ -1382,7 +1382,7 @@ Desactivar una cuenta impide su ingreso y conserva sus datos (RF005). Toda acci�
     <bpmn:participant id="Participant_CTA" name="TuCriadero — Administrar las cuentas" processRef="Process_CTA"/>
   </bpmn:collaboration>
   <bpmn:process id="Process_CAT" name="Mantener el catálogo de variedades y factores" isExecutable="false">
-    <bpmn:documentation>Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 762 variedades, sus factores y su composición vienen precargados (RF028, DAT-005).
+    <bpmn:documentation>Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 880 variedades, sus factores y su composición vienen precargados (RF028, DAT-005).
 Los cambios aplican para todos los criadores y se auditan (RF032, SEG-003).</bpmn:documentation>
     <bpmn:laneSet id="CAT_lanes">
       <bpmn:lane id="CAT_persona" name="Administrador">

@@ -11,7 +11,7 @@ Aquí trabaja el equipo de backend: rutas, permisos, validaciones, reglas de neg
 | `Services/Genetica/` | El cálculo de cruces y la deducción de portadores (`docs/backend.md` §5). Sin acceso directo a la base. | `HerenciaLigadaAlSexo.php` |
 | `Models/` | Consultas a MySQL con PDO y consultas preparadas. **Siempre** filtran por el `criadero_id` de la sesión. | `CanarioModel.php` |
 | `database/migrations/` | Cambios de tablas en SQL numerado. Una migración integrada no se edita nunca. | `001_crear_usuario.sql` |
-| `database/seeds/` | Catálogo (762 variedades, factores, composición) y datos de prueba inventados. | `01_variedades.sql` |
+| `database/seeds/` | Catálogo (880 variedades, factores, composición) y datos de prueba inventados. | `01_variedades.sql` |
 | `database/migrar.php` | Aplica migraciones y seeds (`docs/base-de-datos.md` §6). | `php backend/database/migrar.php --seeds` |
 | `tests/` | Pruebas PHPUnit, con nombre `*Test.php`. Usan la base `tucriadero_pruebas`. | `HerenciaLigadaAlSexoTest.php` |
 

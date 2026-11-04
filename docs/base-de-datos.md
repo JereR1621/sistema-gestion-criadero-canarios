@@ -82,7 +82,7 @@ En macOS o Linux, instala las mismas versiones con el gestor de paquetes del sis
    ```
    mysql -u tucriadero -p tucriadero -e "SELECT COUNT(*) FROM variedad;"
    ```
-   Debe responder **762**.
+   Debe responder **880**.
 
 Si rompes tu base, la vuelves a crear desde cero con `php backend/database/migrar.php --desde-cero --seeds`. Solo funciona con `APP_ENV=local`: así nadie borra por error la base del entorno de pruebas.
 

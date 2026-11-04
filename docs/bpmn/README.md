@@ -1,10 +1,10 @@
 # TuCriadero — Procesos BPMN 2.0
 
-Modelos descriptivos del SRS v1.0, corregidos según la revisión de QA externo. Separan las acciones del criador o administrador de las operaciones automáticas de la aplicación web. Incluyen validaciones, errores del SRS, correcciones, cancelaciones y resultados, sin ampliar los requisitos.
+Modelos descriptivos del SRS v1.1, corregidos según la revisión de QA externo. Separan las acciones del criador o administrador de las operaciones automáticas de la aplicación web. Incluyen validaciones, errores del SRS, correcciones, cancelaciones y resultados, sin ampliar los requisitos.
 
 - [Modelo completo editable](TuCriadero.bpmn): 12 procesos con sus diagramas BPMN DI.
-- [Documento de los 12 procesos](TuCriadero_BPMN_v1.0.pdf): hojas A3 para lectura e impresión.
-- [SRS completo](../srs/SRS_Gestion_Criadero_v1.0.pdf): mismos diagramas (Figuras 3 a 14) y matriz de trazabilidad. Las Figuras 1 y 2 son el modelo de datos.
+- [Documento de los 12 procesos](TuCriadero_BPMN_v1.1.pdf): hojas A3 para lectura e impresión.
+- [SRS completo](../srs/SRS_Gestion_Criadero_v1.1.pdf): mismos diagramas (Figuras 3 a 14) y matriz de trazabilidad. Las Figuras 1 y 2 son el modelo de datos.
 - [Trazabilidad por actividad](trazabilidad.md): identificadores, responsables, requisitos, errores anotados y finales de cada proceso.
 
 | Figura | Proceso | Vista vectorial | PDF vectorial | Archivo editable |

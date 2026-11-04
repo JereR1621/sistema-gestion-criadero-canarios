@@ -2,7 +2,7 @@
 
 **Versión 0.1 · 02/11/2026.** Es una propuesta: backend y frontend la revisan y la acuerdan en la tarea correspondiente de la épica E0, antes de programar las pantallas. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
 
-Fuente: SRS v1.0 (`docs/srs/`), `docs/backend.md` y `docs/frontend.md`.
+Fuente: SRS v1.1 (`docs/srs/`), `docs/backend.md` y `docs/frontend.md`.
 
 ## 1. Cómo se comunican las dos partes
 
@@ -56,7 +56,7 @@ Reglas fijas:
 - **Fechas:** se envían como `AAAA-MM-DD` (`<input type="date">`) y se muestran como `DD/MM/AAAA`.
 - **Campos opcionales vacíos** se envían como cadena vacía; el backend los guarda como "sin dato".
 - **Listas:** `portadores[]` (ids de factores); pichones con índice, `pichones[0][anillo_correlativo]`. Los errores de una lista usan la clave con puntos: `pichones.0.anillo_correlativo`.
-- **Selección de variedad sin JavaScript (RF029):** `<input list="variedades" name="variedad_codigo">` con un `<datalist>` de las 762 variedades (`código – nombre`). Vacío = "sin determinar".
+- **Selección de variedad sin JavaScript (RF029):** `<input list="variedades" name="variedad_codigo">` con un `<datalist>` de las 880 variedades (`código – nombre`). Vacío = "sin determinar".
 
 ## 5. Estructuras que reciben las vistas
 
@@ -69,7 +69,7 @@ Son arreglos asociativos de PHP. Los campos `*_texto` y `url` los arma el backen
   'anillo' => ['socio' => '7', 'anio' => 2024, 'correlativo' => '150', 'club' => 'CLUB'],
   'anillo_texto' => '7 · 2024 · 150 · CLUB',
   'sexo' => 'macho',                       // 'macho' | 'hembra' | 'sin_determinar'
-  'variedad' => ['codigo' => '033', 'nombre' => 'ROJO INTENSO'],   // o null = sin determinar
+  'variedad' => ['codigo' => 'D.049', 'nombre' => 'ROJO INTENSO'],   // o null = sin determinar
   'ubicacion_texto' => 'Jaula 25',         // 'Jaula N' | 'Jaula grande' | 'Sin ubicación'
   'estado' => 'activo',                    // 'activo' | 'baja'
   'url' => '/canarios/12',
@@ -108,7 +108,7 @@ Son arreglos asociativos de PHP. Los campos `*_texto` y `url` los arma el backen
 **`ResultadoCruce`** (RF035 a RF039)
 ```php
 [
-  'machos'  => [['variedad' => ['codigo' => '041', 'nombre' => '…'] | null,
+  'machos'  => [['variedad' => ['codigo' => 'D.051', 'nombre' => '…'] | null,
                  'factores' => ['marfil'], 'porcentaje' => 50.0, 'portador_de' => ['marfil']], ...],
   'hembras' => [ ... misma forma ... ],
   'no_calculables' => ['nombre de factor', ...],   // RF039: mostrar aviso por cada uno
@@ -176,7 +176,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | Nombre | Método y ruta | Vista | Datos para la vista | RF |
 |---|---|---|---|---|
 | buscar | GET /buscar?tipo=anillo&q=150 | busqueda/resultados | `$tipo`, `$q`, `$resultados` [CanarioResumen], incluidos los dados de baja. Si hay **una sola** coincidencia, redirige directo a la ficha. | RF023 |
-| buscar | GET /buscar?tipo=variedad&q=033 | busqueda/resultados | `$tipo`, `$q`, `$resultados` [CanarioResumen] (solo activos) | RF025 |
+| buscar | GET /buscar?tipo=variedad&q=D.049 | busqueda/resultados | `$tipo`, `$q`, `$resultados` [CanarioResumen] (solo activos) | RF025 |
 | buscar | GET /buscar?tipo=jaula&q=25 | (redirige a la ficha de la jaula) | — | RF026 |
 
 ### Administración (RF005, RF006, RF032). Solo rol `admin`; un criador recibe 403.

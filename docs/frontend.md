@@ -1,6 +1,6 @@
 # Resumen para frontend
 
-Guía de trabajo para el equipo de frontend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.0 (`docs/srs/`) exige a las pantallas. **Si este resumen y el SRS no coinciden, manda el SRS**; los cambios se piden al PM.
+Guía de trabajo para el equipo de frontend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.1 (`docs/srs/`) exige a las pantallas. **Si este resumen y el SRS no coinciden, manda el SRS**; los cambios se piden al PM.
 
 ## 1. Qué es "frontend" en este proyecto
 
@@ -87,7 +87,7 @@ Usar siempre estos términos en la interfaz, igual que en el SRS (§1.4):
 | Cruce | Unión de un macho y una hembra en una jaula y temporada. |
 | Ficha de cría | La vista de un cruce con sus pichones. |
 | Pichón | Cría nacida de un cruce. |
-| Variedad | Color reconocido del nomenclador, con su código (por ejemplo, 033 Rojo intenso). |
+| Variedad | Color reconocido del nomenclador, con su código (por ejemplo, D.049 Rojo intenso). |
 | Portador | Canario que lleva un factor sin manifestarlo. |
 | Dar de baja | Sacar del criadero por venta, muerte u otra salida, sin borrar la historia. |
 

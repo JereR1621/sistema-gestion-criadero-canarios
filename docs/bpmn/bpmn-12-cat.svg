@@ -115,7 +115,7 @@
   <text x="1510" y="1441" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">realizada; sin</text>
   <text x="1510" y="1465" font-family="Arial, Liberation Sans, sans-serif" font-size="20" text-anchor="middle" fill="#253957" font-weight="normal">cambios</text>
   <text x="55" y="1585" font-family="Arial, Liberation Sans, sans-serif" font-size="24" text-anchor="start" fill="#253957" font-weight="bold">Reglas y alcance del proceso</text>
-  <text x="55" y="1619" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 762</text>
+  <text x="55" y="1619" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 880</text>
   <text x="55" y="1649" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">   variedades, sus factores y su composición vienen precargados (RF028, DAT-005).</text>
   <text x="55" y="1679" font-family="Arial, Liberation Sans, sans-serif" font-size="22" text-anchor="start" fill="#475569" font-weight="normal">• Los cambios aplican para todos los criadores y se auditan (RF032, SEG-003).</text>
 </svg>

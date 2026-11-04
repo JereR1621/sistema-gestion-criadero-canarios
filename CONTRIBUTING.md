@@ -1,6 +1,6 @@
 # Cómo trabajamos en este repositorio
 
-Estas reglas están en definición por el PM. El SRS v1.0 está preparado para presentarlo al cliente para su aceptación; su aprobación se registra por separado.
+Estas reglas están en definición por el PM. El SRS v1.1 está preparado para presentarlo al cliente para su aceptación; su aprobación se registra por separado.
 
 ## Ramas
 
@@ -50,7 +50,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 
 ## Cuándo se cierra un issue (definición de terminado)
 
-- [ ] Cumple el texto del RF en el SRS v1.0.
+- [ ] Cumple el texto del RF en el SRS v1.1.
 - [ ] Respeta las reglas de integridad y de aislamiento entre criaderos (`docs/backend.md`, §2 y §3).
 - [ ] Se ve bien en un teléfono de 360 px de ancho (si tiene pantalla).
 - [ ] Tiene pruebas PHPUnit (si tiene lógica).
