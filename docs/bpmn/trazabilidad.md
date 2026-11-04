@@ -1,6 +1,6 @@
 # TuCriadero — Trazabilidad de actividades BPMN
 
-Actividades de los 12 procesos BPMN y requisitos del SRS v1.0. Los identificadores coinciden con los archivos .bpmn y las vistas gráficas. El número de figura es el del SRS (las Figuras 1 y 2 son el modelo de datos).
+Actividades de los 12 procesos BPMN y requisitos del SRS v1.1. Los identificadores coinciden con los archivos .bpmn y las vistas gráficas. El número de figura es el del SRS (las Figuras 1 y 2 son el modelo de datos).
 
 ## TEM — Temporada de cría (vista general) (Figura 3)
 
@@ -219,7 +219,7 @@ Precondición: sesión de administrador; un criador no accede a esta función. E
 
 ## CAT — Mantener el catálogo de variedades y factores (Figura 14)
 
-Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 762 variedades, sus factores y su composición vienen precargados (RF028, DAT-005). Los cambios aplican para todos los criadores y se auditan (RF032, SEG-003).
+Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 880 variedades, sus factores y su composición vienen precargados (RF028, DAT-005). Los cambios aplican para todos los criadores y se auditan (RF032, SEG-003).
 
 | Actividad | Responsable | Requisitos | Tarea |
 |---|---|---|---|

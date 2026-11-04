@@ -4,9 +4,9 @@ Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno d
 
 | | |
 |---|---|
-| **Estado** | SRS v1.0 listo para la aceptación del cliente (todavía sin aprobar). El código está por empezar: hay estructura, sin implementación. |
+| **Estado** | SRS v1.1 listo para la aceptación del cliente (todavía sin aprobar); corrige la v1.0 con el nomenclador oficial 2026 que entregó el cliente. El código está por empezar: hay estructura, sin implementación. |
 | **Stack** | PHP con HTML embebido · MySQL 8 · AWS · PHPUnit · Apache JMeter · Figma |
-| **Requisitos** | [`docs/srs/`](docs/srs/), SRS v1.0 (ISO/IEC/IEEE 29148): **es la fuente oficial.** Si un documento o una issue no coincide con el SRS, manda el SRS. |
+| **Requisitos** | [`docs/srs/`](docs/srs/), SRS v1.1 (ISO/IEC/IEEE 29148): **es la fuente oficial.** Si un documento o una issue no coincide con el SRS, manda el SRS. |
 
 ## Empieza aquí
 
@@ -29,7 +29,7 @@ backend/                  ← equipo de backend
   Models/                 acceso a MySQL con PDO y consultas preparadas
   database/
     migrations/           cambios de tablas: 001_crear_usuario.sql, 002_…
-    seeds/                catálogo de 762 variedades y datos de prueba inventados
+    seeds/                catálogo de 880 variedades y datos de prueba inventados
     migrar.php            aplica migraciones y seeds
   tests/                  pruebas PHPUnit
 frontend/                 ← equipo de frontend
@@ -38,7 +38,7 @@ frontend/                 ← equipo de frontend
 public/
   index.php               punto de entrada de la web: solo carga el backend
 docs/                     ← todos
-  srs/                    SRS v1.0 (PDF)
+  srs/                    SRS v1.1 (PDF)
   backend.md              modelo de datos, reglas, genética y seguridad
   base-de-datos.md        MySQL: instalación, migraciones y qué se sube a GitHub
   frontend.md             pantallas, mensajes y uso en el teléfono

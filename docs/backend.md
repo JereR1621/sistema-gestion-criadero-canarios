@@ -1,6 +1,6 @@
 # Resumen para backend
 
-Guía de trabajo para el equipo de backend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.0 (`docs/srs/`) exige a la lógica y a la base de datos. **Si este resumen y el SRS no coinciden, manda el SRS**; cualquier cambio de requisitos se pide al PM y queda registrado como CR en el SRS (§9.2).
+Guía de trabajo para el equipo de backend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.1 (`docs/srs/`) exige a la lógica y a la base de datos. **Si este resumen y el SRS no coinciden, manda el SRS**; cualquier cambio de requisitos se pide al PM y queda registrado como CR en el SRS (§9.2).
 
 El contrato con frontend (rutas, datos de cada vista y campos de los formularios) está en `docs/contrato-back-front.md`.
 
@@ -55,7 +55,7 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 | `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_registro, fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_registro` la pone el sistema al crear la cuenta (la muestra la administración de cuentas, RF006; es un dato técnico que la Figura 2 no dibuja). `fecha_cierre` solo si estado = cerrada. Socio y club solo para criadores. |
 | `criadero` | id, usuario_id | `usuario_id` UNIQUE (un criadero por criador; el administrador no tiene). |
 | `jaula` | id, criadero_id, numero | UNIQUE (`criadero_id`, `numero`). |
-| `variedad` | codigo (CHAR 3), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
+| `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
 | `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante`) | `nombre` UNIQUE. |
 | `variedad_factor` | variedad_codigo, factor_id | PK compuesta. Es la **composición de la variedad**. |
 | `canario` | id, criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, fecha_nacimiento, sexo (`macho` / `hembra` / `sin_determinar`), variedad_codigo, padre_id, madre_id, cruce_origen_id, procedencia, estado (`activo` / `baja`) | UNIQUE (`criadero_id`, `anillo_socio`, `anillo_anio`, `anillo_correlativo`, `anillo_club`). Índices en (`criadero_id`, `anillo_correlativo`) y (`criadero_id`, `variedad_codigo`). `variedad_codigo`, padres, cruce y fechas pueden ser NULL. |
@@ -128,10 +128,10 @@ Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100
 
 ## 6. Catálogo: carga inicial (DAT-005)
 
-- **Fuente:** el Excel del cliente, hoja "NOMENCLADOR". Se cargan solo las filas de tipo `CC=Color`: 762 variedades, códigos 001 a 762. Las de forma (CP) quedan fuera del alcance.
-- **El Excel no se sube al repositorio:** trae datos personales de un tercero (nombre, teléfono y correo). Al repositorio va solo el seed generado (código, nombre y sexo).
-- **Composición:** la arma el equipo descomponiendo cada nombre en sus factores (serie, mutación, lipocromo y categoría). Cada factor es una mutación presente; su ausencia equivale a la forma normal (por ejemplo, nevado = sin el factor intenso). La composición se valida antes de cargarla, incluida la regla de que no haya combinaciones repetidas por sexo.
-- **Limpieza:** el Excel tiene títulos de grupo con números repetidos y variantes de escritura (por ejemplo, "ISABELS/ISABELES"). Los títulos de grupo no son variedades.
+- **Fuente:** el nomenclador oficial 2026 de canarios de color (sección D), que el cliente entregó el 04/11/2026. Sus 880 variedades (códigos `D.001` a `D.880`) ya están extraídas en [`docs/catalogo/nomenclador-color-2026.csv`](catalogo/nomenclador-color-2026.csv) (código y nombre). Las demás secciones del nomenclador (porte) quedan fuera del alcance.
+- **Líneas con dos códigos:** el nomenclador trae líneas como `D.001-D.002 BLANCO - DOMINANTE`, que agrupan dos variedades. No son una variedad: cada código se carga por separado. El CSV ya viene separado (880 filas, sin huecos ni duplicados).
+- **Composición:** la arma el equipo descomponiendo cada nombre en sus factores (serie, mutación, lipocromo y categoría). Cada factor es una mutación presente; su ausencia equivale a la forma normal (por ejemplo, nevado = sin el factor intenso). Los nombres siguen la nomenclatura 2026 (por ejemplo, «bruno», no «canela»). La composición se valida antes de cargarla, incluida la regla de que no haya combinaciones repetidas por sexo.
+- **Sexo:** 408 variedades indican el sexo en el nombre ("… MACHO", "… HEMBRA").
 
 ## 7. Seguridad (SEG-001 a SEG-005)
 

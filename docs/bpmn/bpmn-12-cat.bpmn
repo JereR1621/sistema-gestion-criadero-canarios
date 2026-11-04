@@ -2,7 +2,7 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="TuCriadero_BPMN" targetNamespace="urn:tucriadero:bpmn" exporter="TuCriadero" exporterVersion="2.0">
   <bpmn:error id="Error_no_disponible" name="Sin conexión, mantenimiento o sesión expirada" errorCode="NO_DISPONIBLE"/>
   <bpmn:process id="Process_CAT" name="Mantener el catálogo de variedades y factores" isExecutable="false">
-    <bpmn:documentation>Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 762 variedades, sus factores y su composición vienen precargados (RF028, DAT-005).
+    <bpmn:documentation>Precondición: sesión de administrador; para los criadores el catálogo es de solo lectura (RF030, SEG-001). Las 880 variedades, sus factores y su composición vienen precargados (RF028, DAT-005).
 Los cambios aplican para todos los criadores y se auditan (RF032, SEG-003).</bpmn:documentation>
     <bpmn:laneSet id="CAT_lanes">
       <bpmn:lane id="CAT_persona" name="Administrador">
