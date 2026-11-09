@@ -57,7 +57,7 @@ docs/                     ← todos
 2. Lee la issue completa. Todas tienen las mismas secciones: **qué hacer, por qué, qué incluye y qué no, el detalle, cómo hacerlo paso a paso, criterios de aceptación y definición de terminado**. Al final hay un glosario con los términos técnicos.
 3. Crea **una rama solo para esa issue** desde `develop` actualizado, con el nombre que indica la issue en «Cómo hacerlo» (por ejemplo `feature/RF023-backend-busqueda-por-anillo-o-correlativo`).
 4. Programa, prueba (PHPUnit y teléfono de 360 px) y sube tus cambios.
-5. Abre un pull request hacia `develop` con `Closes #NN`. Claude lo revisa automáticamente y un integrante del equipo lo aprueba.
+5. Abre un pull request hacia `develop` con `Closes #NN`. Claude lo revisa automáticamente y otro integrante del equipo lo revisa y lo aprueba. **Solo el PM (`JereR1621`) integra en `develop` y en `main`**: comprueba la issue, sus dependencias y los acuerdos del proyecto antes de integrar.
 6. Al integrarse, GitHub borra la rama; bórrala también en tu computador (`git branch -d …`). La siguiente issue empieza con una rama nueva.
 7. Si algo no está en la issue, en el SRS ni en `docs/ajustes-cliente.md`, **no lo inventes**: pregunta al PM en un comentario de la issue.
 
