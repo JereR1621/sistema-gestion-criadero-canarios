@@ -214,3 +214,5 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 - El formato visible del anillo (`anillo_texto`): la propuesta es `socio · año · correlativo · club`. Se puede ajustar en los mockups.
 - La paginación de las listas largas (propuesta: 50 por página).
 - La librería que genera el PDF de la ficha (AC-04): la propuesta es Dompdf, con Composer. La confirma la tarea de estructura base.
+- Las rutas del mantenimiento del catálogo (RF032): crear una variedad, corregir un factor existente (con su identificador) y rechazar la eliminación de una variedad asignada a algún canario. Hoy la §6 solo tiene editar una variedad y crear un factor.
+- Cómo se registra el consentimiento informado al crear la cuenta (RF001) y cómo ejerce el criador sus derechos de acceso, rectificación y eliminación (POL-001).

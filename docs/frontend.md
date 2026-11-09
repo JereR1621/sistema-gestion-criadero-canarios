@@ -68,7 +68,7 @@ Backend valida y devuelve el error; la vista lo muestra junto al campo afectado,
 - **Diseño primero para el teléfono** (*mobile-first*), sin desplazamiento horizontal desde 360 px de ancho (RNF001, IF-001). Se revisa en un teléfono Android y en uno iOS.
 - **Registrar un pichón en 2 minutos o menos**, en el primer intento y sin capacitación (RNF002): formularios cortos y con valores por defecto (socio y club del perfil; padres tomados del cruce).
 - **Ficha de un canario a 3 interacciones o menos** desde el inicio (RNF003).
-- **Accesibilidad WCAG 2.1 nivel AA** (propuesta): etiquetas en todos los campos, contraste suficiente y uso con teclado.
+- **Accesibilidad WCAG 2.1 nivel AA** (la exige el SRS): etiquetas en todos los campos, contraste suficiente y uso con teclado. Se verifica en la tarea de usabilidad (T09).
 - **Navegadores:** versiones actuales de Chrome, Safari, Edge y Firefox, en teléfono y en computador.
 - Los usuarios son criadores, y muchos están acostumbrados al cuaderno: los botones y textos deben ser grandes, claros y con los términos de la sección 7.
 
