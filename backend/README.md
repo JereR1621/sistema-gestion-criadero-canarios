@@ -9,7 +9,7 @@ Aquí trabaja el equipo de backend: rutas, permisos, validaciones, reglas de neg
 | `Controllers/` | Recibe la petición, comprueba la sesión y el permiso, llama al servicio y elige la vista o la redirección. **Sin reglas de negocio ni SQL.** | `CruceController.php`: `nuevo()`, `guardar()` |
 | `Services/` | Las reglas del SRS: validaciones, integridad (`docs/backend.md` §3) y transacciones. | `CruceService.php` |
 | `Services/Genetica/` | El cálculo de cruces y la deducción de portadores (`docs/backend.md` §5). Sin acceso directo a la base. | `HerenciaLigadaAlSexo.php` |
-| `Models/` | Consultas a MySQL con PDO y consultas preparadas. **Siempre** filtran por el `criadero_id` de la sesión. | `CanarioModel.php` |
+| `Models/` | Consultas a MySQL con PDO y consultas preparadas. Las de datos de un criadero (canarios, jaulas, cruces, ubicaciones, bajas y portadores) **siempre** filtran por el `criadero_id` de la sesión; las de cuentas y catálogo no tienen criadero y las protege la sesión y el rol. | `CanarioModel.php` |
 | `database/migrations/` | Cambios de tablas en SQL numerado. Una migración integrada no se edita nunca. | `001_crear_usuario.sql` |
 | `database/seeds/` | Catálogo (880 variedades, factores, composición) y datos de prueba inventados. | `01_variedades.sql` |
 | `database/migrar.php` | Aplica migraciones y seeds (`docs/base-de-datos.md` §6). | `php backend/database/migrar.php --seeds` |

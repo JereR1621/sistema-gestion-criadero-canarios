@@ -145,6 +145,7 @@ flowchart LR
     n17 --> n102
     n102 --> n104
     n88 --> n104
+    n96 --> n104
     n104 --> n106
     n88 --> n120
     n88 --> n142
@@ -161,13 +162,13 @@ flowchart LR
 | 7 | [#90](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/90) RF008 · Rechazo de anillo duplicado | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116) |
 | 7 | [#92](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/92) RF009 · Portadores indicados por el criador | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88), [#24](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/24) | [#100](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/100), [#48](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/48) |
 | 7 | [#94](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/94) RF010 · Canario adquirido sin padres | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | — |
-| 7 | [#96](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/96) RF011 · Baja de canario | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | [#142](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/142) |
-| 7 | [#98](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/98) RF012 · Validación de variedad según el sexo | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88), [#148](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/148) | — |
-| 7 | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104) RF015 · Asignar canario a una jaula | [#102](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/102), [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | [#106](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/106), [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108), [#124](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/124), [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126) |
+| 7 | [#96](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/96) RF011 · Baja de canario | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#142](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/142) |
+| 7 | [#98](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/98) RF012 · Validación de variedad según el sexo | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88), [#148](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/148) | [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116) |
 | 7 | [#120](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/120) RF023 · Búsqueda por anillo o correlativo | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | [#122](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/122), [#124](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/124), [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126) |
 | 8 | [#100](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/100) RF013 · Hembra no portadora de factor ligado al sexo | [#92](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/92), [#24](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/24), [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | — |
-| 8 | [#106](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/106) RF016 · Traslado a la jaula grande | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104) | — |
+| 8 | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104) RF015 · Asignar canario a una jaula | [#102](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/102), [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88), [#96](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/96) | [#106](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/106), [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108), [#124](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/124), [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126) |
 | 8 | [#142](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/142) AC-03 · Canario reservado | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88), [#96](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/96) | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110) |
+| 9 | [#106](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/106) RF016 · Traslado a la jaula grande | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104) | — |
 
 ### M3 Crías, búsqueda y genealogía
 
@@ -179,6 +180,7 @@ flowchart LR
     n82["#82 RF029 · Selección de variedad desde el catálo…"]:::antes
     n88["#88 RF007 · Registro de canario (sexo y variedad…"]:::antes
     n90["#90 RF008 · Rechazo de anillo duplicado"]:::antes
+    n98["#98 RF012 · Validación de variedad según el sexo"]:::antes
     n102["#102 RF014 · Registro de jaula"]:::antes
     n104["#104 RF015 · Asignar canario a una jaula"]:::antes
     n120["#120 RF023 · Búsqueda por anillo o correlativo"]:::antes
@@ -207,6 +209,7 @@ flowchart LR
     n110 --> n116
     n90 --> n116
     n76 --> n116
+    n98 --> n116
     n110 --> n118
     n120 --> n122
     n116 --> n122
@@ -217,6 +220,7 @@ flowchart LR
     n120 --> n124
     n104 --> n126
     n110 --> n126
+    n108 --> n126
     n120 --> n126
     n116 --> n128
     n110 --> n128
@@ -230,16 +234,16 @@ flowchart LR
 | Etapa | Issue | Espera a | Al cerrarla, desbloquea |
 |---|---|---|---|
 | 6 | [#47](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/47) RF033 · Factores manifestados desde la variedad | [#21](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/21) | [#122](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/122), [#145](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/145), [#48](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/48), [#50](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/50), [#51](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/51), [#52](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/52), [#132](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/132) |
-| 8 | [#124](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/124) RF025 · Búsqueda por variedad | [#82](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/82), [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#120](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/120) | — |
 | 9 | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110) RF018 · Registro de cruce | [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88), [#102](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/102), [#142](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/142) | [#38](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/38), [#39](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/39), [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108), [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116), [#118](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/118), [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126), [#128](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/128) |
+| 9 | [#124](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/124) RF025 · Búsqueda por variedad | [#82](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/82), [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#120](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/120) | — |
 | 10 | [#38](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/38) RF019 · Hembra con varios machos | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110) | — |
 | 10 | [#39](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/39) RF020 · Macho con varias hembras | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110) | — |
-| 10 | [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116) RF021 · Anillado de pichones | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110), [#90](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/90), [#76](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/76) | [#122](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/122), [#128](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/128), [#48](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/48) |
+| 10 | [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116) RF021 · Anillado de pichones | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110), [#90](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/90), [#76](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/76), [#98](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/98) | [#122](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/122), [#128](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/128), [#48](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/48) |
 | 10 | [#118](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/118) RF022 · Terminar un cruce | [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110) | [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108) |
-| 10 | [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126) RF026 · Búsqueda por jaula | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110), [#120](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/120) | — |
-| 11 | [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108) RF017 · Historial de la jaula | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110), [#118](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/118) | — |
+| 11 | [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108) RF017 · Historial de la jaula | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110), [#118](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/118) | [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126) |
 | 11 | [#122](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/122) RF024 · Ficha del canario con genealogía | [#120](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/120), [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116), [#47](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/47), [#88](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/88) | [#145](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/145) |
 | 11 | [#128](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/128) RF027 · Ficha de cría del cruce | [#116](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/116), [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110) | — |
+| 12 | [#126](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/126) RF026 · Búsqueda por jaula | [#104](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/104), [#110](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/110), [#108](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/108), [#120](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/120) | — |
 | 12 | [#145](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/145) AC-04 · Exportar la ficha del canario en PDF | [#122](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/122), [#47](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/47), [#10](https://github.com/JereR1621/sistema-gestion-criadero-canarios/issues/10) | — |
 
 ### M4 Genética y previsualización de cruces

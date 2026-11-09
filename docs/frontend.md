@@ -25,7 +25,7 @@ El trabajo de frontend vive en la carpeta `frontend/`: las vistas en `frontend/v
 
 | # | Pantalla | Contenido y acciones | RF |
 |---|---|---|---|
-| 1 | Registro de cuenta | Nombre, correo y contraseña (mínimo 8 caracteres). | RF001, SEG-001 |
+| 1 | Registro de cuenta | Nombre, correo y contraseña (mínimo 8 caracteres). Casilla obligatoria de consentimiento: acepta el uso de sus datos para el servicio (POL-001). | RF001, SEG-001 |
 | 2 | Inicio de sesión | Correo y contraseña. Mensaje claro si la cuenta está desactivada. | RF002, RF005 |
 | 3 | Perfil | Número de socio y club, que se proponen por defecto al anillar. | RF004 |
 | 4 | Inicio | **Buscador por anillo visible de inmediato:** es la entrada principal del sistema (AC-05). La ficha de un canario tiene que quedar a 3 interacciones como máximo. | RNF003 |
@@ -41,7 +41,7 @@ El trabajo de frontend vive en la carpeta `frontend/`: las vistas en `frontend/v
 | 14 | Ficha de cría (cruce) | Macho, hembra, jaula, temporada y pichones con anillo, sexo y estado. Acciones: anillar pichones y terminar el cruce. | RF021, RF022, RF027 |
 | 15 | Anillar pichones | Uno o varios anillos en el mismo envío, con fecha de anillado y fecha de nacimiento (opcional). Sexo y variedad pueden quedar sin determinar. | RF021, RF007 |
 | 16 | Búsqueda | Por anillo completo o solo por el correlativo (por ejemplo, "150"), por variedad o por jaula. Si hay varias coincidencias, se muestra una lista con año, socio y club. También encuentra a los dados de baja. | RF023, RF025, RF026 |
-| 17 | Administración: cuentas | Lista con datos de registro y estado; activar y desactivar. | RF005, RF006 |
+| 17 | Administración: cuentas | Lista con datos de registro y estado; activar y desactivar; cerrar una cuenta a pedido del criador, con confirmación (POL-001). | RF005, RF006 |
 | 18 | Administración: catálogo | Variedades, su composición y factores, con su tipo de herencia. | RF032 |
 | 19 | Reserva del canario (en la ficha) | Etiqueta «Reservado» y botón «Reservar» o «Quitar reserva». | AC-03 |
 | 20 | Ficha en PDF | Botón «Exportar PDF» en la ficha. El PDF trae los datos de la ficha, factores, portadores y el árbol de 3 generaciones, legible al imprimirlo en A4. | AC-04 |
@@ -53,6 +53,8 @@ Backend valida y devuelve el error; la vista lo muestra junto al campo afectado,
 | Situación | Mensaje (orientativo) | RF |
 |---|---|---|
 | Anillo repetido | "Este anillo ya lo usa el canario …", con enlace a su ficha. | RF008 |
+| Correo o contraseña incorrectos | "Correo o contraseña incorrectos" (sin decir cuál de los dos falló). | RF002 |
+| Registro sin consentimiento | "Para crear la cuenta debes aceptar el uso de tus datos". | RF001 |
 | Número de jaula repetido | "Ya existe la jaula N.º …". | RF014 |
 | Sexo que no corresponde en un cruce | "El macho debe estar registrado como macho" (o lo mismo para la hembra). | RF018 |
 | Variedad incompatible con el sexo | "Esta variedad es solo para hembras" (o para machos). | RF012 |
