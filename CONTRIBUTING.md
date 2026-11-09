@@ -7,7 +7,7 @@ Estas reglas están en definición por el PM. El SRS v1.1 está preparado para p
 | Rama | Uso | Quién integra |
 |---|---|---|
 | `main` | Versión entregable (la que se despliega en producción). | Solo por pull request desde `develop`, con revisión interna y autorización del PM basada en la revisión externa del hito. |
-| `develop` | Integración del trabajo terminado. Se despliega en el entorno de pruebas. | Por pull request desde una rama de trabajo, con una revisión. |
+| `develop` | Integración del trabajo terminado. Se despliega en el entorno de pruebas. | Solo el PM, por pull request desde una rama de trabajo, con una revisión. |
 | `feature/RF0xx-backend-descripcion` / `feature/RF0xx-frontend-descripcion` | Trabajo de una issue de implementación (por ejemplo, `feature/RF023-backend-busqueda-por-anillo-o-correlativo`). Cada issue trae el nombre exacto en «Cómo hacerlo». | — |
 | `fix/descripcion` | Corrección de un defecto detectado internamente o comunicado por QA externo. | — |
 | `docs/descripcion` | Cambios de documentación y reglas del repositorio. | — |
@@ -47,6 +47,21 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 3. Un integrante del equipo revisa el código antes de unir a `develop`.
 4. Para pasar de `develop` a `main`, el PM comprueba la revisión externa del hito y autoriza la entrega; un integrante del equipo revisa el PR. QA externo no tiene que aprobar PR ni operar GitHub.
 5. El PM (JereR1621, administrador del repositorio) no tiene restricciones: las reglas «Proteger develop» y «Proteger main» lo exceptúan siempre, porque GitHub no deja aprobar un PR propio y el PM prepara la base del proyecto. El resto del equipo tiene rol **Write** (nunca Admin) y trabaja siempre por PR con una aprobación.
+
+## Integración y permisos
+
+- Los colaboradores tienen permiso **Write**: crean ramas de trabajo, suben código, abren pull requests y revisan y aprueban los de otros.
+- **Solo el PM (`JereR1621`) integra en `develop` y en `main`.** La regla «Restrict updates» impide que el resto del equipo actualice esas ramas, incluso mediante un PR aprobado. La aprobación del equipo es una revisión técnica; la decisión final de integración corresponde al PM.
+- El equipo trabaja siempre en ramas propias. La excepción administrativa del PM se conserva; permite preparar la base y resolver sus propios PR, que GitHub no permite autoaprobar.
+- **Auto-merge está desactivado.** La revisión automática de Claude comenta el PR y no lo integra.
+- La entrega a `main` se realiza por PR desde `develop`, con revisión interna y autorización del PM basada en las revisiones externas previstas. El PM comprueba la rama de origen antes de integrar.
+
+### Reglas para las issues
+
+- El equipo se asigna issues, comenta dudas y registra avances.
+- Cambiar alcance, criterios de aceptación, dependencias, hitos o requisitos requiere acuerdo del PM. Las propuestas se registran en comentarios.
+- El PM sincroniza las issues desde el plan. Una edición manual del cuerpo puede sobrescribirse en la siguiente sincronización; los comentarios son el lugar para propuestas y evidencias.
+- Esta regla del tablero es un acuerdo de trabajo: el permiso Write permite técnicamente gestionar las issues. Las protecciones de ramas no restringen su edición.
 
 ## Cuándo se cierra un issue (definición de terminado)
 
