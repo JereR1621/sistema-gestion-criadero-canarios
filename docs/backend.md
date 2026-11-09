@@ -1,6 +1,6 @@
 # Resumen para backend
 
-Guía de trabajo para el equipo de backend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.1 (`docs/srs/`) exige a la lógica y a la base de datos. **Si este resumen y el SRS no coinciden, manda el SRS**; cualquier cambio de requisitos se pide al PM y queda registrado como CR en el SRS (§9.2).
+Guía de trabajo para el equipo de backend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.1 (`docs/srs/`) exige a la lógica y a la base de datos. **Si este resumen y el SRS no coinciden, manda el SRS**, salvo los ajustes del cliente de [`ajustes-cliente.md`](ajustes-cliente.md), que lo amplían sin modificarlo. Cualquier otro cambio de requisitos se pide al PM.
 
 El contrato con frontend (rutas, datos de cada vista y campos de los formularios) está en `docs/contrato-back-front.md`.
 
@@ -15,6 +15,7 @@ Todos los valores del SRS, incluidos los numéricos de los requisitos no funcion
 | Base de datos | MySQL | Usar **MySQL 8.0.16 o superior** (recomendado 8.4 LTS): antes de esa versión MySQL ignora las restricciones `CHECK` que pide IF-002. Instalación, migraciones y qué se sube a GitHub: [`base-de-datos.md`](base-de-datos.md). |
 | Despliegue | AWS | Entorno de pruebas (staging) y producción. |
 | Pruebas | PHPUnit (código) y Apache JMeter (carga) | Sujetas a cambio, según el SRS. |
+| PDF de la ficha | Dompdf (propuesta), instalado con Composer | AC-04. La librería y el uso de Composer los confirma la tarea de estructura base. |
 | Repositorio | GitHub | Ver `CONTRIBUTING.md`. |
 
 ## 2. Arquitectura propuesta
@@ -58,7 +59,7 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 | `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
 | `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante`) | `nombre` UNIQUE. |
 | `variedad_factor` | variedad_codigo, factor_id | PK compuesta. Es la **composición de la variedad**. |
-| `canario` | id, criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, fecha_nacimiento, sexo (`macho` / `hembra` / `sin_determinar`), variedad_codigo, padre_id, madre_id, cruce_origen_id, procedencia, estado (`activo` / `baja`) | UNIQUE (`criadero_id`, `anillo_socio`, `anillo_anio`, `anillo_correlativo`, `anillo_club`). Índices en (`criadero_id`, `anillo_correlativo`) y (`criadero_id`, `variedad_codigo`). `variedad_codigo`, padres, cruce y fechas pueden ser NULL. |
+| `canario` | id, criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, fecha_nacimiento, sexo (`macho` / `hembra` / `sin_determinar`), variedad_codigo, padre_id, madre_id, cruce_origen_id, procedencia, estado (`activo` / `reservado` / `baja`) | UNIQUE (`criadero_id`, `anillo_socio`, `anillo_anio`, `anillo_correlativo`, `anillo_club`). Índices en (`criadero_id`, `anillo_correlativo`) y (`criadero_id`, `variedad_codigo`). `variedad_codigo`, padres, cruce y fechas pueden ser NULL. |
 | `cruce` | id, criadero_id, macho_id, hembra_id, jaula_id, temporada (año), fecha_inicio, fecha_fin | `fecha_fin` NULL = cruce activo. CHECK `fecha_fin >= fecha_inicio`. |
 | `ubicacion` | id, canario_id, jaula_id, fecha_desde, fecha_hasta | `jaula_id` NULL = jaula grande. `fecha_hasta` NULL = ubicación actual. |
 | `baja` | id, canario_id, motivo (`venta` / `muerte` / `otra`), fecha | `canario_id` UNIQUE (una baja por canario). |
@@ -85,6 +86,7 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 | Cada canario tiene como máximo una ubicación con `fecha_hasta` NULL. | DAT-004 |
 | Solo se es portador de factores recesivos o ligados al sexo. Una hembra no porta factores ligados al sexo. Nadie porta un factor que ya manifiesta su variedad. | DAT-004, RF013 |
 | La baja crea el registro en `baja` y cambia `canario.estado` en la misma operación. | DAT-004, RF011 |
+| Un canario reservado o dado de baja no forma un cruce nuevo; uno con un cruce activo sí puede formar otro (RF019 y RF020). | RF018, AC-02 |
 | Dos variedades del mismo sexo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004 |
 | No se elimina una variedad asignada a algún canario. | RF032 |
 
@@ -93,10 +95,10 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 | Módulo | RF | Lo esencial para backend |
 |---|---|---|
 | Cuentas y acceso | RF001–RF006 | Autorregistro solo como criador; crea el criadero vacío. La cuenta de administrador se crea por seed, nunca por autorregistro. Una cuenta desactivada no inicia sesión y conserva sus datos. El administrador ve los datos de registro de las cuentas, no los criaderos. |
-| Individuos | RF007–RF013 | El anillo es obligatorio; sexo y variedad pueden quedar "sin determinar". Si el anillo está duplicado, se informa qué canario lo usa. Un canario adquirido se guarda sin padres y con su procedencia. La baja lo saca de los listados de activos, pero conserva su genealogía. |
+| Individuos | RF007–RF013 | El anillo es obligatorio; sexo y variedad pueden quedar "sin determinar". Si el anillo está duplicado, se informa qué canario lo usa. Un canario adquirido se guarda sin padres y con su procedencia. La baja lo saca de los listados de activos, pero conserva su genealogía. Un canario puede quedar **reservado** (AC-03): sigue activo en listados y búsquedas, pero no forma cruces nuevos; un dado de baja no se reserva. |
 | Jaulas | RF014–RF017 | El número de jaula es único por criadero. Asignar o trasladar a un canario cierra su ubicación anterior y abre otra (la jaula grande es `jaula_id` NULL). El historial de la jaula se arma con ubicaciones y cruces ordenados por fecha. |
-| Libro de crías | RF018–RF022 | Para crear un cruce se exige macho, hembra, jaula, temporada y fecha de inicio. Una hembra con varios machos, o un macho con varias hembras, son cruces independientes. Al anillar, cada pichón queda con padre, madre y cruce de origen. Terminar un cruce registra su `fecha_fin`. |
-| Búsqueda y genealogía | RF023–RF027 | Se busca por anillo completo o solo por el correlativo; si hay varias coincidencias, se listan con año, socio y club. Los dados de baja también se encuentran. La ficha muestra padres, hermanos (mismo padre y madre), medios hermanos (un progenitor en común) y crías. La ficha de cría muestra el cruce con sus pichones. |
+| Libro de crías | RF018–RF022 | Para crear un cruce se exige macho, hembra, jaula, temporada y fecha de inicio. Solo se ofrecen y se aceptan canarios disponibles: no reservados ni dados de baja (AC-02). Una hembra con varios machos, o un macho con varias hembras, son cruces independientes. Al anillar, cada pichón queda con padre, madre y cruce de origen. Terminar un cruce registra su `fecha_fin`. |
+| Búsqueda y genealogía | RF023–RF027 | Se busca por anillo completo o solo por el correlativo; si hay varias coincidencias, se listan con año, socio y club. Los dados de baja también se encuentran. La ficha muestra padres, hermanos (mismo padre y madre), medios hermanos (un progenitor en común), crías y el árbol genealógico de 3 generaciones (AC-01), y se exporta en PDF (AC-04). La ficha de cría muestra el cruce con sus pichones. |
 | Catálogo | RF028–RF034 | El catálogo viene precargado y es de solo lectura para los criadores. Solo el administrador lo modifica. Los factores que manifiesta un canario se obtienen de su variedad (RF033). Los portadores deducidos se recalculan (RF034, ver §5). |
 | Previsualización de cruces | RF035–RF039 | Es un cálculo; no se guarda nada hasta que el criador confirma el cruce (ver §5). |
 
@@ -118,6 +120,8 @@ La "tabla de Mendel" **no se carga como datos**: son tres reglas que se programa
 
 Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100% de hembras marfil y 100% de machos portadores de marfil.
 
+Caso de prueba que dio el cliente (RF037, audio del 09/11/2026): negro ópalo amarillo mosaico macho × negro amarillo marfil mosaico hembra → ninguna cría manifiesta ópalo y todas lo portan.
+
 **Deducción de portadores (RF034).** Cuando se registran o modifican el sexo, la variedad o los padres de un pichón nacido en el criadero, o la variedad de alguno de sus padres, se **recalculan solo los portadores con `origen = deducido`**:
 - Por cada factor recesivo o ligado al sexo que manifieste el padre o la madre, y que el pichón no manifieste → portador deducido.
 - Excepción: las hembras no son portadoras de factores ligados al sexo.
@@ -130,7 +134,7 @@ Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100
 
 - **Fuente:** el nomenclador oficial 2026 de canarios de color (sección D), que el cliente entregó el 04/11/2026. Sus 880 variedades (códigos `D.001` a `D.880`) ya están extraídas en [`docs/catalogo/nomenclador-color-2026.csv`](catalogo/nomenclador-color-2026.csv) (código y nombre). Las demás secciones del nomenclador (porte) quedan fuera del alcance.
 - **Líneas con dos códigos:** el nomenclador trae líneas como `D.001-D.002 BLANCO - DOMINANTE`, que agrupan dos variedades. No son una variedad: cada código se carga por separado. El CSV ya viene separado (880 filas, sin huecos ni duplicados).
-- **Composición:** la arma el equipo descomponiendo cada nombre en sus factores (serie, mutación, lipocromo y categoría). Cada factor es una mutación presente; su ausencia equivale a la forma normal (por ejemplo, nevado = sin el factor intenso). Los nombres siguen la nomenclatura 2026 (por ejemplo, «bruno», no «canela»). La composición se valida antes de cargarla, incluida la regla de que no haya combinaciones repetidas por sexo.
+- **Composición:** la arma el equipo descomponiendo cada nombre en sus factores (serie, mutación, lipocromo y categoría). Cada factor es una mutación presente; su ausencia equivale a la forma normal (por ejemplo, nevado = sin el factor intenso). Los nombres siguen la nomenclatura 2026 (por ejemplo, «bruno», no «canela»; el cliente usa canela, marrón y bruno como sinónimos). Los conceptos que explicó el cliente están en [`ajustes-cliente.md`](ajustes-cliente.md). La composición se valida antes de cargarla, incluida la regla de que no haya combinaciones repetidas por sexo.
 - **Sexo:** 408 variedades indican el sexo en el nombre ("… MACHO", "… HEMBRA").
 
 ## 7. Seguridad (SEG-001 a SEG-005)
@@ -148,7 +152,7 @@ Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100
 
 | Tema | Requisito | Qué implementar |
 |---|---|---|
-| Auditoría | SEG-003 | Registrar altas, bajas y modificaciones de canarios y cruces, y toda acción del administrador. Conservar 1 año. |
+| Auditoría | SEG-003 | Registrar altas, bajas y modificaciones de canarios y cruces, y toda acción del administrador, con un helper común que crea la tarea del esquema. Conservar 1 año. |
 | Respaldo | DAT-003, RNF008 | Respaldo completo diario, con retención de 30 días. Restaurar en menos de 4 horas, con una pérdida máxima de 24 horas. |
 | Retención | DAT-002 | Al cerrar una cuenta, guardar `fecha_cierre`; una tarea programada borra los datos del criadero a los 90 días. |
 | Desempeño | RNF004, RNF005 | Búsqueda por anillo en menos de 2 segundos con 5.000 canarios; 50 usuarios concurrentes. Usar los índices de §3 y medir con JMeter. |

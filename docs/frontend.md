@@ -1,6 +1,6 @@
 # Resumen para frontend
 
-Guía de trabajo para el equipo de frontend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.1 (`docs/srs/`) exige a las pantallas. **Si este resumen y el SRS no coinciden, manda el SRS**; los cambios se piden al PM.
+Guía de trabajo para el equipo de frontend del **Sistema de Gestión de Criadero de Canarios**. Resume lo que el SRS v1.1 (`docs/srs/`) exige a las pantallas. **Si este resumen y el SRS no coinciden, manda el SRS**, salvo los ajustes del cliente de [`ajustes-cliente.md`](ajustes-cliente.md), que lo amplían; los cambios se piden al PM.
 
 ## 1. Qué es "frontend" en este proyecto
 
@@ -28,21 +28,23 @@ El trabajo de frontend vive en la carpeta `frontend/`: las vistas en `frontend/v
 | 1 | Registro de cuenta | Nombre, correo y contraseña (mínimo 8 caracteres). | RF001, SEG-001 |
 | 2 | Inicio de sesión | Correo y contraseña. Mensaje claro si la cuenta está desactivada. | RF002, RF005 |
 | 3 | Perfil | Número de socio y club, que se proponen por defecto al anillar. | RF004 |
-| 4 | Inicio | **Buscador visible de inmediato.** La ficha de un canario tiene que quedar a 3 interacciones como máximo. | RNF003 |
-| 5 | Lista de canarios | Solo los activos, con anillo, sexo, variedad y ubicación. | RF011 |
+| 4 | Inicio | **Buscador por anillo visible de inmediato:** es la entrada principal del sistema (AC-05). La ficha de un canario tiene que quedar a 3 interacciones como máximo. | RNF003 |
+| 5 | Lista de canarios | Solo los activos, con anillo, sexo, variedad y ubicación. Los reservados aparecen con la etiqueta «Reservado» (AC-03). | RF011 |
 | 6 | Alta y edición de canario | Anillo en cuatro campos (socio, año, correlativo, club). Sexo: macho, hembra o "sin determinar". Variedad: buscable por código o por nombre, o "sin determinar". Procedencia, si fue comprado. Portadores que indica el criador. | RF007–RF010, RF012, RF029 |
-| 7 | Ficha del canario | Datos del canario; padre, madre, hermanos, medios hermanos y crías, cada uno con enlace a su ficha; cruces en que participó, con enlace a su ficha de cría; ubicación actual. **Factores que manifiesta** (se muestran, no se editan) y **portadores**, distinguiendo "deducido por el sistema" de "indicado por el criador". | RF024, RF027, RF033, RF034 |
+| 7 | Ficha del canario | Datos del canario; padre, madre, hermanos, medios hermanos y crías, cada uno con enlace a su ficha; cruces en que participó, con enlace a su ficha de cría; ubicación actual. **Factores que manifiesta** (se muestran, no se editan) y **portadores**, distinguiendo "deducido por el sistema" de "indicado por el criador". **Árbol genealógico** de 3 generaciones, con «Sin registro» donde falta un antepasado (AC-01). | RF024, RF027, RF033, RF034 |
 | 8 | Baja de canario | Motivo (venta, muerte u otra salida) y fecha, ambos obligatorios. | RF011 |
 | 9 | Lista y alta de jaulas | Número de jaula, único por criadero. | RF014 |
 | 10 | Ficha de jaula | Ocupantes actuales, cruce activo e historial de ocupantes y cruces por fecha. | RF017, RF026 |
 | 11 | Asignar o trasladar canario | A una jaula numerada o a la **jaula grande**, que no tiene número. | RF015, RF016 |
-| 12 | Nuevo cruce | Macho, hembra, jaula, temporada y fecha de inicio. Antes de confirmar, se muestra la pestaña **"Posible resultado"**. | RF018–RF020, RF035 |
+| 12 | Nuevo cruce | Macho, hembra, jaula, temporada y fecha de inicio. Solo se ofrecen canarios disponibles: sin reservados ni dados de baja (AC-02). Antes de confirmar, se muestra la pestaña **"Posible resultado"**. | RF018–RF020, RF035 |
 | 13 | Posible resultado | Variedades esperadas con su porcentaje, **separadas para machos y para hembras**. Las combinaciones sin variedad se muestran como lista de factores. Aviso si algún factor no se puede calcular. Botones para confirmar o volver. | RF035, RF039 |
 | 14 | Ficha de cría (cruce) | Macho, hembra, jaula, temporada y pichones con anillo, sexo y estado. Acciones: anillar pichones y terminar el cruce. | RF021, RF022, RF027 |
 | 15 | Anillar pichones | Uno o varios anillos en el mismo envío, con fecha de anillado y fecha de nacimiento (opcional). Sexo y variedad pueden quedar sin determinar. | RF021, RF007 |
 | 16 | Búsqueda | Por anillo completo o solo por el correlativo (por ejemplo, "150"), por variedad o por jaula. Si hay varias coincidencias, se muestra una lista con año, socio y club. También encuentra a los dados de baja. | RF023, RF025, RF026 |
 | 17 | Administración: cuentas | Lista con datos de registro y estado; activar y desactivar. | RF005, RF006 |
 | 18 | Administración: catálogo | Variedades, su composición y factores, con su tipo de herencia. | RF032 |
+| 19 | Reserva del canario (en la ficha) | Etiqueta «Reservado» y botón «Reservar» o «Quitar reserva». | AC-03 |
+| 20 | Ficha en PDF | Botón «Exportar PDF» en la ficha. El PDF trae los datos de la ficha, factores, portadores y el árbol de 3 generaciones, legible al imprimirlo en A4. | AC-04 |
 
 ## 4. Mensajes que el usuario debe ver
 
@@ -56,6 +58,8 @@ Backend valida y devuelve el error; la vista lo muestra junto al campo afectado,
 | Variedad incompatible con el sexo | "Esta variedad es solo para hembras" (o para machos). | RF012 |
 | Hembra portadora de un factor ligado al sexo | "Una hembra no puede ser portadora de este factor: lo manifiesta o no lo tiene". | RF013 |
 | Factor sin regla de herencia | "No se puede calcular el resultado para el factor …". | RF039 |
+| Canario reservado o dado de baja en un cruce | "Este canario está reservado: no puede formar un cruce" (o "está dado de baja"). | RF018, AC-02 |
+| Reservar un canario dado de baja | "Un canario dado de baja no se puede reservar". | AC-03 |
 | Sin conexión o servidor caído | Aviso de que no se pueden consultar ni guardar datos. | SRS §2.5 |
 | Mantenimiento | Aviso de mantenimiento para los criadores. | SRS §2.5 |
 
@@ -90,6 +94,8 @@ Usar siempre estos términos en la interfaz, igual que en el SRS (§1.4):
 | Variedad | Color reconocido del nomenclador, con su código (por ejemplo, D.049 Rojo intenso). |
 | Portador | Canario que lleva un factor sin manifestarlo. |
 | Dar de baja | Sacar del criadero por venta, muerte u otra salida, sin borrar la historia. |
+| Reservado | Canario apartado por el criador: sigue en el criadero, pero no se ofrece para formar cruces (AC-03). |
+| Árbol genealógico | Padres, abuelos y bisabuelos del canario (AC-01). |
 
 ## 8. Flujo de trabajo
 

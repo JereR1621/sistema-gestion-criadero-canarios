@@ -6,7 +6,7 @@ Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno d
 |---|---|
 | **Estado** | SRS v1.1 listo para la aceptación del cliente (todavía sin aprobar); corrige la v1.0 con el nomenclador oficial 2026 que entregó el cliente. El código está por empezar: hay estructura, sin implementación. |
 | **Stack** | PHP con HTML embebido · MySQL 8 · AWS · PHPUnit · Apache JMeter · Figma |
-| **Requisitos** | [`docs/srs/`](docs/srs/), SRS v1.1 (ISO/IEC/IEEE 29148): **es la fuente oficial.** Si un documento o una issue no coincide con el SRS, manda el SRS. |
+| **Requisitos** | [`docs/srs/`](docs/srs/), SRS v1.1 (ISO/IEC/IEEE 29148): **es la fuente oficial.** Si un documento o una issue no coincide con el SRS, manda el SRS. Los pedidos que el cliente acordó después del SRS están en [`docs/ajustes-cliente.md`](docs/ajustes-cliente.md) (etiqueta `ajuste:cliente`) y lo amplían. |
 
 ## Empieza aquí
 
@@ -39,6 +39,7 @@ public/
   index.php               punto de entrada de la web: solo carga el backend
 docs/                     ← todos
   srs/                    SRS v1.1 (PDF)
+  ajustes-cliente.md      pedidos del cliente acordados después del SRS (AC-01 a AC-05)
   backend.md              modelo de datos, reglas, genética y seguridad
   base-de-datos.md        MySQL: instalación, migraciones y qué se sube a GitHub
   frontend.md             pantallas, mensajes y uso en el teléfono
@@ -57,7 +58,7 @@ docs/                     ← todos
 4. Programa, prueba (PHPUnit y teléfono de 360 px) y sube tus cambios.
 5. Abre un pull request hacia `develop` con `Closes #NN`. Claude lo revisa automáticamente y un integrante del equipo lo aprueba.
 6. Al integrarse, GitHub borra la rama; bórrala también en tu computador (`git branch -d …`). La siguiente issue empieza con una rama nueva.
-7. Si algo no está en la issue ni en el SRS, **no lo inventes**: pregunta al PM en un comentario de la issue.
+7. Si algo no está en la issue, en el SRS ni en `docs/ajustes-cliente.md`, **no lo inventes**: pregunta al PM en un comentario de la issue.
 
 ## Cómo están organizadas las issues
 
