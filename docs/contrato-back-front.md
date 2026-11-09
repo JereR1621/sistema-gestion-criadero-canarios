@@ -133,7 +133,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | Nombre | Método y ruta | Vista | Datos para la vista | Campos del formulario | RF |
 |---|---|---|---|---|---|
 | registro | GET /registro | cuentas/registro | — | — | RF001 |
-| registro.guardar | POST /registro | (redirige a /inicio) | — | nombre, correo, contrasena | RF001 |
+| registro.guardar | POST /registro | (redirige a /inicio) | — | nombre, correo, contrasena, consentimiento (casilla obligatoria que acepta el uso de los datos para el servicio, POL-001) | RF001 |
 | ingreso | GET /ingresar | cuentas/ingresar | — | — | RF002 |
 | ingreso.enviar | POST /ingresar | (redirige a /inicio) | — | correo, contrasena. Cuenta desactivada → `_general` | RF002, RF005 |
 | salida | POST /salir | (redirige a /ingresar) | — | — | SEG-004 |
@@ -149,7 +149,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | canarios.nuevo | GET /canarios/nuevo | canarios/formulario | `$variedades` [VariedadOpcion], `$factores_portables` [FactorOpcion] (solo recesivos y ligados al sexo), `$por_defecto` = anillo_socio, anillo_club | — | RF007, RF009, RF010, RF029, RF004 |
 | canarios.guardar | POST /canarios | (redirige a la ficha) | — | anillo_socio, anillo_anio, anillo_correlativo, anillo_club, sexo, variedad_codigo, fecha_anillado, fecha_nacimiento, procedencia, portadores[] | RF007–RF010, RF012, RF013 |
 | canarios.ficha | GET /canarios/{id} | canarios/ficha | `$canario` CanarioFicha (con `arbol`, AC-01) | — | RF024, RF033, RF034 |
-| canarios.editar | GET /canarios/{id}/editar | canarios/formulario | lo mismo que "nuevo" + `$canario` CanarioFicha | — | RF007, RF009 |
+| canarios.editar | GET /canarios/{id}/editar | canarios/formulario | lo mismo que "nuevo" + `$canario` CanarioFicha | — | RF007, RF009, RF029 |
 | canarios.actualizar | POST /canarios/{id} | (redirige a la ficha) | — | los mismos campos que "guardar" | RF007, RF009, RF012, RF013 |
 | canarios.baja | GET /canarios/{id}/baja | canarios/baja | `$canario` CanarioResumen | — | RF011 |
 | canarios.baja.guardar | POST /canarios/{id}/baja | (redirige a la ficha) | — | motivo (`venta` / `muerte` / `otra`), fecha | RF011 |
@@ -191,7 +191,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | Nombre | Método y ruta | Vista | Datos para la vista | Campos del formulario | RF |
 |---|---|---|---|---|---|
 | admin.cuentas | GET /admin/cuentas | admin/cuentas | `$cuentas` [id, nombre, correo, estado, fecha_registro]. Nunca datos del criadero. | — | RF006 |
-| admin.cuentas.estado | POST /admin/cuentas/{id}/estado | (redirige a /admin/cuentas) | — | estado (`activa` / `desactivada`) | RF005 |
+| admin.cuentas.estado | POST /admin/cuentas/{id}/estado | (redirige a /admin/cuentas) | — | estado (`activa` / `desactivada` / `cerrada`; cerrar se hace a pedido del criador y guarda `fecha_cierre`, POL-001 y DAT-002) | RF005 |
 | admin.variedades | GET /admin/variedades?q= | admin/variedades | `$variedades` [VariedadOpcion + `factores` [nombre]] | — | RF032 |
 | admin.variedades.editar | GET /admin/variedades/{codigo} | admin/variedad | `$variedad` (con su composición), `$factores` [FactorOpcion] | — | RF032 |
 | admin.variedades.guardar | POST /admin/variedades/{codigo} | (redirige a /admin/variedades) | — | nombre, sexo, factores[] | RF032 |
@@ -215,4 +215,6 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 - La paginación de las listas largas (propuesta: 50 por página).
 - La librería que genera el PDF de la ficha (AC-04): la propuesta es Dompdf, con Composer. La confirma la tarea de estructura base.
 - Las rutas del mantenimiento del catálogo (RF032): crear una variedad, corregir un factor existente (con su identificador) y rechazar la eliminación de una variedad asignada a algún canario. Hoy la §6 solo tiene editar una variedad y crear un factor.
-- Cómo se registra el consentimiento informado al crear la cuenta (RF001) y cómo ejerce el criador sus derechos de acceso, rectificación y eliminación (POL-001).
+- Cómo entrega el backend el enlace al canario que ya usa un anillo (RF008): por ejemplo, una variable aparte con su URL. Los mensajes de `$errores` son texto; nunca llevan HTML.
+
+**Decidido por el PM (09/11/2026), POL-001:** el consentimiento es una casilla obligatoria al crear la cuenta (`consentimiento`; el backend guarda `fecha_consentimiento`). Los derechos de acceso, rectificación y eliminación se piden por correo de soporte (SOS-004). Para eliminar, el administrador cierra la cuenta (`estado = cerrada`, RF005) y la tarea de retención borra los datos a los 90 días (DAT-002).

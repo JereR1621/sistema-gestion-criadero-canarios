@@ -53,7 +53,7 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 
 | Tabla | Columnas | Claves y restricciones |
 |---|---|---|
-| `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_registro, fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_registro` la pone el sistema al crear la cuenta (la muestra la administración de cuentas, RF006; es un dato técnico que la Figura 2 no dibuja). `fecha_cierre` solo si estado = cerrada. Socio y club solo para criadores. |
+| `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_registro, fecha_consentimiento, fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_registro` la pone el sistema al crear la cuenta (la muestra la administración de cuentas, RF006; es un dato técnico que la Figura 2 no dibuja). `fecha_consentimiento` registra cuándo el criador aceptó el uso de sus datos al registrarse (POL-001; también es un dato técnico). `fecha_cierre` solo si estado = cerrada: la registra el administrador al cerrar la cuenta a pedido del criador (RF005). Socio y club solo para criadores. |
 | `criadero` | id, usuario_id | `usuario_id` UNIQUE (un criadero por criador; el administrador no tiene). |
 | `jaula` | id, criadero_id, numero | UNIQUE (`criadero_id`, `numero`). |
 | `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
@@ -78,16 +78,17 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 
 | Regla | Origen |
 |---|---|
-| Padre, madre, la jaula del cruce y la jaula de la ubicación pertenecen al **mismo criadero** que el canario o el cruce. | DAT-004 |
+| Padre, madre, la jaula del cruce y la jaula de la ubicación pertenecen al **mismo criadero** que el canario o el cruce. | DAT-004, RF015, RF018, RF021 |
 | El padre es macho y la madre es hembra; el macho del cruce es macho y la hembra, hembra. Un canario "sin determinar" no puede formar un cruce. | DAT-004, RF018 |
 | Si el canario tiene cruce de origen, su padre y su madre son el macho y la hembra de ese cruce. | DAT-004, RF021 |
-| El año del anillo de un pichón no es anterior al de sus padres. | DAT-004 |
+| El año del anillo de un pichón no es anterior al de sus padres. | DAT-004, RF021 |
 | Una variedad con sexo solo se asigna a un canario de ese sexo. | RF012 |
-| Cada canario tiene como máximo una ubicación con `fecha_hasta` NULL. | DAT-004 |
+| Cada canario tiene como máximo una ubicación con `fecha_hasta` NULL. | DAT-004, RF015, RF016 |
 | Solo se es portador de factores recesivos o ligados al sexo. Una hembra no porta factores ligados al sexo. Nadie porta un factor que ya manifiesta su variedad. | DAT-004, RF013 |
-| La baja crea el registro en `baja` y cambia `canario.estado` en la misma operación. | DAT-004, RF011 |
+| La baja crea el registro en `baja` y cambia `canario.estado` en la misma operación. Un canario dado de baja no se da de baja otra vez. | DAT-004, RF011 |
+| La baja cierra la ubicación abierta del canario con la fecha de la baja (deja de ser ocupante de su jaula y el historial lo muestra como salida). Un canario dado de baja no se ubica en jaulas. | RF011, RF015, RF016 (decisión del PM, 09/11/2026) |
 | Un canario reservado o dado de baja no forma un cruce nuevo; uno con un cruce activo sí puede formar otro (RF019 y RF020). | RF018, AC-02 |
-| Dos variedades del mismo sexo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004 |
+| Dos variedades del mismo sexo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
 | No se elimina una variedad asignada a algún canario. | RF032 |
 
 ## 4. Lógica por módulo
