@@ -59,7 +59,7 @@ fix: rechaza anillo duplicado al anillar pichones (#61)
 - [ ] Código revisado e integrado en `develop`.
 - [ ] Rama de la issue borrada en GitHub y en tu computador.
 
-Cerrar una implementación significa que está lista para revisión externa; no equivale a aprobar la entrega. Las tareas documentales se cierran con el entregable revisado por el equipo y la conformidad del PM. Un RF con pantalla se cierra cuando sus issues de backend y frontend están cerradas y el RF completo se comprobó en el entorno de pruebas. Las épicas se cierran al terminar sus entregables, respetando las dependencias técnicas; la entrega beta además exige las revisiones externas previstas.
+Cerrar una implementación significa que está lista para revisión externa; no equivale a aprobar la entrega. Las tareas documentales se cierran con el entregable revisado por el equipo y la conformidad del PM. Un RF con pantalla se cierra cuando sus issues de backend y frontend están cerradas y el RF completo se comprobó en el entorno de pruebas. Una issue se empieza y se integra cuando las issues que la bloquean («Blocked by») están cerradas; no hace falta esperar a que se cierre su épica ni la anterior. Las épicas se cierran cuando todos sus sub-issues están cerrados, en el orden que indica su «Depende de»; la entrega beta además exige las revisiones externas previstas.
 
 ## QA externo y aprobación de entregas
 

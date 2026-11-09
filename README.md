@@ -72,6 +72,8 @@ docs/                     ← todos
   E5 → E6 Búsqueda y genealogía y E7 Genética → E8 Beta
   ```
 
+  Las flechas son el **orden de cierre** de las épicas. Para empezar o integrar una issue **mandan sus propias dependencias** («Blocked by» en GitHub), no la épica: no hace falta esperar a que se cierre la épica anterior.
+
 - **Cada RF con pantalla se divide en dos** (divide y vencerás):
 
   ```
@@ -86,7 +88,7 @@ docs/                     ← todos
 - **Cada ruta y cada vista las crea una sola issue.** Si un RF necesita algo en una pantalla que crea otro RF, su issue dice «**No crees** … : la crea #NN. Edítala y agrega …» y depende de esa issue. Por ejemplo, el formulario de canarios lo crea RF007, y RF008, RF009, RF010, RF012, RF013 y RF029 le agregan su parte. Así dos personas nunca crean el mismo archivo.
 
 - **5 hitos** (M1 a M5) y **5 revisiones externas**, una por hito, que coordina el PM con QA externo. QA externo entrega su informe y no recibe tareas de implementación.
-- **126 issues**: 9 épicas (`E0`–`E8`), 39 RF (`SRS-RFxxx`), 2 ajustes del cliente (`AC-03` y `AC-04`), 60 implementaciones (`[Backend]` y `[Frontend]`), 11 tareas (`T01`–`T11`) y 5 revisiones (`QA-M1`–`QA-M5`). Toda issue empieza por su ID.
+- **127 issues**: 9 épicas (`E0`–`E8`), 39 RF (`SRS-RFxxx`), 2 ajustes del cliente (`AC-03` y `AC-04`), 60 implementaciones (`[Backend]` y `[Frontend]`), 12 tareas (`T01`–`T12`) y 5 revisiones (`QA-M1`–`QA-M5`). Toda issue empieza por su ID.
 
 | Etiqueta | Para qué sirve |
 |---|---|
