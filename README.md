@@ -40,6 +40,7 @@ public/
 docs/                     ← todos
   srs/                    SRS v1.1 (PDF)
   ajustes-cliente.md      pedidos del cliente acordados después del SRS (AC-01 a AC-05)
+  guia-issues.md          nomenclatura de las issues y árbol de qué desbloquea qué (backend y frontend)
   backend.md              modelo de datos, reglas, genética y seguridad
   base-de-datos.md        MySQL: instalación, migraciones y qué se sube a GitHub
   frontend.md             pantallas, mensajes y uso en el teléfono
@@ -62,6 +63,8 @@ docs/                     ← todos
 
 ## Cómo están organizadas las issues
 
+> **Guía completa:** [`docs/guia-issues.md`](docs/guia-issues.md), con la nomenclatura, por dónde empezar y el árbol de qué desbloquea qué para backend y para frontend.
+
 - **9 épicas** (`tipo:epica`), una por etapa. Cada una agrupa sus RF y sus tareas.
 
   ```
@@ -72,7 +75,7 @@ docs/                     ← todos
 - **Cada RF con pantalla se divide en dos** (divide y vencerás):
 
   ```
-  Épica E5: Libro de crías
+  E5: Libro de crías
   └─ SRS-RF018: Registro de cruce              tipo:requisito   → no se programa: se valida completo
      ├─ SRS-RF018 [Backend]: Registro de cruce   area:backend   → lo programa backend
      └─ SRS-RF018 [Frontend]: Registro de cruce  area:frontend  → lo programa frontend
@@ -83,7 +86,7 @@ docs/                     ← todos
 - **Cada ruta y cada vista las crea una sola issue.** Si un RF necesita algo en una pantalla que crea otro RF, su issue dice «**No crees** … : la crea #NN. Edítala y agrega …» y depende de esa issue. Por ejemplo, el formulario de canarios lo crea RF007, y RF008, RF009, RF010, RF012, RF013 y RF029 le agregan su parte. Así dos personas nunca crean el mismo archivo.
 
 - **5 hitos** (M1 a M5) y **5 revisiones externas**, una por hito, que coordina el PM con QA externo. QA externo entrega su informe y no recibe tareas de implementación.
-- **120 issues**: 9 épicas, 39 RF, 56 implementaciones (28 de backend y 28 de frontend), 11 tareas y 5 revisiones.
+- **126 issues**: 9 épicas (`E0`–`E8`), 39 RF (`SRS-RFxxx`), 2 ajustes del cliente (`AC-03` y `AC-04`), 60 implementaciones (`[Backend]` y `[Frontend]`), 11 tareas (`T01`–`T11`) y 5 revisiones (`QA-M1`–`QA-M5`). Toda issue empieza por su ID.
 
 | Etiqueta | Para qué sirve |
 |---|---|
@@ -94,6 +97,7 @@ docs/                     ← todos
 | `tipo:revision` / `tipo:defecto` | Revisión externa de un hito / defecto a corregir. |
 | `area:backend`, `area:frontend`, `area:pruebas`, `area:gestion` | **Quién la hace.** Cada issue que se programa tiene una sola área. |
 | `modulo:…` y `prioridad:…` | Módulo del SRS y prioridad del RF. |
+| `ajuste:cliente` | Pedido del cliente acordado después del SRS ([`docs/ajustes-cliente.md`](docs/ajustes-cliente.md)). |
 
 **Para encontrar tu trabajo**, filtra por tu área: [backend](../../issues?q=is%3Aopen+label%3Aarea%3Abackend), [frontend](../../issues?q=is%3Aopen+label%3Aarea%3Afrontend).
 

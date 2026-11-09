@@ -65,7 +65,7 @@ Cerrar una implementación significa que está lista para revisión externa; no 
 
 Boris Barrios y José Barraza forman el equipo QA externo. Revisan el proyecto y entregan sus observaciones por correo al PM. No son responsables de implementar funcionalidades, ejecutar las pruebas internas del equipo ni mantener el tablero.
 
-Hay una issue `Revisión externa QA: M1` a `M5` por hito, con `tipo:revision` y `area:gestion`. La coordina el PM y registra la versión revisada, las evidencias, el informe de QA y las correcciones. Las tareas de pruebas internas usan `area:pruebas` y se asignan al equipo de desarrollo. No se asignan issues a QA externo por defecto.
+Hay una issue de revisión externa por hito, `QA-M1` a `QA-M5`, con `tipo:revision` y `area:gestion`. La coordina el PM y registra la versión revisada, las evidencias, el informe de QA y las correcciones. Las tareas de pruebas internas usan `area:pruebas` y se asignan al equipo de desarrollo. No se asignan issues a QA externo por defecto.
 
 La revisión de M5 se realiza en el entorno de pruebas después de seguridad, respaldos, carga y usabilidad, antes del despliegue beta. La aceptación final del cliente tras el periodo beta se registra después, sin darla por completada al desplegar.
 
