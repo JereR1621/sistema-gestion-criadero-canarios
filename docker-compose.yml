@@ -1,0 +1,56 @@
+# Entorno local de TuCriadero con Docker (opción recomendada; guía en docs/base-de-datos.md §3).
+#   docker compose up -d            → aplicación en http://localhost:8080
+#   docker compose --profile herramientas up -d   → además, Adminer en http://localhost:8081
+# Lee los valores del archivo .env (copia de .env.example). Ninguna credencial va en este archivo.
+# Solo es para trabajar en el computador de cada integrante: el despliegue en AWS lo define la tarea de estructura base.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html            # el código del repositorio: se edita en tu computador y se ve al instante
+    env_file:
+      - .env
+    environment:
+      # Dentro de Docker la base se llama "db". Estas variables tienen prioridad sobre lo que diga el .env.
+      DB_HOST: db
+      DB_PORT: "3306"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4               # la misma versión que pide el proyecto (MySQL 8.4 LTS; los CHECK requieren 8.0.16 o superior)
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-tucriadero}
+      MYSQL_USER: ${DB_USER:-tucriadero}
+      MYSQL_PASSWORD: ${DB_PASS:?Completa DB_PASS en tu archivo .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:?Completa DB_ROOT_PASS en tu archivo .env}
+      DB_NAME_PRUEBAS: ${DB_NAME_PRUEBAS:-tucriadero_pruebas}
+    ports:
+      - "${DB_PORT_DOCKER:-3307}:3306"   # 3307 en tu computador, para no chocar con un MySQL instalado
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d:ro   # solo crea la base de pruebas; las tablas las crea migrar.php
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  adminer:
+    image: adminer:4
+    profiles: ["herramientas"]     # opcional: para ver la base desde el navegador
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
