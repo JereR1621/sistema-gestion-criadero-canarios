@@ -146,8 +146,8 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | Nombre | Método y ruta | Vista | Datos para la vista | Campos del formulario | RF |
 |---|---|---|---|---|---|
 | canarios | GET /canarios?pagina=N | canarios/lista | `$canarios` [CanarioResumen] (solo activos), `$paginacion` = pagina, total_paginas | — | RF011 |
-| canarios.nuevo | GET /canarios/nuevo | canarios/formulario | `$variedades` [VariedadOpcion], `$factores_portables` [FactorOpcion] (solo recesivos y ligados al sexo), `$por_defecto` = anillo_socio, anillo_club | — | RF007, RF009, RF010, RF029, RF004 |
-| canarios.guardar | POST /canarios | (redirige a la ficha) | — | anillo_socio, anillo_anio, anillo_correlativo, anillo_club, sexo, variedad_codigo, fecha_anillado, fecha_nacimiento, procedencia, portadores[] | RF007–RF010, RF012, RF013 |
+| canarios.nuevo | GET /canarios/nuevo | canarios/formulario | `$variedades` [VariedadOpcion], `$factores_portables` [FactorOpcion] (solo recesivos y ligados al sexo), `$por_defecto` = anillo_socio, anillo_club, `$posibles_padres` y `$posibles_madres` [CanarioResumen] (machos y hembras del criadero, sin el propio canario, para indicar padres a mano) | — | RF007, RF009, RF010, RF029, RF004 |
+| canarios.guardar | POST /canarios | (redirige a la ficha) | — | anillo_socio, anillo_anio, anillo_correlativo, anillo_club, sexo, variedad_codigo, fecha_anillado, fecha_nacimiento, padre_id, madre_id (opcionales), procedencia, portadores[] | RF007–RF010, RF012, RF013 |
 | canarios.ficha | GET /canarios/{id} | canarios/ficha | `$canario` CanarioFicha (con `arbol`, AC-01) | — | RF024, RF033, RF034 |
 | canarios.editar | GET /canarios/{id}/editar | canarios/formulario | lo mismo que "nuevo" + `$canario` CanarioFicha | — | RF007, RF009, RF029 |
 | canarios.actualizar | POST /canarios/{id} | (redirige a la ficha) | — | los mismos campos que "guardar" | RF007, RF009, RF012, RF013 |
@@ -216,5 +216,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 - La librería que genera el PDF de la ficha (AC-04): la propuesta es Dompdf, con Composer. La confirma la tarea de estructura base.
 - Las rutas del mantenimiento del catálogo (RF032): crear una variedad, corregir un factor existente (con su identificador) y rechazar la eliminación de una variedad asignada a algún canario. Hoy la §6 solo tiene editar una variedad y crear un factor.
 - Cómo entrega el backend el enlace al canario que ya usa un anillo (RF008): por ejemplo, una variable aparte con su URL. Los mensajes de `$errores` son texto; nunca llevan HTML.
+
+**Decidido por el PM (10/11/2026), padres a mano:** el formulario de canarios tiene padre y madre **opcionales** (`padre_id`, `madre_id`), elegidos entre los machos y hembras del criadero. Sirven para reconstruir la genealogía de canarios que nacieron antes de usar el sistema. Un canario comprado (con procedencia) o uno anillado desde un cruce no los lleva a mano: el comprado queda sin padres y el pichón los toma del cruce. Reglas en `backend.md` §3.
 
 **Decidido por el PM (09/11/2026), POL-001:** el consentimiento es una casilla obligatoria al crear la cuenta (`consentimiento`; el backend guarda `fecha_consentimiento`). Los derechos de acceso, rectificación y eliminación se piden por correo de soporte (SOS-004). Para eliminar, el administrador cierra la cuenta (`estado = cerrada`, RF005) y la tarea de retención borra los datos a los 90 días (DAT-002).
