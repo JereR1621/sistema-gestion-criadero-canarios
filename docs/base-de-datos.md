@@ -26,6 +26,40 @@ Antes de cada commit, revisa con `git status` qué vas a subir. Si aparece `.env
 
 Versiones: **MySQL 8.4 LTS** (sirve cualquier 8.0.16 o superior; las anteriores ignoran las restricciones `CHECK`) y **PHP 8.2 o superior** (recomendado 8.3).
 
+Hay dos formas de preparar tu computador. **Elige una:**
+
+- **Opción A: Docker (recomendada).** Un solo programa levanta PHP 8.3 con Apache y MySQL 8.4, iguales para todo el equipo. No instalas PHP ni MySQL.
+- **Opción B: instalación manual.** Instalas MySQL y PHP tú mismo (subsecciones «MySQL» y «PHP», más abajo). Úsala si tu computador no puede correr Docker.
+
+Las dos cumplen las mismas reglas: tu base es tuya, las tablas las crea `migrar.php` y las credenciales viven en tu `.env`.
+
+### Opción A: Docker (recomendada)
+
+1. Instala **Docker Desktop** (<https://www.docker.com/products/docker-desktop/>). En Windows necesita WSL 2 y la virtualización activada en el computador; el instalador te guía. Es gratuito para uso educativo.
+2. Clona el repositorio **fuera de OneDrive** (por ejemplo, en `C:\proyectos\`): las carpetas sincronizadas hacen lento el contenedor.
+3. Copia `.env.example` como `.env` y completa `DB_PASS`, `DB_ROOT_PASS` y `ADMIN_CONTRASENA` con contraseñas tuyas. No cambies `DB_HOST` ni `DB_PORT`: dentro de Docker se usan `db` y `3306` automáticamente.
+4. Levanta el entorno desde la carpeta del repositorio:
+   ```
+   docker compose up -d
+   ```
+   La primera vez descarga las imágenes y crea las bases `tucriadero` y `tucriadero_pruebas`. La aplicación queda en <http://localhost:8080>.
+5. Sigue en la sección 4, en «Con Docker».
+
+Comandos útiles:
+
+| Para | Comando |
+|---|---|
+| Ver si está corriendo | `docker compose ps` |
+| Detenerlo (los datos se conservan) | `docker compose down` |
+| Borrar también la base y empezar de cero | `docker compose down -v` |
+| Ejecutar PHP o Composer | `docker compose exec app php …` · `docker compose exec app composer …` |
+| Ver la base en el navegador (Adminer) | `docker compose --profile herramientas up -d` y abre <http://localhost:8081> (servidor `db`, tu usuario y tu contraseña) |
+| Conectar una herramienta externa a la base | Servidor `127.0.0.1`, puerto `3307` |
+
+Los archivos del entorno están en `docker-compose.yml` y en la carpeta `docker/`. Solo sirven en tu computador: no cambian el despliegue en AWS.
+
+### Opción B: instalación manual
+
 ### MySQL
 
 1. Descarga **MySQL Community Server 8.4 LTS** para Windows (instalador MSI) desde <https://dev.mysql.com/downloads/mysql/>.
@@ -59,6 +93,14 @@ Versiones: **MySQL 8.4 LTS** (sirve cualquier 8.0.16 o superior; las anteriores 
 En macOS o Linux, instala las mismas versiones con el gestor de paquetes del sistema y comprueba lo mismo.
 
 ## 4. Crear tu base local (una sola vez)
+
+**Con Docker:** las bases y el usuario ya los creó `docker compose up` (sección 3, opción A). Solo falta crear las tablas y cargar el catálogo:
+```
+docker compose exec app php backend/database/migrar.php --seeds
+```
+Para comprobarlo: `docker compose exec db mysql -u tucriadero -p tucriadero -e "SELECT COUNT(*) FROM variedad;"` debe responder **880**. En los demás comandos de esta guía, antepone `docker compose exec app` a `php` (por ejemplo, `docker compose exec app php backend/database/migrar.php --desde-cero --seeds`).
+
+**Con la instalación manual:**
 
 1. Entra a MySQL como `root`:
    ```
@@ -131,8 +173,8 @@ Orden de los seeds: `01_variedades.sql`, `02_factores.sql`, `03_composicion.sql`
 
 | Entorno | Base | Quién la usa | Credenciales |
 |---|---|---|---|
-| Tu computador | `tucriadero` en tu MySQL | Tú | Tu `.env` |
-| Pruebas automáticas | `tucriadero_pruebas` en tu MySQL | PHPUnit | Tu `.env` |
+| Tu computador | `tucriadero` en tu MySQL (instalado o en Docker) | Tú | Tu `.env` |
+| Pruebas automáticas | `tucriadero_pruebas` en tu MySQL (instalado o en Docker) | PHPUnit | Tu `.env` |
 | Pruebas en AWS (`develop`) | Base del entorno de pruebas | Despliegue de `develop` | Variables de entorno de AWS |
 | Producción (`main`) | Base de producción | Despliegue de la beta | Variables de entorno de AWS |
 
@@ -147,3 +189,7 @@ En AWS, las migraciones se aplican con el mismo script al desplegar. Nadie modif
 | `Unknown database 'tucriadero'` | Falta el paso 2 de la sección 4. |
 | `mysql` no se reconoce como comando | Falta la carpeta `bin` de MySQL en el `PATH`; abre una terminal nueva después de agregarla. |
 | Una migración falla en tu base pero no en la de otro | Tu base quedó distinta: créala de nuevo con `--desde-cero --seeds`. |
+| Docker: `required variable DB_PASS is missing a value` | Completa `DB_PASS` y `DB_ROOT_PASS` en tu `.env`. |
+| Docker: `port is already allocated` | Otro programa usa el puerto 8080 o 3307: define `APP_PORT` o `DB_PORT_DOCKER` con otro número en tu `.env`. |
+| Docker: cambiaste `DB_PASS` y ahora no conecta | La contraseña quedó guardada en el volumen de la base: `docker compose down -v` y vuelve a levantar (se borran tus datos locales). |
+| Docker: todo funciona muy lento | Mueve el repositorio fuera de OneDrive (mejor aún, dentro de WSL). |

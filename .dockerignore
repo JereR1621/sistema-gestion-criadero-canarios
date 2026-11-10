@@ -1,0 +1,10 @@
+# La imagen solo necesita docker/: el código se monta como volumen (docker-compose.yml).
+.git
+.github
+.env
+.env.*
+vendor
+docs
+*.pdf
+*.xlsx
+*.xls

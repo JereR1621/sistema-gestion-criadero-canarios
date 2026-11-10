@@ -113,7 +113,18 @@ Cerrar una issue significa que está implementada y revisada por el equipo; no e
 
 ## Puesta en marcha local
 
-La base de datos se prepara con [`docs/base-de-datos.md`](docs/base-de-datos.md). El comando para levantar la aplicación lo agrega la tarea de estructura base cuando exista la primera versión ejecutable.
+Todo el detalle está en [`docs/base-de-datos.md`](docs/base-de-datos.md) §3 y §4. Hay dos opciones:
+
+- **Con Docker (recomendada):** copia `.env.example` como `.env`, completa las contraseñas y ejecuta:
+  ```
+  docker compose up -d
+  docker compose exec app composer install
+  docker compose exec app php backend/database/migrar.php --seeds
+  ```
+  La aplicación queda en <http://localhost:8080>.
+- **Instalación manual:** instala PHP 8.3 y MySQL 8.4 y sigue la guía.
+
+`composer install` y `migrar.php` funcionan cuando estén integradas la estructura base (T01) y el esquema (T02).
 
 ## Equipo
 
