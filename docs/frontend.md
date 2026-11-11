@@ -45,6 +45,7 @@ El trabajo de frontend vive en la carpeta `frontend/`: las vistas en `frontend/v
 | 18 | Administración: catálogo | Variedades, su composición y factores, con su tipo de herencia. | RF032 |
 | 19 | Reserva del canario (en la ficha) | Etiqueta «Reservado» y botón «Reservar» o «Quitar reserva». | AC-03 |
 | 20 | Ficha en PDF | Botón «Exportar PDF» en la ficha. El PDF trae los datos de la ficha, factores, portadores y el árbol de 3 generaciones, legible al imprimirlo en A4. | AC-04 |
+| 21 | Libro de crías | Cruces de una temporada (se elige el año): macho, hembra, jaula, fecha de inicio y estado (activo o terminado), con enlace a cada ficha de cría y el botón «＋ Registrar cruce». | RF018 |
 
 ## 4. Mensajes que el usuario debe ver
 
