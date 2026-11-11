@@ -170,6 +170,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 
 | Nombre | Método y ruta | Vista | Datos para la vista | Campos del formulario | RF |
 |---|---|---|---|---|---|
+| cruces | GET /cruces?temporada=2026 | cruces/lista | `$temporada` (año elegido; por defecto, el año actual), `$temporadas` [años con cruces], `$cruces` [CruceResumen] de esa temporada, ordenados por fecha de inicio | — | RF018 |
 | cruces.nuevo | GET /cruces/nuevo | cruces/formulario | `$machos` y `$hembras` [CanarioResumen] (solo disponibles: no reservados ni dados de baja, y con sexo conocido; AC-02), `$jaulas` [JaulaResumen] | — | RF018 |
 | cruces.previsualizar | POST /cruces/previsualizar | cruces/resultado | `$propuesta` (los campos enviados), `$resultado` ResultadoCruce | macho_id, hembra_id, jaula_id, temporada, fecha_inicio | RF035–RF039 |
 | cruces.guardar | POST /cruces | (redirige a la ficha de cría) | — | los mismos de "previsualizar" | RF018–RF020 |
@@ -216,6 +217,8 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 - La librería que genera el PDF de la ficha (AC-04): la propuesta es Dompdf, con Composer. La confirma la tarea de estructura base.
 - Las rutas del mantenimiento del catálogo (RF032): crear una variedad, corregir un factor existente (con su identificador) y rechazar la eliminación de una variedad asignada a algún canario. Hoy la §6 solo tiene editar una variedad y crear un factor.
 - Cómo entrega el backend el enlace al canario que ya usa un anillo (RF008): por ejemplo, una variable aparte con su URL. Los mensajes de `$errores` son texto; nunca llevan HTML.
+
+**Decidido por el PM (10/11/2026), Libro de crías:** la ruta `cruces` lista los cruces de una temporada (macho, hembra, jaula, fecha de inicio y estado), con el botón para registrar un cruce. Es la entrada al libro de crías desde el menú; no tiene filtros por jaula ni por estado. La crea RF018.
 
 **Decidido por el PM (10/11/2026), padres a mano:** el formulario de canarios tiene padre y madre **opcionales** (`padre_id`, `madre_id`), elegidos entre los machos y hembras del criadero. Sirven para reconstruir la genealogía de canarios que nacieron antes de usar el sistema. Un canario comprado (con procedencia) o uno anillado desde un cruce no los lleva a mano: el comprado queda sin padres y el pichón los toma del cruce. Reglas en `backend.md` §3.
 
