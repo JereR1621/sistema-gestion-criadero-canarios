@@ -119,12 +119,20 @@ Todo el detalle está en [`docs/base-de-datos.md`](docs/base-de-datos.md) §3 y 
   ```
   docker compose up -d
   docker compose exec app composer install
-  docker compose exec app php backend/database/migrar.php --seeds
+  docker compose exec app composer test
   ```
-  La aplicación queda en <http://localhost:8080>.
-- **Instalación manual:** instala PHP 8.3 y MySQL 8.4 y sigue la guía.
+  Abre <http://localhost:8080/inicio>. El enlace **Descargar PDF de prueba** debe entregar un PDF generado desde una vista PHP.
+- **Instalación manual:** instala PHP 8.3 con `pdo_mysql`, `mbstring`, `gd` y `zip`, más MySQL 8.4. Copia `.env.example` como `.env`, completa `DB_PASS` y ejecuta:
+  ```
+  composer install
+  composer test
+  php -S localhost:8000 -t public public/router.php
+  ```
+  Abre <http://localhost:8000/inicio>.
 
-`composer install` y `migrar.php` funcionan cuando estén integradas la estructura base (T01) y el esquema (T02).
+Esta base abre la conexión PDO, pero no incluye migraciones, seeds ni `backend/database/migrar.php`: son el alcance de la tarea de esquema (T02). No son necesarios para ver `/inicio`; sí lo serán antes de usar cualquier módulo que guarde datos. Docker publica `frontend/css/` en `/css/`; el router de `public/` hace lo mismo al usar el servidor integrado de PHP.
+
+En AWS, el entorno de pruebas debe terminar TLS y exponer solo HTTPS. Las credenciales se configuran como variables de entorno del servicio, nunca en `.env` ni en el repositorio.
 
 ## Equipo
 
