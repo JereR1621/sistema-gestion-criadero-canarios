@@ -30,3 +30,9 @@ Los nombres de clases de la columna "Ejemplo" son orientativos; los fija la tare
 - La base cambia solo con una migración nueva, en el mismo pull request que el código que la usa.
 - Al terminar un POST con éxito, se redirige (POST → redirección → GET). Si hay errores, se vuelve a mostrar la vista con `$errores` y `$viejo`.
 - Ninguna credencial en el código: todo sale del `.env`.
+
+## Sesión autenticada
+
+La base entrega `TuCriadero\Core\Sesion` para que RF001 y RF002 no implementen sesiones distintas. Después de registrar o validar las credenciales, el controlador llama a `Sesion::iniciarAutenticada($usuarioId, $rol, $criaderoId, $nombre)`: regenera el identificador de sesión y guarda `usuario_id`, `rol` y `criadero_id`. El cuarto argumento solo permite mostrar el nombre en las vistas.
+
+Al salir, el controlador llama a `Sesion::cerrarAutenticada()`. Invalida los datos autenticados, elimina la cookie anterior y genera otro identificador y token CSRF. La sesión usa cookie `HttpOnly`, `SameSite=Lax`, `Secure` cuando la petición llega por HTTPS y expira tras siete días de inactividad. El término HTTPS se termina en AWS; HTTP se mantiene únicamente para el entorno local.
