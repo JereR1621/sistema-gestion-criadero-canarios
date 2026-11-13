@@ -23,7 +23,13 @@ final class ErrorController
             500 => 'Error inesperado',
         ][$estado] ?? 'Error inesperado';
 
-        http_response_code($estado);
+        if ($estado === 419) {
+            // Apache no conoce el código 419 y, sin la frase, lo convierte en 500.
+            header(($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1') . ' 419 Page Expired', true, 419);
+        } else {
+            http_response_code($estado);
+        }
+
         render($vista, ['titulo' => $titulo, 'mensaje' => $mensaje]);
     }
 }

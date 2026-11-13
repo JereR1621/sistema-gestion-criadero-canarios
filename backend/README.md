@@ -35,4 +35,18 @@ Los nombres de clases de la columna "Ejemplo" son orientativos; los fija la tare
 
 La base entrega `TuCriadero\Core\Sesion` para que RF001 y RF002 no implementen sesiones distintas. Después de registrar o validar las credenciales, el controlador llama a `Sesion::iniciarAutenticada($usuarioId, $rol, $criaderoId, $nombre)`: regenera el identificador de sesión y guarda `usuario_id`, `rol` y `criadero_id`. El cuarto argumento solo permite mostrar el nombre en las vistas.
 
-Al salir, el controlador llama a `Sesion::cerrarAutenticada()`. Invalida los datos autenticados, elimina la cookie anterior y genera otro identificador y token CSRF. La sesión usa cookie `HttpOnly`, `SameSite=Lax`, `Secure` cuando la petición llega por HTTPS y expira tras siete días de inactividad. El término HTTPS se termina en AWS; HTTP se mantiene únicamente para el entorno local.
+Al salir, el controlador llama a `Sesion::cerrarAutenticada()`. Invalida los datos autenticados, elimina la cookie anterior y genera otro identificador y token CSRF. La sesión usa cookie `HttpOnly`, `SameSite=Lax`, `Secure` cuando la petición llega por HTTPS y expira tras siete días de inactividad: cada petición renueva la cookie y PHP conserva los datos de la sesión durante ese plazo. HTTPS se termina en AWS; HTTP se usa solo en el entorno local.
+
+## Conexión a la base
+
+Los modelos piden la conexión con `TuCriadero\Core\Conexion::obtener()`: devuelve un `PDO` con errores como excepciones, resultados como arreglos asociativos y consultas preparadas reales. Es la misma conexión durante toda la petición y se abre la primera vez que alguien la pide; una página que no usa la base funciona aunque MySQL esté detenido. No crees otra conexión con `new PDO`.
+
+En las pruebas, `Conexion::usar($pdo)` cambia la conexión (por ejemplo, a la base `tucriadero_pruebas`) y `Conexion::usar(null)` vuelve a la normal.
+
+## Formularios y token CSRF
+
+La base valida el token de **todas** las peticiones que no son GET antes de llegar al controlador. Si el campo `_csrf` falta o no coincide con el de la sesión, responde 419 con la vista `errores/sesion` (contrato §7). Los controladores no tienen que validarlo; las vistas solo incluyen el campo oculto del contrato §4.
+
+## Errores
+
+Para responder un error desde un controlador, lanza `HttpException::noEncontrado()` (404), `prohibido()` (403), `sesionExpirada()` (419) o `mantenimiento()` (503). Cualquier otro error responde 500 sin detalles: el navegador nunca ve el mensaje técnico. El detalle (clase, mensaje, archivo y línea) queda en el registro del servidor; con Docker se ve con `docker compose logs app`. Con `APP_ENV=local`, PHP además muestra en pantalla los avisos que ocurran fuera de esa captura.

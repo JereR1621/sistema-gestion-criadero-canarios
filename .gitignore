@@ -23,6 +23,7 @@ respaldos/
 /storage/logs/
 /storage/cache/
 .phpunit.result.cache
+/.phpunit.cache/
 
 # Editores y sistema operativo
 .vscode/

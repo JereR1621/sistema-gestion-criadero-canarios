@@ -7,8 +7,28 @@ namespace TuCriadero\Core;
 use PDO;
 use RuntimeException;
 
+/**
+ * Conexión a MySQL compartida por toda la petición.
+ *
+ * Los modelos la piden con Conexion::obtener(). Se abre la primera vez que alguien
+ * la pide, así una página que no usa la base (por ejemplo /inicio o los estilos)
+ * no falla si la base está detenida.
+ */
 final class Conexion
 {
+    private static ?PDO $pdo = null;
+
+    public static function obtener(): PDO
+    {
+        return self::$pdo ??= self::crearDesdeEntorno();
+    }
+
+    /** Solo para pruebas: usa otra conexión (por ejemplo, la base de pruebas) o, con null, vuelve a la normal. */
+    public static function usar(?PDO $pdo): void
+    {
+        self::$pdo = $pdo;
+    }
+
     public static function crearDesdeEntorno(): PDO
     {
         $host = Entorno::obtener('DB_HOST');

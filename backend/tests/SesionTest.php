@@ -29,4 +29,13 @@ final class SesionTest extends TestCase
         self::assertArrayNotHasKey('criadero_id', $_SESSION);
         self::assertArrayHasKey('csrf', $_SESSION);
     }
+
+    public function testLaSesionDuraSieteDiasDeInactividad(): void
+    {
+        Sesion::iniciar();
+
+        self::assertSame(604800, Sesion::DURACION_MAXIMA);
+        self::assertSame('604800', ini_get('session.gc_maxlifetime'));
+        self::assertSame(604800, session_get_cookie_params()['lifetime']);
+    }
 }

@@ -8,14 +8,19 @@ use InvalidArgumentException;
 
 final class Sesion
 {
-    private const DURACION_MAXIMA = 604800;
+    /** Siete días de inactividad (backend.md, seguridad de la sesión). */
+    public const DURACION_MAXIMA = 604800;
+
+    private static bool $cookieRenovada = false;
 
     public static function iniciar(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
+            // Sin esto, PHP borra los datos de la sesión a los 24 minutos (valor por defecto: 1440 s).
+            ini_set('session.gc_maxlifetime', (string) self::DURACION_MAXIMA);
             session_name('tucriadero');
             session_set_cookie_params([
-                'lifetime' => 0,
+                'lifetime' => self::DURACION_MAXIMA,
                 'path' => '/',
                 'secure' => self::esHttps(),
                 'httponly' => true,
@@ -31,6 +36,7 @@ final class Sesion
 
         $_SESSION['ultima_actividad'] = $ahora;
         $_SESSION['csrf'] ??= bin2hex(random_bytes(32));
+        self::renovarCookie();
     }
 
     public static function iniciarAutenticada(int $usuarioId, string $rol, ?int $criaderoId, string $nombre = ''): void
@@ -60,7 +66,7 @@ final class Sesion
 
         $_SESSION = [];
 
-        if (ini_get('session.use_cookies')) {
+        if (ini_get('session.use_cookies') && !headers_sent()) {
             $parametros = session_get_cookie_params();
             setcookie(session_name(), '', time() - 42000, $parametros['path'], $parametros['domain'], (bool) $parametros['secure'], (bool) $parametros['httponly']);
         }
@@ -90,6 +96,39 @@ final class Sesion
     {
         self::iniciar();
         return (string) $_SESSION['csrf'];
+    }
+
+    /** Compara el token enviado en `_csrf` con el de la sesión, en tiempo constante. */
+    public static function csrfValido(mixed $token): bool
+    {
+        $esperado = $_SESSION['csrf'] ?? null;
+
+        return is_string($token) && $token !== '' && is_string($esperado) && hash_equals($esperado, $token);
+    }
+
+    /**
+     * La cookie vence siete días después de la última petición, no de la primera:
+     * así la sesión expira por inactividad, como pide backend.md.
+     */
+    private static function renovarCookie(): void
+    {
+        // Una sesión nueva ya recibe su cookie de session_start(); se renueva una vez por petición.
+        if (self::$cookieRenovada || !isset($_COOKIE[session_name()])
+            || !ini_get('session.use_cookies') || headers_sent() || PHP_SAPI === 'cli') {
+            return;
+        }
+
+        self::$cookieRenovada = true;
+
+        $parametros = session_get_cookie_params();
+        setcookie(session_name(), (string) session_id(), [
+            'expires' => time() + self::DURACION_MAXIMA,
+            'path' => $parametros['path'],
+            'domain' => $parametros['domain'],
+            'secure' => (bool) $parametros['secure'],
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
     }
 
     private static function esHttps(): bool
