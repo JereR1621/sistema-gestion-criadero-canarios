@@ -50,3 +50,16 @@ La base valida el token de **todas** las peticiones que no son GET antes de lleg
 ## Errores
 
 Para responder un error desde un controlador, lanza `HttpException::noEncontrado()` (404), `prohibido()` (403), `sesionExpirada()` (419) o `mantenimiento()` (503). Cualquier otro error responde 500 sin detalles: el navegador nunca ve el mensaje técnico. El detalle (clase, mensaje, archivo y línea) queda en el registro del servidor; con Docker se ve con `docker compose logs app`. Con `APP_ENV=local`, PHP además muestra en pantalla los avisos que ocurran fuera de esa captura.
+
+## Auditoría: `auditar()`
+
+Toda operación que guarda datos llama a `auditar($accion, $entidad, $entidadId)` (SEG-003), definida en `backend/Models/AuditoriaHelper.php` y cargada por `backend/autoload.php`. Inserta en la tabla `auditoria` el usuario de la sesión, la acción, la entidad, su id y la fecha y hora.
+
+```php
+// En el servicio, dentro de la misma transacción que el cambio:
+auditar('crear', 'canario', $canarioId);
+```
+
+- Usa `Conexion::obtener()`: si la transacción se deshace, el registro de auditoría también.
+- Sin sesión iniciada (por ejemplo, en el registro), guarda la acción con `usuario_id` NULL.
+- No oculta errores: si no puede guardar, la operación falla.

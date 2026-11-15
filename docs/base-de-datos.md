@@ -153,6 +153,7 @@ Si dos personas crean el mismo número al mismo tiempo, la segunda en integrar r
 - Nombre: tres dígitos, guion bajo y descripción en minúsculas: `001_crear_usuario.sql`.
 - Tablas y columnas con los nombres de `backend.md` §3, en minúsculas y *snake_case*.
 - `ENGINE=InnoDB`, `utf8mb4` y claves foráneas declaradas con `FOREIGN KEY`.
+- Cada sentencia termina con `;` al final de una línea: `migrar.php` las ejecuta una por una para informar el error exacto. Por lo mismo, no pongas `;` dentro de un texto al final de una línea.
 - Las restricciones que pide el modelo (`UNIQUE`, `CHECK`, `NOT NULL`) van en la migración, no solo en el código.
 - Las reglas que no se pueden expresar en SQL van en los servicios (`backend.md` §3, "Reglas que no alcanzan a cubrir FK ni UNIQUE").
 
@@ -167,7 +168,7 @@ Lo programa la tarea "Esquema de base de datos" de la épica E0. Su comportamien
 | `… --desde-cero` | Borra todas las tablas y vuelve a migrar. Se niega a correr si `APP_ENV` no es `local`. |
 | `… --pruebas` | Hace lo mismo sobre `DB_NAME_PRUEBAS`, para PHPUnit. |
 
-Orden de los seeds: `01_variedades.sql`, `02_factores.sql`, `03_composicion.sql` (catálogo) y `90_datos_prueba.sql` (criadores, jaulas y canarios inventados, para probar en tu computador).
+Orden de los seeds: `01_variedades.sql`, `02_factores.sql`, `03_composicion.sql` (catálogo) y `90_datos_prueba.sql` (criadores, jaulas y canarios inventados, para probar en tu computador). Los seeds que empiezan con `9` solo se cargan con `APP_ENV=local`: en otro entorno se omiten.
 
 ## 7. Entornos
 
