@@ -103,6 +103,11 @@ sort($seeds, SORT_STRING);
 
 foreach ($seeds as $ruta) {
     $archivo = basename($ruta);
+    // Los seeds 9x traen cuentas inventadas con contraseña conocida: solo en el computador de cada uno.
+    if (str_starts_with($archivo, '9') && Entorno::obtener('APP_ENV') !== 'local') {
+        echo "Omitido {$archivo}: los datos de prueba solo se cargan con APP_ENV=local.\n";
+        continue;
+    }
     echo "Cargando {$archivo}...\n";
     try {
         ejecutarArchivo($pdo, $ruta);

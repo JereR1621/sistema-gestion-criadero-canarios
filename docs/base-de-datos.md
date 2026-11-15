@@ -168,7 +168,7 @@ Lo programa la tarea "Esquema de base de datos" de la épica E0. Su comportamien
 | `… --desde-cero` | Borra todas las tablas y vuelve a migrar. Se niega a correr si `APP_ENV` no es `local`. |
 | `… --pruebas` | Hace lo mismo sobre `DB_NAME_PRUEBAS`, para PHPUnit. |
 
-Orden de los seeds: `01_variedades.sql`, `02_factores.sql`, `03_composicion.sql` (catálogo) y `90_datos_prueba.sql` (criadores, jaulas y canarios inventados, para probar en tu computador).
+Orden de los seeds: `01_variedades.sql`, `02_factores.sql`, `03_composicion.sql` (catálogo) y `90_datos_prueba.sql` (criadores, jaulas y canarios inventados, para probar en tu computador). Los seeds que empiezan con `9` solo se cargan con `APP_ENV=local`: en otro entorno se omiten.
 
 ## 7. Entornos
 
