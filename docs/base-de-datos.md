@@ -153,6 +153,7 @@ Si dos personas crean el mismo número al mismo tiempo, la segunda en integrar r
 - Nombre: tres dígitos, guion bajo y descripción en minúsculas: `001_crear_usuario.sql`.
 - Tablas y columnas con los nombres de `backend.md` §3, en minúsculas y *snake_case*.
 - `ENGINE=InnoDB`, `utf8mb4` y claves foráneas declaradas con `FOREIGN KEY`.
+- Cada sentencia termina con `;` al final de una línea: `migrar.php` las ejecuta una por una para informar el error exacto. Por lo mismo, no pongas `;` dentro de un texto al final de una línea.
 - Las restricciones que pide el modelo (`UNIQUE`, `CHECK`, `NOT NULL`) van en la migración, no solo en el código.
 - Las reglas que no se pueden expresar en SQL van en los servicios (`backend.md` §3, "Reglas que no alcanzan a cubrir FK ni UNIQUE").
 

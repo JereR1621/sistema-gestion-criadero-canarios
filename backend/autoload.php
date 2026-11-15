@@ -27,3 +27,4 @@ if (is_file($autoloadComposer)) {
 }
 
 require_once __DIR__ . '/Support/helpers.php';
+require_once __DIR__ . '/Models/AuditoriaHelper.php';

@@ -51,23 +51,15 @@ La base valida el token de **todas** las peticiones que no son GET antes de lleg
 
 Para responder un error desde un controlador, lanza `HttpException::noEncontrado()` (404), `prohibido()` (403), `sesionExpirada()` (419) o `mantenimiento()` (503). Cualquier otro error responde 500 sin detalles: el navegador nunca ve el mensaje técnico. El detalle (clase, mensaje, archivo y línea) queda en el registro del servidor; con Docker se ve con `docker compose logs app`. Con `APP_ENV=local`, PHP además muestra en pantalla los avisos que ocurran fuera de esa captura.
 
----
+## Auditoría: `auditar()`
 
-## Sistema de Auditoría (`auditar`)
+Toda operación que guarda datos llama a `auditar($accion, $entidad, $entidadId)` (SEG-003), definida en `backend/Models/AuditoriaHelper.php` y cargada por `backend/autoload.php`. Inserta en la tabla `auditoria` el usuario de la sesión, la acción, la entidad, su id y la fecha y hora.
 
-Para cumplir con el requisito de trazabilidad y seguridad (**SEG-003**), el backend cuenta con una función global de auditoría ubicada en `backend/Models/AuditoriaHelper.php`.
-
-### ¿Qué hace?
-Cada vez que se ejecute una acción de escritura (crear, modificar o eliminar registros críticos en las siguientes tareas de backend), la función inserta automáticamente un registro en la tabla `registro_auditoria` guardando:
-* El ID del usuario activo según la sesión actual (`$_SESSION['usuario_id']`).
-* La acción realizada (`$accion`, ej: `'CREAR'`, `'ACTUALIZAR'`).
-* La entidad afectada (`$entidad`, ej: `'canario'`, `'cruce'`).
-* El identificador único del registro (`$entidadId`).
-* La marca de tiempo automática de la fecha y hora.
-
-### Ejemplo de Uso en Servicios / Controladores
 ```php
-// Ejemplo al registrar un nuevo canario en los servicios de backend
-auditar('CREAR', 'canario', \$canarioId);
+// En el servicio, dentro de la misma transacción que el cambio:
+auditar('crear', 'canario', $canarioId);
+```
 
-Nota: Si no existe una sesión de usuario activa o una conexión PDO disponible en el ámbito, la función se detiene de forma segura (return) para evitar interrumpir o colgar la ejecución del sistema.
+- Usa `Conexion::obtener()`: si la transacción se deshace, el registro de auditoría también.
+- Sin sesión iniciada (por ejemplo, en el registro), guarda la acción con `usuario_id` NULL.
+- No oculta errores: si no puede guardar, la operación falla.
