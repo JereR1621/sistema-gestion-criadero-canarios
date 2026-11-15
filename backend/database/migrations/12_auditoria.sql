@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS registro_auditoria (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    accion VARCHAR(255) NOT NULL,
+    entidad VARCHAR(100) NOT NULL,
+    entidad_id INT NOT NULL,
+    fecha_y_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
