@@ -1,0 +1,64 @@
+# Avisa al responsable cuando una issue queda sin bloqueos.
+# GitHub quita el bloqueo en silencio al cerrar la issue que bloqueaba; este aviso menciona al responsable
+# para que le llegue la notificación. Si la issue no tiene responsable, menciona al PM para que la asigne.
+# Prueba sin comentar: Actions → «Aviso de issue desbloqueada» → Run workflow, con el número de una issue cerrada.
+
+name: Aviso de issue desbloqueada
+
+on:
+  issues:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Número de la issue cerrada"
+        required: true
+      simular:
+        description: "Solo mostrar los avisos en el registro, sin comentar"
+        type: boolean
+        default: true
+
+permissions:
+  issues: write
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          ISSUE: ${{ github.event.issue.number || inputs.issue }}
+          SIMULAR: ${{ inputs.simular || false }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const cerrada = Number(process.env.ISSUE);
+            const simular = process.env.SIMULAR === 'true';
+            const PM = 'JereR1621';
+
+            // PR que cerró la issue, si la cerró un PR.
+            const r = await github.graphql(`query($owner:String!,$repo:String!,$n:Int!){
+              repository(owner:$owner,name:$repo){ issue(number:$n){
+                timelineItems(itemTypes:CLOSED_EVENT,last:1){ nodes{ ... on ClosedEvent{ closer{ ... on PullRequest{ number } } } } }
+              } } }`, { owner, repo, n: cerrada });
+            const pr = r.repository.issue.timelineItems.nodes[0]?.closer?.number;
+            const origen = pr ? `#${cerrada} se cerró con el PR #${pr}` : `#${cerrada} se cerró`;
+
+            const bloqueadas = await github.paginate('GET /repos/{owner}/{repo}/issues/{n}/dependencies/blocking',
+              { owner, repo, n: cerrada });
+            for (const issue of bloqueadas.filter(i => i.state === 'open')) {
+              const pendientes = (await github.paginate('GET /repos/{owner}/{repo}/issues/{n}/dependencies/blocked_by',
+                { owner, repo, n: issue.number })).filter(i => i.state === 'open');
+              if (pendientes.length) {
+                core.info(`#${issue.number}: sigue bloqueada por ${pendientes.map(i => '#' + i.number).join(', ')}`);
+                continue;
+              }
+              const quienes = issue.assignees.map(a => '@' + a.login);
+              const cuerpo = quienes.length
+                ? `${quienes.join(' ')} desbloqueada: ${origen}. Ya puedes empezarla.`
+                : `@${PM} desbloqueada: ${origen}. No tiene responsable: asígnala para empezarla.`;
+              core.info(`#${issue.number}: ${cuerpo}`);
+              if (!simular) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: cuerpo });
+              }
+            }
