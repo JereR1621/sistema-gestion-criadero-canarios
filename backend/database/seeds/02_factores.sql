@@ -1,0 +1,30 @@
+-- Seed de factores genéticos (Issue #148)
+-- 26 factores con IDs fijos alineados a 005_crear_factor.sql
+
+INSERT IGNORE INTO factor (id, nombre, tipo_herencia) VALUES
+  (1, 'ROJO', 'recesivo'),
+  (2, 'BLANCO RECESIVO', 'recesivo'),
+  (3, 'BLANCO DOMINANTE', 'dominante'),
+  (4, 'LIPOCROMO (SIN MELANINA)', 'recesivo'),
+  (5, 'INTENSO', 'dominante'),
+  (6, 'MOSAICO', 'recesivo'),
+  (7, 'MARFIL', 'ligado_sexo'),
+  (8, 'BRUNO', 'ligado_sexo'),
+  (9, 'ÁGATA', 'ligado_sexo'),
+  (10, 'ÓPALO', 'recesivo'),
+  (11, 'PASTEL', 'ligado_sexo'),
+  (12, 'ALAS GRISES', 'ligado_sexo'),
+  (13, 'SATINÉ', 'ligado_sexo'),
+  (14, 'FEO', 'recesivo'),
+  (15, 'INO', 'recesivo'),
+  (16, 'TOPACIO', 'recesivo'),
+  (17, 'ÓNIX', 'recesivo'),
+  (18, 'EUMO', 'recesivo'),
+  (19, 'COBALTO', 'recesivo'),
+  (20, 'MOGNO', 'recesivo'),
+  (21, 'PERLA', 'recesivo'),
+  (22, 'JASPE', 'dominante'),
+  (23, 'JASPE DOBLE DOSIS', 'dominante'),
+  (24, 'ALA BLANCA', 'recesivo'),
+  (25, 'PICO AMARILLO', 'recesivo'),
+  (26, 'URUCUM', 'recesivo');
