@@ -80,6 +80,8 @@ final class Aplicacion
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         $ruta = parse_url($uri, PHP_URL_PATH) ?: '/';
 
+        self::enviarCabecerasDeSeguridad();
+
         if (str_starts_with($ruta, '/css/')) {
             $this->servirCss($ruta);
             return;
@@ -87,6 +89,35 @@ final class Aplicacion
 
         self::comprobarCsrf($metodo, $_POST);
         $this->router->despachar($metodo, $ruta);
+    }
+
+    /**
+     * Cabeceras que el navegador aplica a toda respuesta (SEG-005, OWASP).
+     *
+     * @return array<string, string>
+     */
+    public static function cabecerasDeSeguridad(): array
+    {
+        return [
+            // Ningún otro sitio puede mostrar TuCriadero dentro de un marco (clickjacking).
+            'X-Frame-Options' => 'DENY',
+            'Content-Security-Policy' => "frame-ancestors 'none'",
+            // El navegador no adivina el tipo de archivo: usa el Content-Type que enviamos.
+            'X-Content-Type-Options' => 'nosniff',
+            // Al seguir un enlace externo, no se envía la URL interna de la que viene.
+            'Referrer-Policy' => 'same-origin',
+        ];
+    }
+
+    private static function enviarCabecerasDeSeguridad(): void
+    {
+        if (headers_sent()) {
+            return;
+        }
+
+        foreach (self::cabecerasDeSeguridad() as $nombre => $valor) {
+            header("{$nombre}: {$valor}");
+        }
     }
 
     private function servirCss(string $ruta): void
@@ -103,7 +134,6 @@ final class Aplicacion
         }
 
         header('Content-Type: text/css; charset=UTF-8');
-        header('X-Content-Type-Options: nosniff');
         readfile($archivo);
     }
 
