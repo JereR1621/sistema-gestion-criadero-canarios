@@ -57,8 +57,8 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 | `criadero` | id, usuario_id | `usuario_id` UNIQUE (un criadero por criador; el administrador no tiene). |
 | `jaula` | id, criadero_id, numero | UNIQUE (`criadero_id`, `numero`). |
 | `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL), tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). `tipo` y `rasgo` no son factores: no tienen tipo de herencia (ver §6). |
-| `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante`) | `nombre` UNIQUE. |
-| `variedad_factor` | variedad_codigo, factor_id | PK compuesta. Es la **composición de la variedad**. |
+| `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante` / `codominante`) | `nombre` UNIQUE. |
+| `variedad_factor` | variedad_codigo, factor_id, dosis (1 / 2) | PK compuesta. Es la **composición de la variedad**. `dosis` = copias de un factor codominante (jaspe SD = 1, DD = 2); en los demás factores vale 1. |
 | `canario` | id, criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, fecha_nacimiento, sexo (`macho` / `hembra` / `sin_determinar`), variedad_codigo, padre_id, madre_id, cruce_origen_id, procedencia, estado (`activo` / `reservado` / `baja`) | UNIQUE (`criadero_id`, `anillo_socio`, `anillo_anio`, `anillo_correlativo`, `anillo_club`). Índices en (`criadero_id`, `anillo_correlativo`) y (`criadero_id`, `variedad_codigo`). `variedad_codigo`, padres, cruce y fechas pueden ser NULL. |
 | `cruce` | id, criadero_id, macho_id, hembra_id, jaula_id, temporada (año), fecha_inicio, fecha_fin | `fecha_fin` NULL = cruce activo. CHECK `fecha_fin >= fecha_inicio`. |
 | `ubicacion` | id, canario_id, jaula_id, fecha_desde, fecha_hasta | `jaula_id` NULL = jaula grande. `fecha_hasta` NULL = ubicación actual. |
@@ -86,11 +86,11 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 | Un canario no es padre ni madre de sí mismo ni de ninguno de sus antepasados. | RF007 |
 | Una variedad con sexo solo se asigna a un canario de ese sexo. | RF012 |
 | Cada canario tiene como máximo una ubicación con `fecha_hasta` NULL. | DAT-004, RF015, RF016 |
-| Solo se es portador de factores recesivos o ligados al sexo. Una hembra no porta factores ligados al sexo. Nadie porta un factor que ya manifiesta su variedad. | DAT-004, RF013 |
+| Solo se es portador de factores recesivos o ligados al sexo (un dominante o codominante se ve con una copia). Una hembra no porta factores ligados al sexo. Nadie porta un factor que ya manifiesta su variedad. | DAT-004, RF013 |
 | La baja crea el registro en `baja` y cambia `canario.estado` en la misma operación. Un canario dado de baja no se da de baja otra vez. | DAT-004, RF011 |
 | La baja cierra la ubicación abierta del canario con la fecha de la baja (deja de ser ocupante de su jaula y el historial lo muestra como salida). Un canario dado de baja no se ubica en jaulas. | RF011, RF015, RF016 (decisión del PM, 09/11/2026) |
 | Un canario reservado o dado de baja no forma un cruce nuevo; uno con un cruce activo sí puede formar otro (RF019 y RF020). | RF018, AC-02 |
-| Dos variedades del mismo sexo, tipo y rasgo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
+| Dos variedades del mismo sexo, tipo y rasgo no tienen la misma combinación de factores y dosis (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
 | No se elimina una variedad asignada a algún canario. | RF032 |
 
 ## 4. Lógica por módulo
@@ -107,7 +107,7 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 
 ## 5. Genética: cómo se calcula
 
-La "tabla de Mendel" **no se carga como datos**: son tres reglas que se programan una vez, una por tipo de herencia. Lo que se carga es el tipo de herencia de cada factor (`factor.tipo_herencia`) y la composición de cada variedad (`variedad_factor`). Agregar un factor nuevo no debe requerir tocar código (RNF007).
+La "tabla de Mendel" **no se carga como datos**: son cuatro reglas que se programan una vez, una por tipo de herencia. Lo que se carga es el tipo de herencia de cada factor (`factor.tipo_herencia`) y la composición de cada variedad (`variedad_factor`). Agregar un factor nuevo no debe requerir tocar código (RNF007).
 
 **Previsualización de un cruce (RF035–RF039).** Cálculo exacto y determinista:
 
@@ -115,6 +115,7 @@ La "tabla de Mendel" **no se carga como datos**: son tres reglas que se programa
    - Recesivo: manifiesta = 2 copias; portador = 1; nada = 0.
    - Ligado al sexo: el macho tiene dos cromosomas Z (manifiesta = 2, portador = 1, nada = 0); la hembra tiene uno (manifiesta = 1, nada = 0).
    - Dominante: si lo manifiesta, se supone **una sola dosis** (SUP-004).
+   - Codominante (jaspe): se cuentan las copias con la `dosis` de la composición (SD = 1, DD = 2). Se cruza como un recesivo autosómico (cada padre pasa una copia), pero las dos dosis se ven: 1 copia = SD y 2 = DD. Por ejemplo, DD × sin jaspe = 100% SD y SD × SD = 25% sin jaspe, 50% SD y 25% DD (guía de la calculadora del cliente). **Decisión del PM (21/11/2026):** el SRS (RF038, SUP-004) solo prevé dominantes con una dosis; el jaspe se calcula por dosis porque así lo hace la calculadora del cliente. El cálculo va con RF038.
 2. Cruzar cada factor por separado con su regla y obtener las proporciones por sexo.
 3. Combinar los factores multiplicando probabilidades (se suponen independientes; SUP-004).
 4. Traducir cada combinación a una variedad buscando en `variedad_factor` (con su sexo, si la variedad lo indica), con el tipo de los padres y sin rasgo. Si una combinación no corresponde a ninguna variedad, se muestra como lista de factores (RF035).

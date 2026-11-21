@@ -1,5 +1,5 @@
 -- Seed de factores genéticos (Issue #148)
--- 22 factores con IDs fijos según versión vigente en GitHub
+-- 21 factores con IDs fijos según versión vigente en GitHub (el 19 queda libre: jaspe doble dosis es JASPE con dosis 2)
 
 INSERT IGNORE INTO factor (id, nombre, tipo_herencia) VALUES
   (1, 'ROJO', 'recesivo'),
@@ -19,8 +19,7 @@ INSERT IGNORE INTO factor (id, nombre, tipo_herencia) VALUES
   (15, 'EUMO', 'recesivo'),
   (16, 'COBALTO', 'recesivo'),
   (17, 'MOGNO', 'recesivo'),
-  (18, 'JASPE', 'dominante'),
-  (19, 'JASPE DOBLE DOSIS', 'dominante'),
+  (18, 'JASPE', 'codominante'),
   (20, 'PICO AMARILLO', 'recesivo'),
   (21, 'URUCUM', 'recesivo'),
   (22, 'PERLA', 'recesivo');
