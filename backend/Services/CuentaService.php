@@ -112,10 +112,15 @@ final class CuentaService
         }
 
         try {
-            $pdo->beginTransaction();
+            if ($transaccionPropia) {
+                $pdo->beginTransaction();
+            }
 
             if ($this->usuarios->existeCorreo($correo)) {
-                $pdo->rollBack();
+                if ($transaccionPropia && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+
                 return [
                     'errores' => [
                         'correo' => 'Este correo electrónico ya está registrado.',
@@ -134,7 +139,9 @@ final class CuentaService
             \auditar('crear', 'usuario', $usuarioId);
             \auditar('crear', 'criadero', $criaderoId);
 
-            $pdo->commit();
+            if ($transaccionPropia) {
+                $pdo->commit();
+            }
 
             return [
                 'errores' => [],
@@ -142,7 +149,7 @@ final class CuentaService
                 'criadero_id' => $criaderoId,
             ];
         } catch (Throwable $error) {
-            if ($pdo->inTransaction()) {
+            if ($transaccionPropia && $pdo->inTransaction()) {
                 $pdo->rollBack();
             }
 
