@@ -7,6 +7,7 @@ namespace TuCriadero\Tests;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Throwable;
+use TuCriadero\Core\Aplicacion;
 use TuCriadero\Core\Conexion;
 use TuCriadero\Core\Entorno;
 use TuCriadero\Models\CriaderoModel;
@@ -269,5 +270,212 @@ final class CuentaServiceTest extends TestCase
 
         self::assertArrayHasKey('_general', $login['errores']);
         self::assertArrayNotHasKey('usuario', $login);
+    }
+
+    // -------------------------------------------------------------------------
+    // RF004: Socio y club por defecto en los anillos
+    // -------------------------------------------------------------------------
+
+    public function testPerfilGuardaSocioYClubYEntregaValoresPorDefectoParaAnillos(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Carlos Criador',
+            'correo' => 'carlos.perfil@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $usuarioId = (int) $registro['usuario_id'];
+        $_SESSION['usuario_id'] = $usuarioId;
+
+        // Antes de completar el perfil, los valores por defecto son null
+        self::assertSame(
+            ['anillo_socio' => null, 'anillo_club' => null],
+            $this->servicio->obtenerValoresPorDefectoAnillo($usuarioId)
+        );
+
+        $resultado = $this->servicio->actualizarPerfil($usuarioId, [
+            'numero_socio' => '  S-0452  ',
+            'club' => '  Asociación de Canaricultura Chile  ',
+        ]);
+
+        self::assertSame([], $resultado['errores']);
+
+        // La vista recibe exactamente las claves del contrato (§6): nombre, correo, numero_socio, club
+        $perfil = $this->servicio->obtenerPerfil($usuarioId);
+        self::assertSame([
+            'nombre' => 'Carlos Criador',
+            'correo' => 'carlos.perfil@tucriadero.cl',
+            'numero_socio' => 'S-0452',
+            'club' => 'Asociación de Canaricultura Chile',
+        ], $perfil);
+
+        // El servicio entrega esos valores como predeterminados para los formularios de anillado
+        self::assertSame([
+            'anillo_socio' => 'S-0452',
+            'anillo_club' => 'Asociación de Canaricultura Chile',
+        ], $this->servicio->obtenerValoresPorDefectoAnillo($usuarioId));
+
+        // Auditoría registrada (SEG-003)
+        $stmt = $this->pdo->prepare(
+            "SELECT usuario_id, accion, entidad, entidad_id
+             FROM auditoria
+             WHERE accion = 'actualizar' AND entidad = 'usuario' AND entidad_id = ?"
+        );
+        $stmt->execute([$usuarioId]);
+        $audit = $stmt->fetch();
+
+        self::assertIsArray($audit);
+        self::assertSame($usuarioId, (int) $audit['usuario_id']);
+        self::assertSame('actualizar', $audit['accion']);
+        self::assertSame('usuario', $audit['entidad']);
+        self::assertSame($usuarioId, (int) $audit['entidad_id']);
+
+        unset($_SESSION['usuario_id']);
+    }
+
+    public function testPerfilPermiteLimpiarSocioYClubOpcionalmente(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Elena Criadora',
+            'correo' => 'elena.perfil@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $usuarioId = (int) $registro['usuario_id'];
+
+        $this->servicio->actualizarPerfil($usuarioId, [
+            'numero_socio' => 'S-0900',
+            'club' => 'Club Sur',
+        ]);
+
+        $limpiar = $this->servicio->actualizarPerfil($usuarioId, [
+            'numero_socio' => '   ',
+            'club' => '',
+        ]);
+
+        self::assertSame([], $limpiar['errores']);
+        self::assertSame(
+            ['anillo_socio' => null, 'anillo_club' => null],
+            $this->servicio->obtenerValoresPorDefectoAnillo($usuarioId)
+        );
+    }
+
+    public function testPerfilSoloModificaLaCuentaIndicadaPorLaSesion(): void
+    {
+        $criador1 = $this->servicio->registrar([
+            'nombre' => 'Criador Uno',
+            'correo' => 'perfil.uno@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $criador2 = $this->servicio->registrar([
+            'nombre' => 'Criador Dos',
+            'correo' => 'perfil.dos@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+
+        $id1 = (int) $criador1['usuario_id'];
+        $id2 = (int) $criador2['usuario_id'];
+
+        // Aunque en los datos del formulario se envíe otro usuario_id, se ignora y solo se edita $id1
+        $resultado = $this->servicio->actualizarPerfil($id1, [
+            'usuario_id' => $id2,
+            'numero_socio' => 'S-1111',
+            'club' => 'Club Uno',
+        ]);
+
+        self::assertSame([], $resultado['errores']);
+        self::assertSame(
+            ['anillo_socio' => 'S-1111', 'anillo_club' => 'Club Uno'],
+            $this->servicio->obtenerValoresPorDefectoAnillo($id1)
+        );
+        self::assertSame(
+            ['anillo_socio' => null, 'anillo_club' => null],
+            $this->servicio->obtenerValoresPorDefectoAnillo($id2)
+        );
+    }
+
+    public function testPerfilRechazaSocioOClubQueSuperanLongitudMaximaSinGuardar(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Mario Criador',
+            'correo' => 'mario.largo@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $usuarioId = (int) $registro['usuario_id'];
+        $auditoriaAntes = (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
+
+        $resultado = $this->servicio->actualizarPerfil($usuarioId, [
+            'numero_socio' => str_repeat('9', 51),
+            'club' => str_repeat('A', 101),
+        ]);
+
+        self::assertArrayHasKey('numero_socio', $resultado['errores']);
+        self::assertArrayHasKey('club', $resultado['errores']);
+        self::assertSame(
+            ['anillo_socio' => null, 'anillo_club' => null],
+            $this->servicio->obtenerValoresPorDefectoAnillo($usuarioId)
+        );
+        self::assertSame($auditoriaAntes, (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
+    }
+
+    public function testPerfilRechazaCuentaDeAdministrador(): void
+    {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO usuario (nombre, correo, contrasena_hash, rol, estado)
+             VALUES ('Admin Perfil', 'admin.perfil@tucriadero.cl', ?, 'admin', 'activa')"
+        );
+        $stmt->execute([password_hash('AdminClave2026', PASSWORD_DEFAULT)]);
+        $adminId = (int) $this->pdo->lastInsertId();
+
+        $resultado = $this->servicio->actualizarPerfil($adminId, [
+            'numero_socio' => 'S-0001',
+            'club' => 'Club Admin',
+        ]);
+
+        self::assertArrayHasKey('_general', $resultado['errores']);
+        self::assertSame(
+            ['anillo_socio' => null, 'anillo_club' => null],
+            $this->servicio->obtenerValoresPorDefectoAnillo($adminId)
+        );
+    }
+
+    public function testPerfilRechazaCuentaInexistenteODesactivada(): void
+    {
+        $inexistente = $this->servicio->actualizarPerfil(999999, [
+            'numero_socio' => 'S-0001',
+            'club' => 'Club Fantasma',
+        ]);
+        self::assertArrayHasKey('_general', $inexistente['errores']);
+        self::assertNull($this->servicio->obtenerPerfil(999999));
+        self::assertSame(
+            ['anillo_socio' => null, 'anillo_club' => null],
+            $this->servicio->obtenerValoresPorDefectoAnillo(999999)
+        );
+
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Criador Inactivo',
+            'correo' => 'inactivo.perfil@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $usuarioId = (int) $registro['usuario_id'];
+        $this->pdo->prepare("UPDATE usuario SET estado = 'desactivada' WHERE id = ?")->execute([$usuarioId]);
+
+        $desactivada = $this->servicio->actualizarPerfil($usuarioId, [
+            'numero_socio' => 'S-0002',
+            'club' => 'Club Inactivo',
+        ]);
+        self::assertArrayHasKey('_general', $desactivada['errores']);
+    }
+
+    public function testRutasDePerfilEstanRegistradasSegunContrato(): void
+    {
+        $router = Aplicacion::crearRouter();
+
+        self::assertSame('/perfil', $router->url('perfil'));
+        self::assertSame('/perfil', $router->url('perfil.guardar'));
     }
 }

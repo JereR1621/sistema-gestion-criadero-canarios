@@ -63,4 +63,36 @@ final class UsuarioModel
 
         return (int) $this->pdo->lastInsertId();
     }
+
+    /**
+     * Busca una cuenta de usuario por su identificador (incluye datos de perfil: socio y club).
+     *
+     * @return array<string, mixed>|null
+     */
+    public function buscarPorId(int $id): ?array
+    {
+        $consulta = $this->pdo->prepare(
+            'SELECT id, nombre, correo, rol, estado, numero_socio, club
+             FROM usuario
+             WHERE id = ?
+             LIMIT 1'
+        );
+        $consulta->execute([$id]);
+        $fila = $consulta->fetch();
+
+        return $fila !== false ? $fila : null;
+    }
+
+    /**
+     * Actualiza el número de socio y el club de la cuenta indicada (RF004).
+     */
+    public function actualizarPerfil(int $id, ?string $numeroSocio, ?string $club): void
+    {
+        $consulta = $this->pdo->prepare(
+            'UPDATE usuario
+             SET numero_socio = ?, club = ?
+             WHERE id = ?'
+        );
+        $consulta->execute([$numeroSocio, $club, $id]);
+    }
 }
