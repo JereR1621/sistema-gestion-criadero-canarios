@@ -117,6 +117,39 @@ final class CuentaServiceTest extends TestCase
         self::assertArrayHasKey('contrasena', $resultado['errores']);
     }
 
+    public function testRegistroFallaConContrasenaDeMasDe72Bytes(): void
+    {
+        // bcrypt ignora lo que pasa de 72 bytes: se rechaza en vez de cortarla sin avisar.
+        $larga = $this->servicio->registrar([
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.larga@tucriadero.cl',
+            'contrasena' => str_repeat('a', 73),
+            'consentimiento' => '1',
+        ]);
+        self::assertArrayHasKey('contrasena', $larga['errores']);
+
+        // 40 eñes son 40 caracteres, pero 80 bytes.
+        $conEnies = $this->servicio->registrar([
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.enie@tucriadero.cl',
+            'contrasena' => str_repeat('ñ', 40),
+            'consentimiento' => '1',
+        ]);
+        self::assertArrayHasKey('contrasena', $conEnies['errores']);
+    }
+
+    public function testRegistroAceptaContrasenaDeExactamente72Bytes(): void
+    {
+        $resultado = $this->servicio->registrar([
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.limite@tucriadero.cl',
+            'contrasena' => str_repeat('a', 72),
+            'consentimiento' => '1',
+        ]);
+
+        self::assertSame([], $resultado['errores']);
+    }
+
     public function testRegistroFallaSiFaltaNombreCorreoOContrasena(): void
     {
         $antes = (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn();

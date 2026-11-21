@@ -12,6 +12,9 @@ use TuCriadero\Models\UsuarioModel;
 
 final class CuentaService
 {
+    /** Límite de bcrypt (PASSWORD_DEFAULT): se cuentan bytes, y una letra con tilde ocupa 2. */
+    public const CONTRASENA_MAX_BYTES = 72;
+
     private UsuarioModel $usuarios;
     private CriaderoModel $criaderos;
 
@@ -54,6 +57,9 @@ final class CuentaService
             $errores['contrasena'] = 'La contraseña es obligatoria.';
         } elseif (mb_strlen($contrasena) < 8) {
             $errores['contrasena'] = 'La contraseña debe tener al menos 8 caracteres.';
+        } elseif (strlen($contrasena) > self::CONTRASENA_MAX_BYTES) {
+            // bcrypt solo usa los primeros 72 bytes: más allá, el resto se ignoraría sin avisar.
+            $errores['contrasena'] = 'La contraseña es demasiado larga: máximo 72 caracteres (la ñ y las letras con tilde cuentan doble).';
         }
 
         if (!in_array($consentimiento, ['1', 1, true, 'on'], true)) {
