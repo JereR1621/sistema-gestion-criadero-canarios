@@ -10,7 +10,7 @@ use TuCriadero\Models\FactorModel;
 use TuCriadero\Models\VariedadModel;
 
 /**
- * Reglas del catálogo global de variedades de color y factores genéticos (SRS-RF028, DAT-004, DAT-005).
+ * Reglas del catálogo global de variedades de color y factores genéticos (SRS-RF028, SRS-RF031, DAT-004, DAT-005).
  *
  * Lee siempre a través de `VariedadModel` y `FactorModel` (sin consultar PDO directamente).
  * El catálogo es global: no se filtra por `criadero_id`.
@@ -18,6 +18,12 @@ use TuCriadero\Models\VariedadModel;
 final class CatalogoService
 {
     public const TOTAL_VARIEDADES_NOMENCLADOR = 880;
+
+    /** Tipos de herencia admitidos por la tabla de Mendel y docs/backend.md §3 y §5. */
+    public const TIPOS_HERENCIA_VALIDOS = ['ligado_sexo', 'recesivo', 'dominante', 'codominante'];
+
+    /** Solo factores recesivos o ligados al sexo pueden portarse (DAT-004, docs/backend.md §3). */
+    public const TIPOS_HERENCIA_PORTABLES = ['ligado_sexo', 'recesivo'];
 
     private const SEXOS_VALIDOS = ['macho', 'hembra'];
     private const TIPOS_VALIDOS = ['melanico', 'lipocromico'];
@@ -80,19 +86,24 @@ final class CatalogoService
             return null;
         }
 
-        $variedad['factores'] = $this->variedades->obtenerComposicion($codigo);
+        $variedad['factores'] = $this->obtenerComposicion($codigo);
 
         return $variedad;
     }
 
     /**
-     * Factores genéticos que manifiesta una variedad (RF028 / RF033).
+     * Factores genéticos que manifiesta una variedad, con su tipo de herencia tomado del catálogo (RF028 / RF031 / RF033).
      *
      * @return list<array{id: int, nombre: string, tipo_herencia: string, dosis: int}>
      */
     public function obtenerComposicion(string $codigo): array
     {
-        return $this->variedades->obtenerComposicion($codigo);
+        $factores = $this->variedades->obtenerComposicion($codigo);
+        foreach ($factores as $factor) {
+            $this->asegurarTipoHerenciaEnCatalogo($factor);
+        }
+
+        return $factores;
     }
 
     /**
@@ -101,6 +112,137 @@ final class CatalogoService
     public function listarFactores(): array
     {
         return $this->factores->listarTodos();
+    }
+
+    /**
+     * Devuelve el factor y su tipo de herencia directamente desde el catálogo precargado (SRS-RF031).
+     * El criador nunca indica el tipo de herencia.
+     *
+     * @return array{id: int, nombre: string, tipo_herencia: string}
+     */
+    public function obtenerFactor(int $factorId): array
+    {
+        $factor = $this->factores->buscarPorId($factorId);
+        if ($factor === null) {
+            throw new DomainException("El factor genético con id {$factorId} no existe en el catálogo.");
+        }
+
+        $this->asegurarTipoHerenciaEnCatalogo($factor);
+
+        return $factor;
+    }
+
+    /**
+     * Toma el tipo de herencia de un factor desde el catálogo precargado (SRS-RF031).
+     * Falla si el factor no existe o carece de un tipo de herencia válido en el catálogo.
+     */
+    public function obtenerTipoHerencia(int $factorId): string
+    {
+        return $this->obtenerFactor($factorId)['tipo_herencia'];
+    }
+
+    /**
+     * Resuelve los factores genéticos para usarlos en la ficha de un canario o en un cruce (SRS-RF031),
+     * tomando exclusivamente su tipo de herencia del catálogo precargado.
+     *
+     * @param list<int> $factorIds
+     * @return array<int, array{id: int, nombre: string, tipo_herencia: string}> mapa id => factor
+     */
+    public function resolverFactoresParaUso(array $factorIds): array
+    {
+        $unicos = array_values(array_unique(array_map('intval', $factorIds)));
+        if ($unicos === []) {
+            return [];
+        }
+
+        $encontrados = $this->factores->buscarPorIds($unicos);
+        $resueltos = [];
+
+        foreach ($unicos as $id) {
+            if (!isset($encontrados[$id])) {
+                throw new DomainException("El factor genético con id {$id} no existe en el catálogo.");
+            }
+            $factor = $encontrados[$id];
+            $this->asegurarTipoHerenciaEnCatalogo($factor);
+            $resueltos[$id] = $factor;
+        }
+
+        return $resueltos;
+    }
+
+    /**
+     * Factores que un canario puede portar según su tipo de herencia en el catálogo (recesivo o ligado al sexo).
+     *
+     * @return list<array{id: int, nombre: string, tipo_herencia: string}>
+     */
+    public function listarFactoresPortables(): array
+    {
+        return $this->factores->listarPorTiposHerencia(self::TIPOS_HERENCIA_PORTABLES);
+    }
+
+    /**
+     * Indica si un factor puede portarse según el tipo de herencia definido en el catálogo (RF031 / DAT-004).
+     */
+    public function esFactorPortable(int $factorId): bool
+    {
+        return in_array($this->obtenerTipoHerencia($factorId), self::TIPOS_HERENCIA_PORTABLES, true);
+    }
+
+    /**
+     * Indica si un factor es ligado al sexo según el catálogo (RF031 / RF013).
+     */
+    public function esFactorLigadoAlSexo(int $factorId): bool
+    {
+        return $this->obtenerTipoHerencia($factorId) === 'ligado_sexo';
+    }
+
+    /**
+     * Valida que el tipo de herencia esté presente y sea uno de los admitidos (SRS-RF031).
+     */
+    public static function validarTipoHerencia(?string $tipoHerencia, ?string $nombreFactor = null): string
+    {
+        $valor = $tipoHerencia !== null ? trim($tipoHerencia) : '';
+        if ($valor === '') {
+            $etiqueta = $nombreFactor !== null && trim($nombreFactor) !== ''
+                ? "«" . trim($nombreFactor) . "»"
+                : 'indicado';
+            throw new InvalidArgumentException("El factor {$etiqueta} debe tener un tipo de herencia.");
+        }
+
+        if (!in_array($valor, self::TIPOS_HERENCIA_VALIDOS, true)) {
+            throw new InvalidArgumentException(sprintf(
+                'El tipo de herencia «%s» no es válido. Debe ser uno de: %s.',
+                $valor,
+                implode(', ', self::TIPOS_HERENCIA_VALIDOS)
+            ));
+        }
+
+        return $valor;
+    }
+
+    /**
+     * Registra un factor en el catálogo validando que tenga nombre y tipo de herencia (SRS-RF031).
+     * Si falta el tipo de herencia o no es válido, informa el error sin guardar nada.
+     */
+    public function cargarFactor(string $nombre, ?string $tipoHerencia): int
+    {
+        $nombreNormalizado = trim($nombre);
+        if ($nombreNormalizado === '') {
+            throw new InvalidArgumentException('El nombre del factor es obligatorio.');
+        }
+
+        $herenciaNormalizada = self::validarTipoHerencia($tipoHerencia, $nombreNormalizado);
+
+        if ($this->factores->buscarPorNombre($nombreNormalizado) !== null) {
+            throw new DomainException("Ya existe un factor con el nombre «{$nombreNormalizado}» en el catálogo.");
+        }
+
+        return $this->factores->enTransaccion(function () use ($nombreNormalizado, $herenciaNormalizada): int {
+            $id = $this->factores->insertar($nombreNormalizado, $herenciaNormalizada);
+            \auditar('crear', 'factor', $id);
+
+            return $id;
+        });
     }
 
     /**
@@ -122,6 +264,7 @@ final class CatalogoService
         $variedades = $this->listarVariedadesConComposicion();
         $factoresPorId = [];
         foreach ($this->factores->listarTodos() as $factor) {
+            $this->asegurarTipoHerenciaEnCatalogo($factor);
             $factoresPorId[$factor['id']] = $factor;
         }
 
@@ -301,5 +444,20 @@ final class CatalogoService
             $rasgo ?? 'NULL',
             implode(',', $pares),
         ]);
+    }
+
+    /**
+     * Comprueba que un factor leído del catálogo tenga un tipo de herencia válido (SRS-RF031).
+     *
+     * @param array{id: int, nombre: string, tipo_herencia: string} $factor
+     */
+    private function asegurarTipoHerenciaEnCatalogo(array $factor): void
+    {
+        $tipo = trim($factor['tipo_herencia']);
+        if ($tipo === '' || !in_array($tipo, self::TIPOS_HERENCIA_VALIDOS, true)) {
+            throw new DomainException(
+                "El factor «{$factor['nombre']}» no tiene un tipo de herencia válido en el catálogo."
+            );
+        }
     }
 }
