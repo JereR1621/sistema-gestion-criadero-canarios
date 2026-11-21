@@ -7,6 +7,7 @@ namespace TuCriadero\Core;
 use Throwable;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
+use TuCriadero\Controllers\CuentaController;
 
 final class Aplicacion
 {
@@ -42,14 +43,20 @@ final class Aplicacion
         }
     }
 
-    public static function crearRouter(): Router
+public static function crearRouter(): Router
     {
         return new Router([
             new Ruta('inicio', 'GET', '/inicio', InicioController::class, 'mostrar'),
             new Ruta('inicio.pdf', 'GET', '/inicio/pdf', InicioController::class, 'descargarPdf'),
+
+            new Ruta('registro', 'GET', '/registro', CuentaController::class, 'registro'),
+            new Ruta('registro.guardar', 'POST', '/registro', CuentaController::class, 'registroGuardar'),
+
+            new Ruta('ingreso', 'GET', '/ingresar', CuentaController::class, 'ingreso'),
+            new Ruta('ingreso.enviar', 'POST', '/ingresar', CuentaController::class, 'ingresoEnviar'),
+            new Ruta('salida', 'POST', '/salir', CuentaController::class, 'salida'),
         ]);
     }
-
     /**
      * Todo formulario que envía datos lleva el campo oculto `_csrf` (contrato §4).
      * Si falta o no coincide con el de la sesión, se responde 419 (contrato §7)
