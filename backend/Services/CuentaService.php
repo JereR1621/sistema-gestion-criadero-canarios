@@ -174,4 +174,122 @@ final class CuentaService
             ],
         ];
     }
+
+    /**
+     * Devuelve los datos del perfil de la cuenta para la vista `cuentas/perfil` (contrato §6, RF004).
+     *
+     * @return array{nombre: string, correo: string, numero_socio: ?string, club: ?string}|null
+     */
+    public function obtenerPerfil(int $usuarioId): ?array
+    {
+        $usuario = $this->usuarios->buscarPorId($usuarioId);
+        if ($usuario === null) {
+            return null;
+        }
+
+        return [
+            'nombre' => (string) $usuario['nombre'],
+            'correo' => (string) $usuario['correo'],
+            'numero_socio' => $usuario['numero_socio'] !== null ? (string) $usuario['numero_socio'] : null,
+            'club' => $usuario['club'] !== null ? (string) $usuario['club'] : null,
+        ];
+    }
+
+    /**
+     * Valores por defecto para los anillos de pichones propios (SRS-RF004, contrato §6: canarios.nuevo y pichones.nuevo).
+     *
+     * @return array{anillo_socio: ?string, anillo_club: ?string}
+     */
+    public function obtenerValoresPorDefectoAnillo(int $usuarioId): array
+    {
+        $perfil = $this->obtenerPerfil($usuarioId);
+
+        return [
+            'anillo_socio' => $perfil['numero_socio'] ?? null,
+            'anillo_club' => $perfil['club'] ?? null,
+        ];
+    }
+
+    /**
+     * Valida y guarda el número de socio y el club del criador autenticado (SRS-RF004).
+     * Solo opera sobre `$usuarioId` recibido de la sesión; ignora cualquier identificador en `$datos`.
+     *
+     * @param array<string, mixed> $datos
+     * @return array{
+     *     errores: array<string, string>,
+     *     perfil?: array{nombre: string, correo: string, numero_socio: ?string, club: ?string}
+     * }
+     */
+    public function actualizarPerfil(int $usuarioId, array $datos): array
+    {
+        $usuario = $this->usuarios->buscarPorId($usuarioId);
+        if ($usuario === null || ($usuario['estado'] ?? '') !== 'activa') {
+            return [
+                'errores' => [
+                    '_general' => 'La cuenta no está disponible.',
+                ],
+            ];
+        }
+
+        if (($usuario['rol'] ?? '') !== 'criador') {
+            return [
+                'errores' => [
+                    '_general' => 'Solo las cuentas de criador pueden registrar número de socio y club.',
+                ],
+            ];
+        }
+
+        $numeroSocio = trim((string) ($datos['numero_socio'] ?? ''));
+        $club = trim((string) ($datos['club'] ?? ''));
+
+        $errores = [];
+
+        if (mb_strlen($numeroSocio) > 50) {
+            $errores['numero_socio'] = 'El número de socio no puede superar los 50 caracteres.';
+        }
+
+        // 50, como canario.anillo_club: el club se propone al anillar (RF007, RF021) y tiene que caber en el anillo.
+        if (mb_strlen($club) > 50) {
+            $errores['club'] = 'El club no puede superar los 50 caracteres.';
+        }
+
+        if ($errores !== []) {
+            return ['errores' => $errores];
+        }
+
+        $socioGuardar = $numeroSocio !== '' ? $numeroSocio : null;
+        $clubGuardar = $club !== '' ? $club : null;
+
+        $pdo = Conexion::obtener();
+        $transaccionPropia = !$pdo->inTransaction();
+
+        try {
+            if ($transaccionPropia) {
+                $pdo->beginTransaction();
+            }
+
+            $this->usuarios->actualizarPerfil($usuarioId, $socioGuardar, $clubGuardar);
+            \auditar('actualizar', 'usuario', $usuarioId);
+
+            if ($transaccionPropia) {
+                $pdo->commit();
+            }
+
+            return [
+                'errores' => [],
+                'perfil' => [
+                    'nombre' => (string) $usuario['nombre'],
+                    'correo' => (string) $usuario['correo'],
+                    'numero_socio' => $socioGuardar,
+                    'club' => $clubGuardar,
+                ],
+            ];
+        } catch (Throwable $error) {
+            if ($transaccionPropia && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            throw $error;
+        }
+    }
 }
