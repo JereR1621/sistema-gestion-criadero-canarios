@@ -1,6 +1,6 @@
 # Contrato backend–frontend
 
-**Versión 0.3 (pendiente de revisión con Figma) · 16/11/2026, con los ajustes del cliente del 09/11/2026 ([`ajustes-cliente.md`](ajustes-cliente.md)).** Acordado entre backend y frontend en la épica E0; una vez validado contra los mockups de Figma pasará a v1.0. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
+**Versión 0.3 (pendiente de revisión con Figma) · 21/11/2026, con los ajustes del cliente del 09/11/2026 ([`ajustes-cliente.md`](ajustes-cliente.md)).** Acordado entre backend y frontend en la épica E0; una vez validado contra los mockups de Figma pasará a v1.0. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
 
 Fuente: SRS v1.1 (`docs/srs/`), los ajustes del cliente (`docs/ajustes-cliente.md`), `docs/backend.md` y `docs/frontend.md`.
 
@@ -86,7 +86,7 @@ Un canario reservado sigue siendo un canario activo del criadero (no está dado 
   'medios_hermanos' => [CanarioResumen + ['en_comun' => 'padre' | 'madre'], ...],
   'crias' => [CanarioResumen, ...],
   'cruces' => [CruceResumen, ...],
-  'factores_manifestados' => [['nombre' => 'marfil', 'tipo_herencia' => 'ligado_sexo'], ...],   // solo lectura (RF033)
+  'factores_manifestados' => [['nombre' => 'marfil', 'tipo_herencia' => 'ligado_sexo', 'dosis' => 1], ...],   // solo lectura (RF033); dosis = 1 | 2
   'portadores' => [['factor' => 'ópalo', 'origen' => 'deducido'], ...],   // 'deducido' | 'criador' (RF034)
   'baja' => null,                          // o ['motivo' => 'venta' | 'muerte' | 'otra', 'fecha' => '2026-10-01']
   'arbol' => ['padre' => NodoArbol|null, 'madre' => NodoArbol|null],   // AC-01: 3 generaciones
@@ -122,7 +122,9 @@ Un canario reservado sigue siendo un canario activo del criadero (no está dado 
 ```
 Si `pio` es `true`, no se calculan ni muestran porcentajes genéticos: la vista muestra solo un aviso informativo. Si `variedad` es `null`, la combinación no corresponde a ninguna variedad del nomenclador y se muestra la lista de `factores` (RF035).
 
-**`VariedadOpcion`**: `['codigo', 'nombre', 'sexo' => 'macho' | 'hembra' | null]` · **`FactorOpcion`**: `['id', 'nombre', 'tipo_herencia']`
+**`VariedadOpcion`**: `['codigo', 'nombre', 'sexo' => 'macho' | 'hembra' | null]` · **`FactorOpcion`**: `['id', 'nombre', 'tipo_herencia' => 'ligado_sexo' | 'recesivo' | 'dominante' | 'codominante']` · **`ComposicionFactor`**: `['factor_id', 'nombre', 'dosis' => 1 | 2]`.
+
+En el formulario de variedad, cada factor seleccionado lleva su dosis. La dosis debe ser `1` o `2`; hoy solo el factor jaspe usa una diferencia: SD usa `dosis = 1` y DD usa `dosis = 2`.
 
 ## 6. Rutas, vistas y formularios
 
@@ -193,16 +195,16 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 |---|---|---|---|---|---|
 | admin.cuentas | GET /admin/cuentas | admin/cuentas | `$cuentas` [id, nombre, correo, estado, fecha_registro]. Nunca datos del criadero. | — | RF006 |
 | admin.cuentas.estado | POST /admin/cuentas/{id}/estado | (redirige a /admin/cuentas) | — | estado (activa / desactivada / cerrada; cerrar se hace a pedido del criador y guarda fecha_cierre, POL-001 y DAT-002) | RF005 |
-| admin.variedades | GET /admin/variedades?q= | admin/variedades | `$variedades` [VariedadOpcion + factores [nombre]] | — | RF032 |
+| admin.variedades | GET /admin/variedades?q= | admin/variedades | `$variedades` [VariedadOpcion + factores [ComposicionFactor]] | — | RF032 |
 | admin.variedades.nueva | GET /admin/variedades/nueva | admin/variedad | `$variedad` (null), `$factores` [FactorOpcion] | — | RF032 |
-| admin.variedades.crear | POST /admin/variedades | (redirige a /admin/variedades) | — | codigo, nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[] | RF032 |
+| admin.variedades.crear | POST /admin/variedades | (redirige a /admin/variedades) | — | codigo, nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[n][factor_id], factores[n][dosis] | RF032 |
 | admin.variedades.editar | GET /admin/variedades/{codigo} | admin/variedad | `$variedad` (con su composición, `tipo` y `rasgo`), `$factores` [FactorOpcion] | — | RF032 |
-| admin.variedades.guardar | POST /admin/variedades/{codigo} | (redirige a /admin/variedades) | — | nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[] | RF032 |
+| admin.variedades.guardar | POST /admin/variedades/{codigo} | (redirige a /admin/variedades) | — | nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[n][factor_id], factores[n][dosis] | RF032 |
 | admin.variedades.eliminar | POST /admin/variedades/{codigo}/eliminar | (redirige a /admin/variedades) | — | — (rechaza con mensaje flash de error si la variedad está asignada a algún canario) | RF032 |
 | admin.factores | GET /admin/factores | admin/factores | `$factores` [FactorOpcion] | — | RF032 |
-| admin.factores.guardar | POST /admin/factores | (redirige a /admin/factores) | — | nombre, tipo_herencia | RF032 |
+| admin.factores.guardar | POST /admin/factores | (redirige a /admin/factores) | — | nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante` / `codominante`) | RF032 |
 | admin.factores.editar | GET /admin/factores/{id} | admin/factor | `$factor` FactorOpcion | — | RF032 |
-| admin.factores.actualizar | POST /admin/factores/{id} | (redirige a /admin/factores) | — | nombre, tipo_herencia | RF032 |
+| admin.factores.actualizar | POST /admin/factores/{id} | (redirige a /admin/factores) | — | nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante` / `codominante`) | RF032 |
 
 ## 7. Páginas de error y de estado
 
