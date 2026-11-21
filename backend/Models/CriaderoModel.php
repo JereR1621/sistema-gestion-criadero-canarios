@@ -28,4 +28,17 @@ final class CriaderoModel
 
         return (int) Conexion::obtener()->lastInsertId();
     }
+    /**
+    * Devuelve el ID del criadero perteneciente al usuario, o null si no tiene.
+     */
+    public function obtenerIdPorUsuario(int $usuarioId): ?int
+    {
+        $stmt = Conexion::obtener()->prepare(
+            'SELECT id FROM criadero WHERE usuario_id = :usuario_id LIMIT 1'
+        );
+        $stmt->execute([':usuario_id' => $usuarioId]);
+        $id = $stmt->fetchColumn();
+
+        return $id !== false ? (int) $id : null;
+    }
 }
