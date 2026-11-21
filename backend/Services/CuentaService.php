@@ -64,6 +64,52 @@ final class CuentaService
         }
 
         $pdo = Conexion::obtener();
+        $transaccionPropia = !$pdo->inTransaction();
+
+        try {
+            if ($transaccionPropia) {
+                $pdo->beginTransaction();
+            }
+
+            if ($this->usuarios->existeCorreo($correo)) {
+                if ($transaccionPropia && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+
+                return [
+                    'errores' => [
+                        'correo' => 'Este correo electrónico ya está registrado.',
+                    ],
+                ];
+            }
+
+            $usuarioId = $this->usuarios->crear([
+                'nombre' => $nombre,
+                'correo' => $correo,
+                'contrasena_hash' => password_hash($contrasena, PASSWORD_DEFAULT),
+            ]);
+
+            $criaderoId = $this->criaderos->crear($usuarioId);
+
+            \auditar('crear', 'usuario', $usuarioId);
+            \auditar('crear', 'criadero', $criaderoId);
+
+            if ($transaccionPropia) {
+                $pdo->commit();
+            }
+
+            return [
+                'errores' => [],
+                'usuario_id' => $usuarioId,
+                'criadero_id' => $criaderoId,
+            ];
+        } catch (Throwable $error) {
+            if ($transaccionPropia && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            throw $error;
+        }
 
         try {
             $pdo->beginTransaction();
@@ -102,5 +148,61 @@ final class CuentaService
 
             throw $error;
         }
+    }
+    /**
+     * Valida credenciales de inicio de sesión y devuelve los datos de sesión.
+     *
+     * @param array<string, mixed> $datos
+     * @return array{
+     *     errores: array<string, string>,
+     *     usuario?: array{id: int, nombre: string, rol: string, criadero_id: ?int}
+     * }
+     */
+    public function autenticar(array $datos): array
+    {
+        $correo = mb_strtolower(trim((string) ($datos['correo'] ?? '')));
+        $contrasena = (string) ($datos['contrasena'] ?? '');
+
+        if ($correo === '' || $contrasena === '') {
+            return [
+                'errores' => [
+                    '_general' => 'Correo o contraseña incorrectos',
+                ],
+            ];
+        }
+
+        $usuario = $this->usuarios->buscarPorCorreo($correo);
+
+        if ($usuario === null || !password_verify($contrasena, (string) $usuario['contrasena_hash'])) {
+            return [
+                'errores' => [
+                    '_general' => 'Correo o contraseña incorrectos',
+                ],
+            ];
+        }
+
+        if (($usuario['estado'] ?? '') !== 'activa') {
+            return [
+                'errores' => [
+                    '_general' => 'Tu cuenta está desactivada o cerrada. Contacta al administrador.',
+                ],
+            ];
+        }
+
+        $usuarioId = (int) $usuario['id'];
+        $rol = (string) $usuario['rol'];
+        $criaderoId = $rol === 'criador'
+            ? $this->criaderos->obtenerIdPorUsuario($usuarioId)
+            : null;
+
+        return [
+            'errores' => [],
+            'usuario' => [
+                'id' => $usuarioId,
+                'nombre' => (string) $usuario['nombre'],
+                'rol' => $rol,
+                'criadero_id' => $criaderoId,
+            ],
+        ];
     }
 }
