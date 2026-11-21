@@ -12,6 +12,8 @@ use TuCriadero\Models\UsuarioModel;
 
 final class CuentaService
 {
+    public const ESTADOS_CUENTA = ['activa', 'desactivada', 'cerrada'];
+
     private UsuarioModel $usuarios;
     private CriaderoModel $criaderos;
 
@@ -150,10 +152,27 @@ final class CuentaService
             ];
         }
 
-        if (($usuario['estado'] ?? '') !== 'activa') {
+        $estado = (string) ($usuario['estado'] ?? '');
+        if ($estado === 'desactivada') {
             return [
                 'errores' => [
-                    '_general' => 'Tu cuenta está desactivada o cerrada. Contacta al administrador.',
+                    '_general' => 'Tu cuenta está desactivada. Contacta al administrador.',
+                ],
+            ];
+        }
+
+        if ($estado === 'cerrada') {
+            return [
+                'errores' => [
+                    '_general' => 'Tu cuenta está cerrada. Contacta al administrador.',
+                ],
+            ];
+        }
+
+        if ($estado !== 'activa') {
+            return [
+                'errores' => [
+                    '_general' => 'Tu cuenta no está activa. Contacta al administrador.',
                 ],
             ];
         }
@@ -282,6 +301,111 @@ final class CuentaService
                     'correo' => (string) $usuario['correo'],
                     'numero_socio' => $socioGuardar,
                     'club' => $clubGuardar,
+                ],
+            ];
+        } catch (Throwable $error) {
+            if ($transaccionPropia && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            throw $error;
+        }
+    }
+
+    /**
+     * Lista las cuentas de criadores para las vistas de administración (contrato §6: admin.cuentas).
+     * Solo devuelve datos de registro y estado; nunca datos de criaderos.
+     *
+     * @return list<array{id: int, nombre: string, correo: string, estado: string, fecha_registro: string}>
+     */
+    public function listarCuentasParaAdmin(): array
+    {
+        return $this->usuarios->listarCuentasParaAdmin();
+    }
+
+    /**
+     * Cambia el estado de la cuenta de un criador (SRS-RF005, POL-001, DAT-002).
+     * Desactivar o cerrar impide el inicio de sesión y conserva todos los datos del criadero.
+     * Al cerrar (`estado = cerrada`), guarda `fecha_cierre`.
+     *
+     * @param array<string, mixed> $datos
+     * @return array{
+     *     errores: array<string, string>,
+     *     no_encontrado?: bool,
+     *     cuenta?: array{
+     *         id: int,
+     *         nombre: string,
+     *         correo: string,
+     *         estado: string,
+     *         fecha_registro: string,
+     *         fecha_cierre: ?string
+     *     }
+     * }
+     */
+    public function cambiarEstadoCuenta(int $cuentaId, array $datos, ?int $adminId = null): array
+    {
+        $nuevoEstado = trim((string) ($datos['estado'] ?? ''));
+
+        if (!in_array($nuevoEstado, self::ESTADOS_CUENTA, true)) {
+            return [
+                'errores' => [
+                    'estado' => 'El estado indicado no es válido. Debe ser activa, desactivada o cerrada.',
+                ],
+            ];
+        }
+
+        $usuario = $this->usuarios->buscarPorId($cuentaId);
+        if ($usuario === null) {
+            return [
+                'errores' => [
+                    '_general' => 'La cuenta indicada no existe.',
+                ],
+                'no_encontrado' => true,
+            ];
+        }
+
+        if (($usuario['rol'] ?? '') !== 'criador' || ($adminId !== null && $adminId === $cuentaId)) {
+            return [
+                'errores' => [
+                    '_general' => 'Solo se puede cambiar el estado de cuentas de criadores.',
+                ],
+            ];
+        }
+
+        $accionAuditoria = match ($nuevoEstado) {
+            'desactivada' => 'desactivar',
+            'cerrada' => 'cerrar',
+            default => 'activar',
+        };
+
+        $pdo = Conexion::obtener();
+        $transaccionPropia = !$pdo->inTransaction();
+
+        try {
+            if ($transaccionPropia) {
+                $pdo->beginTransaction();
+            }
+
+            $this->usuarios->actualizarEstado($cuentaId, $nuevoEstado);
+            \auditar($accionAuditoria, 'usuario', $cuentaId);
+
+            $actualizada = $this->usuarios->buscarPorId($cuentaId);
+
+            if ($transaccionPropia) {
+                $pdo->commit();
+            }
+
+            return [
+                'errores' => [],
+                'cuenta' => [
+                    'id' => (int) ($actualizada['id'] ?? $cuentaId),
+                    'nombre' => (string) ($actualizada['nombre'] ?? $usuario['nombre']),
+                    'correo' => (string) ($actualizada['correo'] ?? $usuario['correo']),
+                    'estado' => (string) ($actualizada['estado'] ?? $nuevoEstado),
+                    'fecha_registro' => (string) ($actualizada['fecha_registro'] ?? $usuario['fecha_registro']),
+                    'fecha_cierre' => ($actualizada['fecha_cierre'] ?? null) !== null
+                        ? (string) $actualizada['fecha_cierre']
+                        : null,
                 ],
             ];
         } catch (Throwable $error) {

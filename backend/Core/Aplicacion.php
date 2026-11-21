@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace TuCriadero\Core;
 
 use Throwable;
+use TuCriadero\Controllers\AdminCuentaController;
+use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
-use TuCriadero\Controllers\CuentaController;
 
 final class Aplicacion
 {
@@ -58,6 +59,8 @@ final class Aplicacion
 
             new Ruta('perfil', 'GET', '/perfil', CuentaController::class, 'perfil'),
             new Ruta('perfil.guardar', 'POST', '/perfil', CuentaController::class, 'perfilGuardar'),
+
+            new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
         ]);
     }
 

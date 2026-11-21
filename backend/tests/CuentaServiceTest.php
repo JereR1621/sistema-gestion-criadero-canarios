@@ -7,9 +7,11 @@ namespace TuCriadero\Tests;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Throwable;
+use TuCriadero\Controllers\AdminCuentaController;
 use TuCriadero\Core\Aplicacion;
 use TuCriadero\Core\Conexion;
 use TuCriadero\Core\Entorno;
+use TuCriadero\Core\HttpException;
 use TuCriadero\Models\CriaderoModel;
 use TuCriadero\Models\UsuarioModel;
 use TuCriadero\Services\CuentaService;
@@ -43,6 +45,7 @@ final class CuentaServiceTest extends TestCase
             $this->pdo->rollBack();
         }
         Conexion::usar(null);
+        unset($_SESSION['usuario_id'], $_SESSION['rol'], $_SESSION['criadero_id'], $_SESSION['nombre']);
     }
 
     /** Conexión a DB_NAME_PRUEBAS (docs/base-de-datos.md): las pruebas nunca tocan la base de trabajo. */
@@ -495,5 +498,217 @@ final class CuentaServiceTest extends TestCase
 
         self::assertSame('/perfil', $router->url('perfil'));
         self::assertSame('/perfil', $router->url('perfil.guardar'));
+    }
+
+    // -------------------------------------------------------------------------
+    // RF005: Desactivar y cerrar cuenta (administrador)
+    // -------------------------------------------------------------------------
+
+    public function testDesactivarCuentaImpideInicioDeSesionYConservaDatosYRegistraAuditoria(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Lucia Criadora',
+            'correo' => 'lucia.rf005@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $criadorId = (int) $registro['usuario_id'];
+        $criaderoId = (int) $registro['criadero_id'];
+
+        // Crear datos reales del criadero (una jaula y un canario) para comprobar que se conservan al desactivar
+        $this->pdo->prepare('INSERT INTO jaula (criadero_id, numero) VALUES (?, ?)')->execute([$criaderoId, 15]);
+        $this->pdo->prepare(
+            "INSERT INTO canario (criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, sexo, estado)
+             VALUES (?, 'S-50', 2026, 7, 'Club Norte', '2026-10-10', 'macho', 'activo')"
+        )->execute([$criaderoId]);
+
+        $adminId = $this->crearAdminDePrueba('admin.rf005@tucriadero.cl');
+        $_SESSION['usuario_id'] = $adminId;
+        $_SESSION['rol'] = 'admin';
+
+        $resultado = $this->servicio->cambiarEstadoCuenta($criadorId, ['estado' => 'desactivada'], $adminId);
+
+        self::assertSame([], $resultado['errores']);
+        self::assertSame('desactivada', $resultado['cuenta']['estado']);
+        self::assertNull($resultado['cuenta']['fecha_cierre']);
+
+        // Impide iniciar sesión con error _general (contrato §6, ingreso.enviar)
+        $login = $this->servicio->autenticar([
+            'correo' => 'lucia.rf005@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+        ]);
+        self::assertArrayHasKey('_general', $login['errores']);
+        self::assertStringContainsString('desactivada', $login['errores']['_general']);
+        self::assertArrayNotHasKey('usuario', $login);
+
+        // Conserva todos los datos del criadero (usuario, criadero, jaula y canario)
+        self::assertSame(1, (int) $this->pdo->query("SELECT COUNT(*) FROM criadero WHERE id = {$criaderoId}")->fetchColumn());
+        self::assertSame(1, (int) $this->pdo->query("SELECT COUNT(*) FROM jaula WHERE criadero_id = {$criaderoId}")->fetchColumn());
+        self::assertSame(1, (int) $this->pdo->query("SELECT COUNT(*) FROM canario WHERE criadero_id = {$criaderoId}")->fetchColumn());
+
+        // Auditoría registrada (SEG-003)
+        $stmt = $this->pdo->prepare(
+            "SELECT usuario_id, accion, entidad, entidad_id
+             FROM auditoria
+             WHERE accion = 'desactivar' AND entidad = 'usuario' AND entidad_id = ?"
+        );
+        $stmt->execute([$criadorId]);
+        $audit = $stmt->fetch();
+        self::assertIsArray($audit);
+        self::assertSame($adminId, (int) $audit['usuario_id']);
+
+        // El administrador también puede reactivar la cuenta y el criador vuelve a entrar
+        $reactivar = $this->servicio->cambiarEstadoCuenta($criadorId, ['estado' => 'activa'], $adminId);
+        self::assertSame([], $reactivar['errores']);
+        self::assertSame('activa', $reactivar['cuenta']['estado']);
+        self::assertNull($reactivar['cuenta']['fecha_cierre']);
+
+        $loginReactivado = $this->servicio->autenticar([
+            'correo' => 'lucia.rf005@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+        ]);
+        self::assertSame([], $loginReactivado['errores']);
+    }
+
+    public function testCerrarCuentaGuardaEstadoCerradaYFechaCierreEImpideInicioDeSesion(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Pedro Cierre',
+            'correo' => 'pedro.cierre@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $criadorId = (int) $registro['usuario_id'];
+        $criaderoId = (int) $registro['criadero_id'];
+
+        $adminId = $this->crearAdminDePrueba('admin.cierre@tucriadero.cl');
+        $_SESSION['usuario_id'] = $adminId;
+        $_SESSION['rol'] = 'admin';
+
+        $resultado = $this->servicio->cambiarEstadoCuenta($criadorId, ['estado' => 'cerrada'], $adminId);
+
+        self::assertSame([], $resultado['errores']);
+        self::assertSame('cerrada', $resultado['cuenta']['estado']);
+        self::assertNotNull($resultado['cuenta']['fecha_cierre'], 'POL-001 / DAT-002: guarda fecha_cierre al cerrar.');
+
+        $fila = $this->pdo->query("SELECT estado, fecha_cierre FROM usuario WHERE id = {$criadorId}")->fetch();
+        self::assertSame('cerrada', $fila['estado']);
+        self::assertNotNull($fila['fecha_cierre']);
+
+        // No borra los datos del criadero (se conservan 90 días para la tarea de retención)
+        self::assertSame(1, (int) $this->pdo->query("SELECT COUNT(*) FROM criadero WHERE id = {$criaderoId}")->fetchColumn());
+
+        // Impide inicio de sesión con error _general
+        $login = $this->servicio->autenticar([
+            'correo' => 'pedro.cierre@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+        ]);
+        self::assertArrayHasKey('_general', $login['errores']);
+        self::assertStringContainsString('cerrada', $login['errores']['_general']);
+        self::assertArrayNotHasKey('usuario', $login);
+
+        // Auditoría registrada (SEG-003)
+        $stmt = $this->pdo->prepare(
+            "SELECT usuario_id, accion FROM auditoria WHERE accion = 'cerrar' AND entidad = 'usuario' AND entidad_id = ?"
+        );
+        $stmt->execute([$criadorId]);
+        $audit = $stmt->fetch();
+        self::assertIsArray($audit);
+        self::assertSame($adminId, (int) $audit['usuario_id']);
+    }
+
+    public function testCriadorQueEntraARutaDeAdminCuentasRecibe403(): void
+    {
+        $_SESSION['usuario_id'] = 1001;
+        $_SESSION['rol'] = 'criador';
+        $_SESSION['criadero_id'] = 1001;
+        $_SESSION['nombre'] = 'Criador Común';
+
+        try {
+            (new AdminCuentaController())->estado('1');
+            self::fail('Un criador que intenta acceder a admin.cuentas.estado debe recibir 403.');
+        } catch (HttpException $error) {
+            self::assertSame(403, $error->codigo());
+        }
+    }
+
+    public function testAdminNoRecibeDatosDeCriaderoEnListadoNiEnRespuestaDeEstado(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Raul Privado',
+            'correo' => 'raul.privado@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $criadorId = (int) $registro['usuario_id'];
+
+        $cuentas = $this->servicio->listarCuentasParaAdmin();
+        self::assertNotEmpty($cuentas);
+
+        $encontrada = null;
+        foreach ($cuentas as $cuenta) {
+            // Exactamente las claves del contrato (§6): id, nombre, correo, estado, fecha_registro
+            self::assertSame(['id', 'nombre', 'correo', 'estado', 'fecha_registro'], array_keys($cuenta));
+            self::assertArrayNotHasKey('criadero_id', $cuenta);
+            self::assertArrayNotHasKey('canarios', $cuenta);
+            self::assertArrayNotHasKey('jaulas', $cuenta);
+            self::assertArrayNotHasKey('cruces', $cuenta);
+            if ($cuenta['id'] === $criadorId) {
+                $encontrada = $cuenta;
+            }
+        }
+        self::assertNotNull($encontrada);
+
+        $adminId = $this->crearAdminDePrueba('admin.privado@tucriadero.cl');
+        $cambio = $this->servicio->cambiarEstadoCuenta($criadorId, ['estado' => 'desactivada'], $adminId);
+        self::assertSame([], $cambio['errores']);
+        self::assertArrayNotHasKey('criadero_id', $cambio['cuenta']);
+        self::assertArrayNotHasKey('canarios', $cambio['cuenta']);
+    }
+
+    public function testCambiarEstadoRechazaEstadoInvalidoCuentaInexistenteOAdmin(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Sofia Criadora',
+            'correo' => 'sofia.estado@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $criadorId = (int) $registro['usuario_id'];
+        $adminId = $this->crearAdminDePrueba('admin.validaciones@tucriadero.cl');
+        $auditoriaAntes = (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
+
+        $invalido = $this->servicio->cambiarEstadoCuenta($criadorId, ['estado' => 'eliminada'], $adminId);
+        self::assertArrayHasKey('estado', $invalido['errores']);
+
+        $inexistente = $this->servicio->cambiarEstadoCuenta(999999, ['estado' => 'desactivada'], $adminId);
+        self::assertArrayHasKey('_general', $inexistente['errores']);
+        self::assertTrue($inexistente['no_encontrado'] ?? false);
+
+        $sobreAdmin = $this->servicio->cambiarEstadoCuenta($adminId, ['estado' => 'desactivada'], $adminId);
+        self::assertArrayHasKey('_general', $sobreAdmin['errores']);
+
+        // Nada cambió ni se registró auditoría en los casos rechazados
+        self::assertSame('activa', $this->pdo->query("SELECT estado FROM usuario WHERE id = {$criadorId}")->fetchColumn());
+        self::assertSame('activa', $this->pdo->query("SELECT estado FROM usuario WHERE id = {$adminId}")->fetchColumn());
+        self::assertSame($auditoriaAntes, (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
+    }
+
+    public function testRutaAdminCuentasEstadoEstaRegistradaSegunContrato(): void
+    {
+        $router = Aplicacion::crearRouter();
+
+        self::assertSame('/admin/cuentas/42/estado', $router->url('admin.cuentas.estado', ['id' => 42]));
+    }
+
+    private function crearAdminDePrueba(string $correo): int
+    {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO usuario (nombre, correo, contrasena_hash, rol, estado)
+             VALUES ('Admin Prueba', ?, ?, 'admin', 'activa')"
+        );
+        $stmt->execute([$correo, password_hash('AdminClave2026', PASSWORD_DEFAULT)]);
+
+        return (int) $this->pdo->lastInsertId();
     }
 }
