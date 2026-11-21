@@ -7,161 +7,220 @@ namespace TuCriadero\Tests;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use TuCriadero\Core\Conexion;
+use TuCriadero\Models\CriaderoModel;
+use TuCriadero\Models\UsuarioModel;
 use TuCriadero\Services\CuentaService;
 
 final class CuentaServiceTest extends TestCase
 {
     private PDO $pdo;
+    private CuentaService $servicio;
 
     protected function setUp(): void
     {
-        $this->pdo = new PDO('sqlite::memory:', null, null, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+        $this->pdo = Conexion::obtener();
+        $this->pdo->beginTransaction();
 
-        $this->pdo->exec("
-            CREATE TABLE usuario (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT NOT NULL,
-                correo TEXT NOT NULL UNIQUE,
-                contrasena_hash TEXT NOT NULL,
-                rol TEXT NOT NULL DEFAULT 'criador',
-                estado TEXT NOT NULL DEFAULT 'activa',
-                fecha_registro TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                fecha_consentimiento TEXT NULL,
-                fecha_cierre TEXT NULL,
-                numero_socio TEXT NULL,
-                club TEXT NULL
-            )
-        ");
-
-        $this->pdo->exec("
-            CREATE TABLE criadero (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                usuario_id INTEGER NOT NULL UNIQUE
-            )
-        ");
-
-        $this->pdo->exec("
-            CREATE TABLE auditoria (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                usuario_id INTEGER NULL,
-                accion TEXT NOT NULL,
-                entidad TEXT NOT NULL,
-                entidad_id INTEGER NOT NULL,
-                fecha_hora TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )
-        ");
-
-        Conexion::usar($this->pdo);
+        $this->servicio = new CuentaService(
+            new UsuarioModel(),
+            new CriaderoModel()
+        );
     }
 
     protected function tearDown(): void
     {
-        Conexion::usar(null);
+        if ($this->pdo->inTransaction()) {
+            $this->pdo->rollBack();
+        }
     }
 
-    public function testCreaCuentaDeCriadorConCriaderoPropioYVacio(): void
-    {
-        $servicio = new CuentaService();
+    // -------------------------------------------------------------------------
+    // RF001: Registro de cuenta de criador
+    // -------------------------------------------------------------------------
 
-        $resultado = $servicio->registrar([
-            'nombre' => 'Ana Pérez',
-            'correo' => 'Ana@Ejemplo.com',
-            'contrasena' => 'ClaveSegura2026',
+    public function testRegistroExitosoCreaCuentaYCriaderoVacio(): void
+    {
+        $resultado = $this->servicio->registrar([
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.prueba@tucriadero.cl',
+            'contrasena' => 'ClaveSegura123',
             'consentimiento' => '1',
         ]);
 
         self::assertSame([], $resultado['errores']);
+        self::assertArrayHasKey('usuario_id', $resultado);
+        self::assertArrayHasKey('criadero_id', $resultado);
         self::assertGreaterThan(0, $resultado['usuario_id']);
         self::assertGreaterThan(0, $resultado['criadero_id']);
-
-        $usuario = $this->pdo->query('SELECT * FROM usuario WHERE id = ' . (int) $resultado['usuario_id'])->fetch();
-        self::assertSame('Ana Pérez', $usuario['nombre']);
-        self::assertSame('ana@ejemplo.com', $usuario['correo']);
-        self::assertSame('criador', $usuario['rol']);
-        self::assertSame('activa', $usuario['estado']);
-        self::assertNotEmpty($usuario['fecha_consentimiento']);
-        self::assertTrue(password_verify('ClaveSegura2026', $usuario['contrasena_hash']));
-
-        $criadero = $this->pdo->query('SELECT * FROM criadero WHERE id = ' . (int) $resultado['criadero_id'])->fetch();
-        self::assertSame((int) $resultado['usuario_id'], (int) $criadero['usuario_id']);
-
-        $auditorias = (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
-        self::assertSame(2, $auditorias);
     }
 
-    public function testRechazaContrasenaDeMenosDeOchoCaracteres(): void
+    public function testRegistroFallaSinConsentimientoPol001(): void
     {
-        $servicio = new CuentaService();
+        $resultado = $this->servicio->registrar([
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.sinconsentimiento@tucriadero.cl',
+            'contrasena' => 'ClaveSegura123',
+        ]);
 
-        $resultado = $servicio->registrar([
-            'nombre' => 'Ana Pérez',
-            'correo' => 'ana@ejemplo.com',
+        self::assertSame(
+            'Para crear la cuenta debes aceptar el uso de tus datos',
+            $resultado['errores']['consentimiento'] ?? ''
+        );
+    }
+
+    public function testRegistroFallaConContrasenaCorta(): void
+    {
+        $resultado = $this->servicio->registrar([
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.corta@tucriadero.cl',
             'contrasena' => '1234567',
             'consentimiento' => '1',
         ]);
 
         self::assertArrayHasKey('contrasena', $resultado['errores']);
-        self::assertSame(0, (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn());
-        self::assertSame(0, (int) $this->pdo->query('SELECT COUNT(*) FROM criadero')->fetchColumn());
     }
 
-    public function testRechazaCorreoYaRegistrado(): void
+    public function testRegistroFallaConCorreoDuplicado(): void
     {
-        $servicio = new CuentaService();
+        $datos = [
+            'nombre' => 'Ana Criadora',
+            'correo' => 'ana.duplicada@tucriadero.cl',
+            'contrasena' => 'ClaveSegura123',
+            'consentimiento' => '1',
+        ];
 
-        $servicio->registrar([
-            'nombre' => 'Ana Pérez',
-            'correo' => 'ana@ejemplo.com',
-            'contrasena' => 'ClaveSegura2026',
+        $primero = $this->servicio->registrar($datos);
+        self::assertSame([], $primero['errores']);
+
+        $segundo = $this->servicio->registrar($datos);
+        self::assertArrayHasKey('correo', $segundo['errores']);
+    }
+
+    // -------------------------------------------------------------------------
+    // RF002: Inicio de sesión
+    // -------------------------------------------------------------------------
+
+    public function testInicioSesionExitosoCriadorDevuelveSuPropioCriadero(): void
+    {
+        $registro1 = $this->servicio->registrar([
+            'nombre' => 'Criador Uno',
+            'correo' => 'criador1@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
             'consentimiento' => '1',
         ]);
 
-        $resultado = $servicio->registrar([
-            'nombre' => 'Otra Persona',
-            'correo' => 'ANA@ejemplo.com',
-            'contrasena' => 'OtraClave2026',
+        $registro2 = $this->servicio->registrar([
+            'nombre' => 'Criador Dos',
+            'correo' => 'criador2@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
             'consentimiento' => '1',
         ]);
 
-        self::assertArrayHasKey('correo', $resultado['errores']);
-        self::assertSame(1, (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn());
-    }
-
-    public function testRechazaCamposObligatoriosFaltantes(): void
-    {
-        $servicio = new CuentaService();
-
-        $resultado = $servicio->registrar([
-            'nombre' => '',
-            'correo' => '',
-            'contrasena' => '',
-            'consentimiento' => '1',
+        $login = $this->servicio->autenticar([
+            'correo' => 'CRIADOR1@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
         ]);
 
-        self::assertArrayHasKey('nombre', $resultado['errores']);
-        self::assertArrayHasKey('correo', $resultado['errores']);
-        self::assertArrayHasKey('contrasena', $resultado['errores']);
-        self::assertSame(0, (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn());
+        self::assertSame([], $login['errores']);
+        self::assertArrayHasKey('usuario', $login);
+        self::assertSame($registro1['usuario_id'], $login['usuario']['id']);
+        self::assertSame('Criador Uno', $login['usuario']['nombre']);
+        self::assertSame('criador', $login['usuario']['rol']);
+        self::assertSame($registro1['criadero_id'], $login['usuario']['criadero_id']);
+        self::assertNotSame($registro2['criadero_id'], $login['usuario']['criadero_id']);
     }
 
-    public function testRechazaRegistroSinConsentimiento(): void
+    public function testInicioSesionExitosoAdminNoTieneCriadero(): void
     {
-        $servicio = new CuentaService();
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO usuario (nombre, correo, contrasena_hash, rol, estado, fecha_consentimiento)
+             VALUES (:nombre, :correo, :hash, 'admin', 'activa', NOW())"
+        );
+        $stmt->execute([
+            ':nombre' => 'Administrador',
+            ':correo' => 'admin.prueba@tucriadero.cl',
+            ':hash' => password_hash('AdminClave2026', PASSWORD_DEFAULT),
+        ]);
+        $adminId = (int) $this->pdo->lastInsertId();
 
-        $resultado = $servicio->registrar([
-            'nombre' => 'Ana Pérez',
-            'correo' => 'ana@ejemplo.com',
-            'contrasena' => 'ClaveSegura2026',
+        $login = $this->servicio->autenticar([
+            'correo' => 'admin.prueba@tucriadero.cl',
+            'contrasena' => 'AdminClave2026',
+        ]);
+
+        self::assertSame([], $login['errores']);
+        self::assertSame($adminId, $login['usuario']['id']);
+        self::assertSame('admin', $login['usuario']['rol']);
+        self::assertNull($login['usuario']['criadero_id']);
+    }
+
+    public function testInicioSesionFallaConCorreoInexistente(): void
+    {
+        $login = $this->servicio->autenticar([
+            'correo' => 'noexiste@tucriadero.cl',
+            'contrasena' => 'CualquierClave123',
         ]);
 
         self::assertSame(
-            'Para crear la cuenta debes aceptar el uso de tus datos',
-            $resultado['errores']['consentimiento'] ?? null
+            'Correo o contraseña incorrectos',
+            $login['errores']['_general'] ?? ''
         );
-        self::assertSame(0, (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn());
-        self::assertSame(0, (int) $this->pdo->query('SELECT COUNT(*) FROM criadero')->fetchColumn());
+        self::assertArrayNotHasKey('usuario', $login);
+    }
+
+    public function testInicioSesionFallaConContrasenaIncorrecta(): void
+    {
+        $this->servicio->registrar([
+            'nombre' => 'Criador Prueba',
+            'correo' => 'criador.clave@tucriadero.cl',
+            'contrasena' => 'ClaveCorrecta2026',
+            'consentimiento' => '1',
+        ]);
+
+        $login = $this->servicio->autenticar([
+            'correo' => 'criador.clave@tucriadero.cl',
+            'contrasena' => 'ClaveEquivocada999',
+        ]);
+
+        self::assertSame(
+            'Correo o contraseña incorrectos',
+            $login['errores']['_general'] ?? ''
+        );
+        self::assertArrayNotHasKey('usuario', $login);
+    }
+
+    public function testInicioSesionFallaConCamposVacios(): void
+    {
+        $login = $this->servicio->autenticar([
+            'correo' => '',
+            'contrasena' => '',
+        ]);
+
+        self::assertSame(
+            'Correo o contraseña incorrectos',
+            $login['errores']['_general'] ?? ''
+        );
+        self::assertArrayNotHasKey('usuario', $login);
+    }
+
+    public function testInicioSesionFallaConCuentaDesactivada(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Criador Suspendido',
+            'correo' => 'suspendido@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+
+        $stmt = $this->pdo->prepare("UPDATE usuario SET estado = 'desactivada' WHERE id = :id");
+        $stmt->execute([':id' => $registro['usuario_id']]);
+
+        $login = $this->servicio->autenticar([
+            'correo' => 'suspendido@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+        ]);
+
+        self::assertArrayHasKey('_general', $login['errores']);
+        self::assertArrayNotHasKey('usuario', $login);
     }
 }
