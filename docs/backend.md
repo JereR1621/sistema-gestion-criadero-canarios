@@ -56,7 +56,7 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 | `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_registro, fecha_consentimiento, fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_registro` la pone el sistema al crear la cuenta (la muestra la administración de cuentas, RF006; es un dato técnico que la Figura 2 no dibuja). `fecha_consentimiento` registra cuándo el criador aceptó el uso de sus datos al registrarse (POL-001; también es un dato técnico). `fecha_cierre` solo si estado = cerrada: la registra el administrador al cerrar la cuenta a pedido del criador (RF005). Socio y club solo para criadores. |
 | `criadero` | id, usuario_id | `usuario_id` UNIQUE (un criadero por criador; el administrador no tiene). |
 | `jaula` | id, criadero_id, numero | UNIQUE (`criadero_id`, `numero`). |
-| `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
+| `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL), tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). `tipo` y `rasgo` no son factores: no tienen tipo de herencia (ver §6). |
 | `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante`) | `nombre` UNIQUE. |
 | `variedad_factor` | variedad_codigo, factor_id | PK compuesta. Es la **composición de la variedad**. |
 | `canario` | id, criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, fecha_nacimiento, sexo (`macho` / `hembra` / `sin_determinar`), variedad_codigo, padre_id, madre_id, cruce_origen_id, procedencia, estado (`activo` / `reservado` / `baja`) | UNIQUE (`criadero_id`, `anillo_socio`, `anillo_anio`, `anillo_correlativo`, `anillo_club`). Índices en (`criadero_id`, `anillo_correlativo`) y (`criadero_id`, `variedad_codigo`). `variedad_codigo`, padres, cruce y fechas pueden ser NULL. |
@@ -90,7 +90,7 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 | La baja crea el registro en `baja` y cambia `canario.estado` en la misma operación. Un canario dado de baja no se da de baja otra vez. | DAT-004, RF011 |
 | La baja cierra la ubicación abierta del canario con la fecha de la baja (deja de ser ocupante de su jaula y el historial lo muestra como salida). Un canario dado de baja no se ubica en jaulas. | RF011, RF015, RF016 (decisión del PM, 09/11/2026) |
 | Un canario reservado o dado de baja no forma un cruce nuevo; uno con un cruce activo sí puede formar otro (RF019 y RF020). | RF018, AC-02 |
-| Dos variedades del mismo sexo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
+| Dos variedades del mismo sexo, tipo y rasgo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
 | No se elimina una variedad asignada a algún canario. | RF032 |
 
 ## 4. Lógica por módulo
@@ -117,9 +117,10 @@ La "tabla de Mendel" **no se carga como datos**: son tres reglas que se programa
    - Dominante: si lo manifiesta, se supone **una sola dosis** (SUP-004).
 2. Cruzar cada factor por separado con su regla y obtener las proporciones por sexo.
 3. Combinar los factores multiplicando probabilidades (se suponen independientes; SUP-004).
-4. Traducir cada combinación a una variedad buscando en `variedad_factor` (con su sexo, si la variedad lo indica). Si una combinación no corresponde a ninguna variedad, se muestra como lista de factores (RF035).
+4. Traducir cada combinación a una variedad buscando en `variedad_factor` (con su sexo, si la variedad lo indica), con el tipo de los padres y sin rasgo. Si una combinación no corresponde a ninguna variedad, se muestra como lista de factores (RF035).
 5. Devolver variedades y porcentajes, separados para machos y para hembras.
-6. Si un factor no tiene regla de herencia cargada, informar que ese factor no se puede calcular (RF039).
+6. Si un factor no tiene regla de herencia cargada, informar que ese factor no se puede calcular (RF039). Lo mismo con el rasgo: si un padre tiene ala blanca o alas grises, se avisa que no se calcula.
+7. Si un padre es melánico y el otro lipocrómico, no se calcula: se avisa que la descendencia sale pía (con manchas), porque ese reparto no sigue las leyes de Mendel. Así lo hace la calculadora que entregó el cliente.
 
 Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100% de hembras marfil y 100% de machos portadores de marfil.
 
@@ -139,6 +140,10 @@ Caso de prueba que dio el cliente (RF037, audio del 09/11/2026): negro ópalo am
 - **Líneas con dos códigos:** el nomenclador trae líneas como `D.001-D.002 BLANCO - DOMINANTE`, que agrupan dos variedades. No son una variedad: cada código se carga por separado. El CSV ya viene separado (880 filas, sin huecos ni duplicados).
 - **Composición:** la arma el equipo descomponiendo cada nombre en sus factores (serie, mutación, lipocromo y categoría). Cada factor es una mutación presente; su ausencia equivale a la forma normal (por ejemplo, nevado = sin el factor intenso). Los nombres siguen la nomenclatura 2026 (por ejemplo, «bruno», no «canela»; el cliente usa canela, marrón y bruno como sinónimos). Los conceptos que explicó el cliente están en [`ajustes-cliente.md`](ajustes-cliente.md). La composición se valida antes de cargarla, incluida la regla de que no haya combinaciones repetidas por sexo.
 - **Sexo:** 408 variedades indican el sexo en el nombre ("… MACHO", "… HEMBRA").
+- **Tipo:** todo canario de color es melánico (con dibujo: negro, bruno, ágata, isabel y feo) o lipocrómico (sin dibujo: blanco, amarillo, rojo, lutino, rubino y albino). Es lo primero que se elige en la calculadora del cliente; no es un factor. En el seed: 784 melánicos y 96 lipocrómicos.
+- **Rasgo:** ala blanca (32 variedades) y alas grises (18) no llevan fila en `factor` porque no tienen una herencia respaldada: la calculadora del cliente no calcula alas grises (herencia sin consenso) y el estándar OMJ-COM trata ala blanca como un grupo de lipocromos que se juzga aparte.
+- **Feo:** es el phaeo, el factor `INO` sobre un melánico (guía de la calculadora del cliente y estándar OMJ-COM). No es un factor aparte: una variedad «FEO …» se compone con `INO` y tipo melánico.
+- **Fuentes:** guía de la calculadora del cliente (<https://animalesbiologia.com/calculadoras/guia-uso-calculadora-canarios>) y estándar OMJ-COM de canarios de color (<https://www.focde.com/contenidos/focde/PDF%20COMISIONES/COLOR%20PDF/Coleur_Espanol_Standard.pdf>).
 
 ## 7. Seguridad (SEG-001 a SEG-005)
 
