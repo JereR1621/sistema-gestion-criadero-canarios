@@ -12,7 +12,7 @@ final class CuentaController
 {
     public function registro(): void
     {
-        render('cuentas/registro', [
+        render('cuenta/registro', [
             'errores' => [],
             'viejo' => [],
         ]);
@@ -30,7 +30,7 @@ final class CuentaController
         $resultado = (new CuentaService())->registrar($datos);
 
         if ($resultado['errores'] !== []) {
-            render('cuentas/registro', [
+            render('cuenta/registro', [
                 'errores' => $resultado['errores'],
                 'viejo' => [
                     'nombre' => trim((string) $datos['nombre']),
@@ -57,7 +57,7 @@ final class CuentaController
     }
     public function ingreso(): void
     {
-        render('cuentas/ingresar', [
+        render('cuenta/ingresar', [
             'errores' => [],
             'viejo' => [],
         ]);
@@ -73,7 +73,7 @@ final class CuentaController
         $resultado = (new CuentaService())->autenticar($datos);
 
         if ($resultado['errores'] !== []) {
-            render('cuentas/ingresar', [
+            render('cuenta/ingresar', [
                 'errores' => $resultado['errores'],
                 'viejo' => [
                     'correo' => trim((string) $datos['correo']),
