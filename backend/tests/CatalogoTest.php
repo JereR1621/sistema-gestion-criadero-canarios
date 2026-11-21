@@ -20,7 +20,7 @@ final class CatalogoTest extends TestCase
         'ALBINO DOMINANTE' => ['INO', 'BLANCO DOMINANTE'],
         'PICO AMARILLO' => ['PICO AMARILLO'],
         'JASPE SD' => ['JASPE'],
-        'JASPE DD' => ['JASPE DOBLE DOSIS'],
+        'JASPE DD' => ['JASPE'],   // dosis 2: ver DOBLE_DOSIS
         'ALA BLANCA' => [],   // rasgo, no factor
         'ALAS GRISES' => [],  // rasgo, no factor
     ];
@@ -38,11 +38,14 @@ final class CatalogoTest extends TestCase
 
     private const MELANICOS = ['NEGRO', 'BRUNO', 'ÁGATA', 'ISABEL', 'FEO'];
 
+    /** Frase que lleva su factor con dosis 2 (codominante, backend.md §5). */
+    private const DOBLE_DOSIS = ['JASPE DD' => 'JASPE'];
+
     /** @var array<string, array{nombre: string, sexo: ?string, tipo: string, rasgo: ?string}> */
     private static array $variedades;
     /** @var array<int, string> id → nombre */
     private static array $factores;
-    /** @var array<string, list<int>> código → ids de factor */
+    /** @var array<string, array<int, int>> código → [id de factor => dosis] */
     private static array $composicion;
 
     public static function setUpBeforeClass(): void
@@ -53,10 +56,12 @@ final class CatalogoTest extends TestCase
         }
         preg_match_all("/\((\d+), '([^']+)', '\w+'\)/", self::leer('02_factores.sql'), $f, PREG_SET_ORDER);
         self::$factores = array_column($f, 2, 1);
-        preg_match_all("/\('(D\.\d{3})', (\d+)\)/", self::leer('03_composicion.sql'), $c, PREG_SET_ORDER);
+        preg_match_all("/\('(D\.\d{3})', (\d+)(?:, (\d))?\)/", self::leer('03_composicion.sql'), $c, PREG_SET_ORDER);
         self::$composicion = [];
-        foreach ($c as [, $codigo, $id]) {
-            self::$composicion[$codigo][] = (int) $id;
+        foreach ($c as $fila) {
+            [, $codigo, $id] = $fila;
+            self::assertArrayNotHasKey((int) $id, self::$composicion[$codigo] ?? [], "{$codigo} repite el factor {$id}.");
+            self::$composicion[$codigo][(int) $id] = (int) ($fila[3] ?? 1);
         }
     }
 
@@ -85,18 +90,18 @@ final class CatalogoTest extends TestCase
         }
     }
 
-    public function testHay22FactoresSinRasgosComoFactor(): void
+    public function testHay21FactoresSinRasgosNiDosisComoFactor(): void
     {
-        self::assertCount(22, self::$factores);
-        self::assertSame([], array_intersect(self::$factores, ['LIPOCROMO', 'ALA BLANCA', 'ALAS GRISES', 'FEO']));
+        self::assertCount(21, self::$factores);
+        self::assertSame([], array_intersect(self::$factores, ['LIPOCROMO', 'ALA BLANCA', 'ALAS GRISES', 'FEO', 'JASPE DOBLE DOSIS']));
+        self::assertStringContainsString("(18, 'JASPE', 'codominante')", self::leer('02_factores.sql'));
     }
 
-    public function testLaComposicionNoRepiteFilasNiUsaCodigosOFactoresInexistentes(): void
+    public function testLaComposicionNoUsaCodigosOFactoresInexistentes(): void
     {
-        foreach (self::$composicion as $codigo => $ids) {
+        foreach (self::$composicion as $codigo => $factores) {
             self::assertArrayHasKey($codigo, self::$variedades);
-            self::assertSame(array_values(array_unique($ids)), $ids, "{$codigo} repite un factor.");
-            self::assertSame([], array_diff($ids, array_keys(self::$factores)), "{$codigo} usa un factor que no existe.");
+            self::assertSame([], array_diff(array_keys($factores), array_keys(self::$factores)), "{$codigo} usa un factor que no existe.");
         }
     }
 
@@ -104,45 +109,51 @@ final class CatalogoTest extends TestCase
     {
         $porNombre = array_flip(self::$factores);
         foreach (self::$variedades as $codigo => $v) {
-            $esperados = array_map(fn (string $f): int => $porNombre[$f], self::descomponer($v['nombre']));
+            $esperados = [];
+            foreach (self::descomponer($v['nombre']) as $factor => $dosis) {
+                $esperados[$porNombre[$factor]] = $dosis;
+            }
             $cargados = self::$composicion[$codigo] ?? [];   // sin filas = forma normal (por ejemplo, D.004 AMARILLO NEVADO)
-            sort($esperados);
-            sort($cargados);
+            ksort($esperados);
+            ksort($cargados);
 
             self::assertSame($esperados, $cargados, "{$codigo} {$v['nombre']}");
         }
     }
 
-    public function testNingunaCombinacionSeRepiteParaElMismoSexoTipoYRasgo(): void
+    public function testNingunaCombinacionDeFactoresYDosisSeRepiteParaElMismoSexoTipoYRasgo(): void
     {
         $vistas = [];
         foreach (self::$variedades as $codigo => $v) {
-            $ids = self::$composicion[$codigo] ?? [];
-            sort($ids);
-            $clave = implode('|', [$v['sexo'], $v['tipo'], $v['rasgo'], implode(',', $ids)]);
+            $factores = self::$composicion[$codigo] ?? [];
+            ksort($factores);
+            $clave = implode('|', [$v['sexo'], $v['tipo'], $v['rasgo'], http_build_query($factores)]);
 
             self::assertArrayNotHasKey($clave, $vistas, "{$codigo} repite la combinación de " . ($vistas[$clave] ?? ''));
             $vistas[$clave] = $codigo;
         }
     }
 
-    /** @return list<string> nombres de factor, sin repetir */
+    /** @return array<string, int> nombre de factor → dosis */
     private static function descomponer(string $nombre): array
     {
         $texto = " {$nombre} ";
         $factores = [];
         foreach (self::FRASES as $frase => $deLaFrase) {
             if (str_contains($texto, " {$frase} ")) {
-                array_push($factores, ...$deLaFrase);
+                $factores += array_fill_keys($deLaFrase, 1);
+                if (isset(self::DOBLE_DOSIS[$frase])) {
+                    $factores[self::DOBLE_DOSIS[$frase]] = 2;
+                }
                 $texto = str_replace(" {$frase} ", ' ', $texto);
             }
         }
         foreach (array_filter(explode(' ', $texto)) as $palabra) {
             self::assertArrayHasKey($palabra, self::PALABRAS, "Palabra sin regla en «{$nombre}».");
-            array_push($factores, ...self::PALABRAS[$palabra]);
+            $factores += array_fill_keys(self::PALABRAS[$palabra], 1);
         }
 
-        return array_values(array_unique($factores));
+        return $factores;
     }
 
     private static function leer(string $archivo): string
