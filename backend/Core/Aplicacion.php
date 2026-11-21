@@ -43,7 +43,7 @@ final class Aplicacion
         }
     }
 
-public static function crearRouter(): Router
+    public static function crearRouter(): Router
     {
         return new Router([
             new Ruta('inicio', 'GET', '/inicio', InicioController::class, 'mostrar'),
@@ -57,6 +57,7 @@ public static function crearRouter(): Router
             new Ruta('salida', 'POST', '/salir', CuentaController::class, 'salida'),
         ]);
     }
+
     /**
      * Todo formulario que envía datos lleva el campo oculto `_csrf` (contrato §4).
      * Si falta o no coincide con el de la sesión, se responde 419 (contrato §7)

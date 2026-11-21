@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TuCriadero\Services;
 
+use PDOException;
 use Throwable;
 use TuCriadero\Core\Conexion;
 use TuCriadero\Models\CriaderoModel;
@@ -108,54 +109,15 @@ final class CuentaService
                 $pdo->rollBack();
             }
 
-            throw $error;
-        }
-
-        try {
-            if ($transaccionPropia) {
-                $pdo->beginTransaction();
-            }
-
-            if ($this->usuarios->existeCorreo($correo)) {
-                if ($transaccionPropia && $pdo->inTransaction()) {
-                    $pdo->rollBack();
-                }
-
-                return [
-                    'errores' => [
-                        'correo' => 'Este correo electrónico ya está registrado.',
-                    ],
-                ];
-            }
-
-            $usuarioId = $this->usuarios->crear([
-                'nombre' => $nombre,
-                'correo' => $correo,
-                'contrasena_hash' => password_hash($contrasena, PASSWORD_DEFAULT),
-            ]);
-
-            $criaderoId = $this->criaderos->crear($usuarioId);
-
-            \auditar('crear', 'usuario', $usuarioId);
-            \auditar('crear', 'criadero', $criaderoId);
-
-            if ($transaccionPropia) {
-                $pdo->commit();
-            }
-
-            return [
-                'errores' => [],
-                'usuario_id' => $usuarioId,
-                'criadero_id' => $criaderoId,
-            ];
-        } catch (Throwable $error) {
-            if ($transaccionPropia && $pdo->inTransaction()) {
-                $pdo->rollBack();
+            // Dos registros simultáneos con el mismo correo: la clave única rechaza el segundo.
+            if ($error instanceof PDOException && $error->getCode() === '23000') {
+                return ['errores' => ['correo' => 'Este correo electrónico ya está registrado.']];
             }
 
             throw $error;
         }
     }
+
     /**
      * Valida credenciales de inicio de sesión y devuelve los datos de sesión.
      *

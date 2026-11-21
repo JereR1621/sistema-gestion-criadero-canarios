@@ -6,7 +6,9 @@ namespace TuCriadero\Tests;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 use TuCriadero\Core\Conexion;
+use TuCriadero\Core\Entorno;
 use TuCriadero\Models\CriaderoModel;
 use TuCriadero\Models\UsuarioModel;
 use TuCriadero\Services\CuentaService;
@@ -18,7 +20,14 @@ final class CuentaServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->pdo = Conexion::obtener();
+        try {
+            $this->pdo = self::baseDePruebas();
+            $this->pdo->query('SELECT 1 FROM usuario LIMIT 1');
+        } catch (Throwable) {
+            self::markTestSkipped('Sin base de pruebas: levanta MySQL y corre php backend/database/migrar.php --pruebas.');
+        }
+
+        Conexion::usar($this->pdo);
         $this->pdo->beginTransaction();
 
         $this->servicio = new CuentaService(
@@ -29,8 +38,27 @@ final class CuentaServiceTest extends TestCase
 
     protected function tearDown(): void
     {
-        if ($this->pdo->inTransaction()) {
+        if (isset($this->pdo) && $this->pdo->inTransaction()) {
             $this->pdo->rollBack();
+        }
+        Conexion::usar(null);
+    }
+
+    /** Conexión a DB_NAME_PRUEBAS (docs/base-de-datos.md): las pruebas nunca tocan la base de trabajo. */
+    private static function baseDePruebas(): PDO
+    {
+        Entorno::cargar(dirname(__DIR__, 2) . '/.env');
+        $anterior = $_ENV['DB_NAME'] ?? null;
+        $_ENV['DB_NAME'] = Entorno::obtener('DB_NAME_PRUEBAS') ?? '';   // mismo mecanismo que migrar.php --pruebas
+
+        try {
+            return Conexion::crearDesdeEntorno();
+        } finally {
+            if ($anterior === null) {
+                unset($_ENV['DB_NAME']);
+            } else {
+                $_ENV['DB_NAME'] = $anterior;
+            }
         }
     }
 
@@ -52,6 +80,15 @@ final class CuentaServiceTest extends TestCase
         self::assertArrayHasKey('criadero_id', $resultado);
         self::assertGreaterThan(0, $resultado['usuario_id']);
         self::assertGreaterThan(0, $resultado['criadero_id']);
+
+        $usuario = $this->pdo->query("SELECT rol, estado, fecha_consentimiento FROM usuario WHERE id = {$resultado['usuario_id']}")->fetch();
+        self::assertSame(['criador', 'activa'], [$usuario['rol'], $usuario['estado']]);
+        self::assertNotNull($usuario['fecha_consentimiento'], 'POL-001: guarda la fecha del consentimiento.');
+
+        $criadero = (int) $resultado['criadero_id'];
+        foreach (['canario', 'jaula'] as $tabla) {
+            self::assertSame(0, (int) $this->pdo->query("SELECT COUNT(*) FROM {$tabla} WHERE criadero_id = {$criadero}")->fetchColumn(), "Criadero vacío: sin {$tabla}.");
+        }
     }
 
     public function testRegistroFallaSinConsentimientoPol001(): void
@@ -78,6 +115,16 @@ final class CuentaServiceTest extends TestCase
         ]);
 
         self::assertArrayHasKey('contrasena', $resultado['errores']);
+    }
+
+    public function testRegistroFallaSiFaltaNombreCorreoOContrasena(): void
+    {
+        $antes = (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn();
+
+        $resultado = $this->servicio->registrar(['consentimiento' => '1']);
+
+        self::assertSame(['nombre', 'correo', 'contrasena'], array_keys($resultado['errores']));
+        self::assertSame($antes, (int) $this->pdo->query('SELECT COUNT(*) FROM usuario')->fetchColumn(), 'No guarda nada.');
     }
 
     public function testRegistroFallaConCorreoDuplicado(): void
