@@ -65,14 +65,14 @@ final class UsuarioModel
     }
 
     /**
-     * Busca una cuenta de usuario por su identificador (incluye datos de perfil: socio y club).
+     * Busca una cuenta de usuario por su identificador (incluye datos de perfil y estado).
      *
      * @return array<string, mixed>|null
      */
     public function buscarPorId(int $id): ?array
     {
         $consulta = $this->pdo->prepare(
-            'SELECT id, nombre, correo, rol, estado, numero_socio, club
+            'SELECT id, nombre, correo, rol, estado, fecha_registro, fecha_cierre, numero_socio, club
              FROM usuario
              WHERE id = ?
              LIMIT 1'
@@ -94,5 +94,56 @@ final class UsuarioModel
              WHERE id = ?'
         );
         $consulta->execute([$numeroSocio, $club, $id]);
+    }
+
+    /**
+     * Actualiza el estado de una cuenta (RF005, POL-001, DAT-002).
+     * Respeta `chk_usuario_cierre`: al pasar a `cerrada` registra `fecha_cierre`;
+     * en `activa` o `desactivada` deja `fecha_cierre` en NULL.
+     */
+    public function actualizarEstado(int $id, string $estado): void
+    {
+        if ($estado === 'cerrada') {
+            $consulta = $this->pdo->prepare(
+                "UPDATE usuario
+                 SET estado = 'cerrada',
+                     fecha_cierre = COALESCE(fecha_cierre, CURRENT_TIMESTAMP)
+                 WHERE id = ?"
+            );
+            $consulta->execute([$id]);
+            return;
+        }
+
+        $consulta = $this->pdo->prepare(
+            'UPDATE usuario
+             SET estado = ?,
+                 fecha_cierre = NULL
+             WHERE id = ?'
+        );
+        $consulta->execute([$estado, $id]);
+    }
+
+    /**
+     * Lista los datos de registro y estado de las cuentas de criadores para administración (RF005 / RF006).
+     * Nunca incluye datos de criaderos (canarios, jaulas, cruces ni criadero_id).
+     *
+     * @return list<array{id: int, nombre: string, correo: string, estado: string, fecha_registro: string}>
+     */
+    public function listarCuentasParaAdmin(): array
+    {
+        $filas = $this->pdo->query(
+            "SELECT id, nombre, correo, estado, fecha_registro
+             FROM usuario
+             WHERE rol = 'criador'
+             ORDER BY fecha_registro DESC, id DESC"
+        )->fetchAll();
+
+        return array_map(static fn (array $fila): array => [
+            'id' => (int) $fila['id'],
+            'nombre' => (string) $fila['nombre'],
+            'correo' => (string) $fila['correo'],
+            'estado' => (string) $fila['estado'],
+            'fecha_registro' => (string) $fila['fecha_registro'],
+        ], $filas);
     }
 }
