@@ -248,8 +248,9 @@ final class CuentaService
             $errores['numero_socio'] = 'El número de socio no puede superar los 50 caracteres.';
         }
 
-        if (mb_strlen($club) > 100) {
-            $errores['club'] = 'El club no puede superar los 100 caracteres.';
+        // 50, como canario.anillo_club: el club se propone al anillar (RF007, RF021) y tiene que caber en el anillo.
+        if (mb_strlen($club) > 50) {
+            $errores['club'] = 'El club no puede superar los 50 caracteres.';
         }
 
         if ($errores !== []) {

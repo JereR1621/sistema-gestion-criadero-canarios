@@ -409,16 +409,34 @@ final class CuentaServiceTest extends TestCase
 
         $resultado = $this->servicio->actualizarPerfil($usuarioId, [
             'numero_socio' => str_repeat('9', 51),
-            'club' => str_repeat('A', 101),
+            'club' => str_repeat('A', 51),
         ]);
 
         self::assertArrayHasKey('numero_socio', $resultado['errores']);
-        self::assertArrayHasKey('club', $resultado['errores']);
+        self::assertSame('El club no puede superar los 50 caracteres.', $resultado['errores']['club'] ?? null);
         self::assertSame(
             ['anillo_socio' => null, 'anillo_club' => null],
             $this->servicio->obtenerValoresPorDefectoAnillo($usuarioId)
         );
         self::assertSame($auditoriaAntes, (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
+    }
+
+    public function testElClubPropuestoSiempreCabeEnElAnillo(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Mario Criador',
+            'correo' => 'mario.limite@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $usuarioId = (int) $registro['usuario_id'];
+        $limiteDelAnillo = (int) $this->pdo->query(
+            "SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'canario' AND COLUMN_NAME = 'anillo_club'"
+        )->fetchColumn();
+
+        self::assertSame([], $this->servicio->actualizarPerfil($usuarioId, ['numero_socio' => '1', 'club' => str_repeat('A', $limiteDelAnillo)])['errores']);
+        self::assertArrayHasKey('club', $this->servicio->actualizarPerfil($usuarioId, ['numero_socio' => '1', 'club' => str_repeat('A', $limiteDelAnillo + 1)])['errores']);
     }
 
     public function testPerfilRechazaCuentaDeAdministrador(): void
