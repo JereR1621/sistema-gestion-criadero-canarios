@@ -711,4 +711,26 @@ final class CuentaServiceTest extends TestCase
 
         return (int) $this->pdo->lastInsertId();
     }
+
+    public function testDesactivarCortaLaSesionQueElCriadorYaTeniaAbierta(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Criador Conectado',
+            'correo' => 'conectado@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $_SESSION['usuario_id'] = $registro['usuario_id'];
+        $_SESSION['rol'] = 'criador';
+
+        // Mientras la cuenta está activa, la sesión sigue.
+        Aplicacion::cerrarSesionSiLaCuentaNoEstaActiva();
+        self::assertSame($registro['usuario_id'], $_SESSION['usuario_id'] ?? null);
+
+        $this->servicio->cambiarEstadoCuenta((int) $registro['usuario_id'], ['estado' => 'desactivada']);
+        Aplicacion::cerrarSesionSiLaCuentaNoEstaActiva();
+
+        self::assertArrayNotHasKey('usuario_id', $_SESSION);
+        self::assertArrayNotHasKey('rol', $_SESSION);
+    }
 }

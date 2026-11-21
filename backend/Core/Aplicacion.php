@@ -9,6 +9,7 @@ use TuCriadero\Controllers\AdminCuentaController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
+use TuCriadero\Models\UsuarioModel;
 
 final class Aplicacion
 {
@@ -31,10 +32,11 @@ final class Aplicacion
             }
 
             Sesion::iniciar();
+            self::cerrarSesionSiLaCuentaNoEstaActiva();
 
             $router = self::crearRouter();
             Rutas::definir($router);
-            // La conexión a MySQL no se abre aquí: los modelos la piden con Conexion::obtener().
+            // Sin sesión iniciada, la conexión a MySQL no se abre aquí: los modelos la piden con Conexion::obtener().
             (new self($raiz, $router))->manejar();
         } catch (HttpException $error) {
             self::mostrarError($error->codigo(), $error->getMessage());
@@ -62,6 +64,22 @@ final class Aplicacion
 
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
         ]);
+    }
+
+    /**
+     * RF005: una cuenta desactivada o cerrada deja de usar el sistema en su siguiente petición, aunque ya
+     * tuviera la sesión abierta. Sin esto, el criador desactivado seguiría entrando hasta que venza la sesión (7 días).
+     */
+    public static function cerrarSesionSiLaCuentaNoEstaActiva(): void
+    {
+        if (!isset($_SESSION['usuario_id'])) {
+            return;
+        }
+
+        $cuenta = (new UsuarioModel())->buscarPorId((int) $_SESSION['usuario_id']);
+        if ($cuenta === null || ($cuenta['estado'] ?? '') !== 'activa') {
+            Sesion::cerrarAutenticada();
+        }
     }
 
     /**
