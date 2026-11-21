@@ -1,6 +1,6 @@
 # Contrato backend–frontend
 
-**Versión 0.2 (pendiente de revisión con Figma) · 16/11/2026, con los ajustes del cliente del 09/11/2026 ([`ajustes-cliente.md`](ajustes-cliente.md)).** Acordado entre backend y frontend en la épica E0; una vez validado contra los mockups de Figma pasará a v1.0. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
+**Versión 0.3 (pendiente de revisión con Figma) · 16/11/2026, con los ajustes del cliente del 09/11/2026 ([`ajustes-cliente.md`](ajustes-cliente.md)).** Acordado entre backend y frontend en la épica E0; una vez validado contra los mockups de Figma pasará a v1.0. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
 
 Fuente: SRS v1.1 (`docs/srs/`), los ajustes del cliente (`docs/ajustes-cliente.md`), `docs/backend.md` y `docs/frontend.md`.
 
@@ -112,14 +112,15 @@ Un canario reservado sigue siendo un canario activo del criadero (no está dado 
 **`ResultadoCruce`** (RF035 a RF039)
 ```php
 [
+  'pio' => bool,                              // true si un progenitor es melanico y el otro lipocromico
   'machos'  => [['variedad' => ['codigo' => 'D.051', 'nombre' => '…'] | null,
                  'factores' => ['marfil'], 'porcentaje' => 50.0, 'portador_de' => ['marfil']], ...],
   'hembras' => [ ... misma forma ... ],
-  'no_calculables' => ['nombre de factor', ...],   // RF039: mostrar aviso por cada uno
+  'no_calculables' => ['nombre de factor', ...],   // RF039: incluye «ala blanca» o «alas grises» si algún progenitor tiene ese rasgo
   'aproximado' => false,                            // true si combina 2 o más factores ligados al sexo (SUP-004)
 ]
 ```
-Si `variedad` es `null`, la combinación no corresponde a ninguna variedad del nomenclador y se muestra la lista de `factores` (RF035).
+Si `pio` es `true`, no se calculan ni muestran porcentajes genéticos: la vista muestra solo un aviso informativo. Si `variedad` es `null`, la combinación no corresponde a ninguna variedad del nomenclador y se muestra la lista de `factores` (RF035).
 
 **`VariedadOpcion`**: `['codigo', 'nombre', 'sexo' => 'macho' | 'hembra' | null]` · **`FactorOpcion`**: `['id', 'nombre', 'tipo_herencia']`
 
@@ -194,9 +195,9 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | admin.cuentas.estado | POST /admin/cuentas/{id}/estado | (redirige a /admin/cuentas) | — | estado (activa / desactivada / cerrada; cerrar se hace a pedido del criador y guarda fecha_cierre, POL-001 y DAT-002) | RF005 |
 | admin.variedades | GET /admin/variedades?q= | admin/variedades | `$variedades` [VariedadOpcion + factores [nombre]] | — | RF032 |
 | admin.variedades.nueva | GET /admin/variedades/nueva | admin/variedad | `$variedad` (null), `$factores` [FactorOpcion] | — | RF032 |
-| admin.variedades.crear | POST /admin/variedades | (redirige a /admin/variedades) | — | codigo, nombre, sexo, factores[] | RF032 |
-| admin.variedades.editar | GET /admin/variedades/{codigo} | admin/variedad | `$variedad` (con su composición), `$factores` [FactorOpcion] | — | RF032 |
-| admin.variedades.guardar | POST /admin/variedades/{codigo} | (redirige a /admin/variedades) | — | nombre, sexo, factores[] | RF032 |
+| admin.variedades.crear | POST /admin/variedades | (redirige a /admin/variedades) | — | codigo, nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[] | RF032 |
+| admin.variedades.editar | GET /admin/variedades/{codigo} | admin/variedad | `$variedad` (con su composición, `tipo` y `rasgo`), `$factores` [FactorOpcion] | — | RF032 |
+| admin.variedades.guardar | POST /admin/variedades/{codigo} | (redirige a /admin/variedades) | — | nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[] | RF032 |
 | admin.variedades.eliminar | POST /admin/variedades/{codigo}/eliminar | (redirige a /admin/variedades) | — | — (rechaza con mensaje flash de error si la variedad está asignada a algún canario) | RF032 |
 | admin.factores | GET /admin/factores | admin/factores | `$factores` [FactorOpcion] | — | RF032 |
 | admin.factores.guardar | POST /admin/factores | (redirige a /admin/factores) | — | nombre, tipo_herencia | RF032 |
