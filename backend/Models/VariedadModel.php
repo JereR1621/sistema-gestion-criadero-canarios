@@ -225,11 +225,17 @@ final class VariedadModel
     /**
      * Cantidad de canarios (de cualquier criadero) que tienen esta variedad asignada (RF032).
      * El catálogo es global: no se filtra por `criadero_id`.
+     * Con `$distintoDeSexo`, cuenta solo los que no son de ese sexo (RF012).
      */
-    public function contarCanariosAsignados(string $codigo): int
+    public function contarCanariosAsignados(string $codigo, ?string $distintoDeSexo = null): int
     {
-        $consulta = Conexion::obtener()->prepare('SELECT COUNT(*) FROM canario WHERE variedad_codigo = ?');
-        $consulta->execute([$codigo]);
+        if ($distintoDeSexo === null) {
+            $consulta = Conexion::obtener()->prepare('SELECT COUNT(*) FROM canario WHERE variedad_codigo = ?');
+            $consulta->execute([$codigo]);
+        } else {
+            $consulta = Conexion::obtener()->prepare('SELECT COUNT(*) FROM canario WHERE variedad_codigo = ? AND sexo <> ?');
+            $consulta->execute([$codigo, $distintoDeSexo]);
+        }
 
         return (int) $consulta->fetchColumn();
     }

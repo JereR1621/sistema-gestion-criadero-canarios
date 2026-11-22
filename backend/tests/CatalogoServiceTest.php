@@ -432,6 +432,25 @@ final class CatalogoServiceTest extends TestCase
     }
 
     /**
+     * Negativo (RF012, docs/backend.md §3): una variedad con sexo solo se asigna a un canario de ese sexo.
+     * No se le pone a la variedad un sexo distinto del de los canarios que ya la tienen; no se guarda nada.
+     */
+    public function testRechazaCambiarElSexoDeUnaVariedadQueTienenCanariosDelOtroSexo(): void
+    {
+        $this->crearCanarioAsignado('D.049', 'hembra');
+        $datos = ['nombre' => 'ROJO INTENSO', 'tipo' => 'lipocromico', 'rasgo' => null, 'factores' => [1, 4]];
+
+        $resultado = $this->servicio->actualizarVariedad('D.049', $datos + ['sexo' => 'macho']);
+
+        self::assertSame(['sexo' => 'Hay canarios registrados con esta variedad que no son machos.'], $resultado['errores']);
+        self::assertNull($this->servicio->obtenerVariedad('D.049')['sexo']);
+
+        // El mismo sexo que el de sus canarios sí se acepta
+        self::assertSame([], $this->servicio->actualizarVariedad('D.049', $datos + ['sexo' => 'hembra'])['errores']);
+        self::assertSame('hembra', $this->servicio->obtenerVariedad('D.049')['sexo']);
+    }
+
+    /**
      * Criterio negativo (SRS-RF032): un criador que entra a estas rutas recibe 403.
      */
     public function testUnCriadorQueEntraALasRutasDelCatalogoRecibe403(): void
@@ -533,7 +552,7 @@ final class CatalogoServiceTest extends TestCase
     }
 
     /** Crea un canario de un criadero inventado que tiene la variedad indicada asignada (RF032). */
-    private function crearCanarioAsignado(string $codigo): void
+    private function crearCanarioAsignado(string $codigo, string $sexo = 'macho'): void
     {
         $pdo = self::$pdoCompartido;
         self::assertInstanceOf(PDO::class, $pdo);
@@ -545,8 +564,8 @@ final class CatalogoServiceTest extends TestCase
         $pdo->prepare(
             "INSERT INTO canario (criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club,
                                   fecha_anillado, sexo, variedad_codigo, estado)
-             VALUES (?, 'S-032', 2026, 1, 'Club RF032', '2026-11-22', 'macho', ?, 'activo')"
-        )->execute([$criaderoId, $codigo]);
+             VALUES (?, 'S-032', 2026, 1, 'Club RF032', '2026-11-22', ?, ?, 'activo')"
+        )->execute([$criaderoId, $sexo, $codigo]);
     }
 
     private static function conectarBaseDePruebas(): PDO

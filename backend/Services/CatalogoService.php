@@ -544,8 +544,9 @@ final class CatalogoService
 
     /**
      * Corrige una variedad del catálogo y su composición para el administrador (SRS-RF032).
-     * Si la variedad no existe, si los datos no son válidos o si la composición repetiría la de
-     * otra variedad del mismo sexo, tipo y rasgo (DAT-004), devuelve los errores como
+     * Si la variedad no existe, si los datos no son válidos, si el sexo no coincide con el de los
+     * canarios que ya la tienen (RF012) o si la composición repetiría la de otra variedad del
+     * mismo sexo, tipo y rasgo (DAT-004), devuelve los errores como
      * `['campo' => 'mensaje']` sin guardar nada.
      *
      * @param array<string, mixed> $datos nombre, sexo, tipo, rasgo y factores[]
@@ -561,6 +562,13 @@ final class CatalogoService
         $validado = $this->validarDatosDeVariedad($datos);
         if ($validado['errores'] !== []) {
             return ['errores' => $validado['errores']];
+        }
+
+        // Una variedad con sexo solo se asigna a un canario de ese sexo (RF012, docs/backend.md §3).
+        $sexo = $validado['sexo'];
+        if ($sexo !== null && $this->variedades->contarCanariosAsignados($codigo, $sexo) > 0) {
+            return ['errores' => ['sexo' => 'Hay canarios registrados con esta variedad que no son '
+                . ($sexo === 'macho' ? 'machos' : 'hembras') . '.']];
         }
 
         // La dosis no viene del formulario: cada factor conserva la suya y los nuevos entran con una copia.
