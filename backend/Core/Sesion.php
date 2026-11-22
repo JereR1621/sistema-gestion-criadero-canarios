@@ -18,6 +18,10 @@ final class Sesion
         if (session_status() !== PHP_SESSION_ACTIVE) {
             // Sin esto, PHP borra los datos de la sesión a los 24 minutos (valor por defecto: 1440 s).
             ini_set('session.gc_maxlifetime', (string) self::DURACION_MAXIMA);
+            // Rechaza IDs de sesión que no creó el servidor (evita la fijación de sesión).
+            ini_set('session.use_strict_mode', '1');
+            // El ID de sesión solo viaja en la cookie, nunca en la URL.
+            ini_set('session.use_only_cookies', '1');
             session_name('tucriadero');
             session_set_cookie_params([
                 'lifetime' => self::DURACION_MAXIMA,

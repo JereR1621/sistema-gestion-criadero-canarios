@@ -38,4 +38,12 @@ final class SesionTest extends TestCase
         self::assertSame('604800', ini_get('session.gc_maxlifetime'));
         self::assertSame(604800, session_get_cookie_params()['lifetime']);
     }
+
+    public function testLaSesionSoloAceptaIdsCreadosPorElServidor(): void
+    {
+        Sesion::iniciar();
+
+        self::assertSame('1', ini_get('session.use_strict_mode'));
+        self::assertSame('1', ini_get('session.use_only_cookies'));
+    }
 }
