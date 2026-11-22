@@ -638,3 +638,6 @@ a.jaula-card__link:focus-visible {
         margin-top: 2px;
     }
 }
+/* Iconos vectoriales locales: trazos compartidos con el Plan B, sin recursos externos. */
+.jaula-icono { width: 32px; height: 32px; color: var(--petroleo-dark); }
+.jaula-card__img { padding: 12px; color: var(--petroleo-dark); }
