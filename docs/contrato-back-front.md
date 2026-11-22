@@ -151,7 +151,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | recuperar.guardar | POST /recuperar/nueva | (redirige a /ingresar) | — | token, contrasena | Decisión PM 22/11 (§8) |
 | perfil | GET /perfil | cuentas/perfil | `$perfil` = nombre, correo, numero_socio, club | — | RF004 |
 | perfil.guardar | POST /perfil | (redirige a /perfil) | — | numero_socio, club | RF004 |
-| inicio | GET /inicio | inicio/index (si el rol es admin, redirige a /admin/cuentas) | — (el buscador va en la vista) | — | RNF003 |
+| inicio | GET /inicio | inicio/index | — (el buscador va en la vista; si el rol es admin, va a /admin/cuentas) | — | RNF003 |
 
 ### Canarios (RF007–RF013, RF024)
 
@@ -206,7 +206,7 @@ El buscador principal de inicio y de la barra envía `GET /buscar` con `q` y un 
 | Nombre | Método y ruta | Vista | Datos para la vista | Campos del formulario | RF |
 |---|---|---|---|---|---|
 | admin.cuentas | GET /admin/cuentas | admin/cuentas | `$cuentas` [id, nombre, correo, estado, fecha_registro]. Nunca datos del criadero. | — | RF006 |
-| admin.cuentas.estado | POST /admin/cuentas/{id}/estado | (redirige a /admin/cuentas) | — | estado (activa / desactivada / cerrada; cerrar se hace a pedido del criador y guarda fecha_cierre, POL-001 y DAT-002; reactivar una cerrada anula el cierre y deja fecha_cierre en NULL, decisión PM 22/11) | RF005 |
+| admin.cuentas.estado | POST /admin/cuentas/{id}/estado | (redirige a /admin/cuentas) | — | estado (activa / desactivada / cerrada; cerrar se hace a pedido del criador y guarda fecha_cierre, POL-001 y DAT-002; reactivar una cerrada anula el cierre y deja fecha_cierre en NULL; Decisión PM 22/11) | RF005 |
 | admin.variedades | GET /admin/variedades?q= | admin/variedades | `$variedades` [VariedadOpcion + factores [ComposicionFactor]] | — | RF032 |
 | admin.variedades.nueva | GET /admin/variedades/nueva | admin/variedad | `$variedad` (null), `$factores` [FactorOpcion] | — | RF032 |
 | admin.variedades.crear | POST /admin/variedades | (redirige a /admin/variedades) | — | codigo, nombre, sexo, tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / vacío: `null` o `''`), factores[n][factor_id], factores[n][dosis] | RF032 |
