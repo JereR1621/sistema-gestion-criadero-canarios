@@ -1,6 +1,6 @@
 # Contrato backend–frontend
 
-**Versión 0.3 (pendiente de revisión con Figma) · 21/11/2026, con los ajustes del cliente del 09/11/2026 ([`ajustes-cliente.md`](ajustes-cliente.md)).** Acordado entre backend y frontend en la épica E0; una vez validado contra los mockups de Figma pasará a v1.0. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
+**Versión 1.0 · 21/11/2026, con los ajustes del cliente del 09/11/2026 ([`ajustes-cliente.md`](ajustes-cliente.md)).** Acordado entre backend y frontend en la épica E0. Desde entonces, todo cambio a este archivo va en un pull request aprobado por un integrante de cada equipo.
 
 Fuente: SRS v1.1 (`docs/srs/`), los ajustes del cliente (`docs/ajustes-cliente.md`), `docs/backend.md` y `docs/frontend.md`.
 
@@ -8,9 +8,11 @@ Fuente: SRS v1.1 (`docs/srs/`), los ajustes del cliente (`docs/ajustes-cliente.m
 
 El stack es PHP con HTML embebido, así que **no hay una API JSON**. El contrato es la frontera entre el controlador (backend) y la vista (frontend):
 
+```text
 Navegador ──GET/POST──▶ public/index.php ──▶ Controlador ──▶ Servicios / Modelos
 │
 └──▶ render('modulo/vista', $datos) ──▶ frontend/views/modulo/vista.php
+```
 | Responsabilidad | Backend | Frontend |
 |---|---|---|
 | Rutas, permisos y validaciones | ✔ | |
@@ -137,11 +139,11 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | registro | GET /registro | cuentas/registro | — | — | RF001 |
 | registro.guardar | POST /registro | (redirige a /inicio) | — | nombre, correo, contrasena, consentimiento (casilla obligatoria que acepta el uso de los datos para el servicio, POL-001) | RF001 |
 | ingreso | GET /ingresar | cuentas/ingresar | — | — | RF002 |
-| ingreso.enviar | POST /ingresar | (redirige a /inicio; si el rol es admin, a /admin/cuentas) | — | correo, contrasena. Cuenta desactivada → `_general` | RF002, RF005 |
+| ingreso.enviar | POST /ingresar | (redirige a /inicio) | — | correo, contrasena. Cuenta desactivada → `_general` | RF002, RF005 |
 | salida | POST /salir | (redirige a /ingresar) | — | — | SEG-004 |
 | perfil | GET /perfil | cuentas/perfil | `$perfil` = nombre, correo, numero_socio, club | — | RF004 |
 | perfil.guardar | POST /perfil | (redirige a /perfil) | — | numero_socio, club | RF004 |
-| inicio | GET /inicio | inicio/index | — (el buscador va en la vista) | — | RNF003 |
+| inicio | GET /inicio | inicio/index (si el rol es admin, redirige a /admin/cuentas) | — (el buscador va en la vista) | — | RNF003 |
 
 ### Canarios (RF007–RF013, RF024)
 
@@ -219,7 +221,6 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 
 ## 8. Pendiente de acordar
 
-- Revisión contra Figma: Verificar cada pantalla y ruta de la sección 6 contra los mockups aprobados en Figma (#14) para confirmar que no falte ningún dato ni campo antes de pasar el contrato a v1.0.
 - Librería PDF (AC-04): La propuesta es Dompdf con Composer (lo confirma la tarea de estructura base).
 
 Decidido por el PM (10/11/2026), Libro de crías: la ruta cruces lista los cruces de una temporada (macho, hembra, jaula, fecha de inicio y estado), con el botón para registrar un cruce. Es la entrada al libro de crías desde el menú; no tiene filtros por jaula ni por estado. La crea RF018.
@@ -227,6 +228,3 @@ Decidido por el PM (10/11/2026), Libro de crías: la ruta cruces lista los cruce
 Decidido por el PM (10/11/2026), padres a mano: el formulario de canarios tiene padre y madre opcionales (`padre_id`, `madre_id`), elegidos entre los machos y hembras del criadero. Sirven para reconstruir la genealogía de canarios que nacieron antes de usar el sistema. Un canario comprado (con procedencia) o uno anillado desde un cruce no los lleva a mano: el comprado queda sin padres y el pichón los toma del cruce. Reglas en backend.md §3.
 
 Decidido por el PM (09/11/2026), POL-001: el consentimiento es una casilla obligatoria al crear la cuenta (`consentimiento`; el backend guarda `fecha_consentimiento`). Los derechos de acceso, rectificación y eliminación se piden por correo de soporte (SOS-004). Para eliminar, el administrador cierra la cuenta (`estado = cerrada`, RF005) y la tarea de retención borra los datos a los 90 días (DAT-002).
-
-### Próximo paso
-Revisar los mockups de Figma, si todo coincide, simplemente borran el primer punto de la Sección 8, cambian el encabezado a **`Versión 1.0`** y abren el Pull Request hacia `develop`.
