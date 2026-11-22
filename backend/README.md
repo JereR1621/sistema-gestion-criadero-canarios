@@ -53,7 +53,7 @@ Para responder un error desde un controlador, lanza `HttpException::noEncontrado
 
 ## Auditoría: `auditar()`
 
-Toda operación que guarda datos llama a `auditar($accion, $entidad, $entidadId)` (SEG-003), definida en `backend/Models/AuditoriaHelper.php` y cargada por `backend/autoload.php`. Inserta en la tabla `auditoria` el usuario de la sesión, la acción, la entidad, su id y la fecha y hora.
+Toda operación que guarda datos llama a `auditar($accion, $entidad, $entidadId)` (SEG-003), definida en `backend/Models/AuditoriaHelper.php` y cargada por `backend/autoload.php`. Inserta en la tabla `auditoria` el usuario de la sesión, la acción, la entidad, su id y la fecha y hora. El `$entidadId` puede ser un id numérico (un canario) o un código (una variedad del catálogo, `D.049`; migración `016`).
 
 ```php
 // En el servicio, dentro de la misma transacción que el cambio:

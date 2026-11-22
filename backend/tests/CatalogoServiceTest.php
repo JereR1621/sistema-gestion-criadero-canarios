@@ -9,7 +9,11 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PHPUnit\Framework\TestCase;
+use TuCriadero\Controllers\AdminCatalogoController;
+use TuCriadero\Core\Aplicacion;
 use TuCriadero\Core\Conexion;
+use TuCriadero\Core\HttpException;
+use TuCriadero\Core\Rutas;
 use TuCriadero\Models\VariedadModel;
 use TuCriadero\Services\CatalogoService;
 
@@ -56,7 +60,13 @@ final class CatalogoServiceTest extends TestCase
             self::$pdoCompartido->rollBack();
         }
         Conexion::usar(null);
-        unset($_SESSION['criadero_id'], $_SESSION['rol'], $_SESSION['usuario_id']);
+        unset(
+            $_SESSION['criadero_id'],
+            $_SESSION['rol'],
+            $_SESSION['usuario_id'],
+            $_SESSION['nombre'],
+            $_SESSION['flash'],
+        );
     }
 
     /**
@@ -216,6 +226,329 @@ final class CatalogoServiceTest extends TestCase
         self::assertSame($desdeCriadero1, $desdeCriadero2);
     }
 
+    /**
+     * Criterio positivo (SRS-RF032): cuando el administrador agrega o corrige una variedad,
+     * su composición o un factor del catálogo, el cambio queda aplicado para todos los criadores
+     * (el catálogo es global y no se filtra por `criadero_id`) y deja registro de auditoría (SEG-003).
+     */
+    public function testElAdministradorAplicaLosCambiosDelCatalogoParaTodosLosCriadores(): void
+    {
+        $adminId = $this->crearUsuarioDePrueba('admin');
+        $_SESSION['usuario_id'] = $adminId;
+        $_SESSION['rol'] = 'admin';
+        $_SESSION['criadero_id'] = 1001;
+
+        // 1) Agrega un factor: el nombre se guarda en mayúsculas, como el resto del catálogo
+        $factor = $this->servicio->crearFactor('factor de prueba rf032', 'recesivo');
+        self::assertSame([], $factor['errores']);
+        $factorId = (int) $factor['factor_id'];
+
+        // 2) Agrega una variedad nueva con su composición
+        $nueva = $this->servicio->crearVariedad([
+            'codigo' => 'D.900',
+            'nombre' => 'VARIANTE DE PRUEBA',
+            'sexo' => null,
+            'tipo' => 'lipocromico',
+            'rasgo' => null,
+            'factores' => [$factorId],
+        ]);
+        self::assertSame([], $nueva['errores']);
+
+        // 3) Corrige una variedad existente: nombre, sexo y composición
+        $corregida = $this->servicio->actualizarVariedad('D.050', [
+            'nombre' => 'ROJO NEVADO CORREGIDO',
+            'sexo' => 'hembra',
+            'tipo' => 'lipocromico',
+            'rasgo' => null,
+            'factores' => [1, $factorId],
+        ]);
+        self::assertSame([], $corregida['errores']);
+
+        // Los cambios se ven desde cualquier criadero (el catálogo es uno solo y aplica a todos)
+        $_SESSION['criadero_id'] = 1002;
+
+        $lista = $this->servicio->listarVariedadesParaAdmin(null);
+        self::assertCount(881, $lista);
+        self::assertSame(['codigo', 'nombre', 'sexo', 'factores'], array_keys($lista[0]));
+
+        $porCodigo = array_column($lista, null, 'codigo');
+        self::assertSame('VARIANTE DE PRUEBA', $porCodigo['D.900']['nombre']);
+        self::assertSame(['FACTOR DE PRUEBA RF032'], $porCodigo['D.900']['factores']);
+        self::assertSame('ROJO NEVADO CORREGIDO', $porCodigo['D.050']['nombre']);
+        self::assertSame('hembra', $porCodigo['D.050']['sexo']);
+        self::assertSame(['ROJO', 'FACTOR DE PRUEBA RF032'], $porCodigo['D.050']['factores']);
+
+        // El parámetro q= filtra por código o por nombre, sin distinguir mayúsculas
+        self::assertCount(1, $this->servicio->listarVariedadesParaAdmin('D.900'));
+        self::assertCount(1, $this->servicio->listarVariedadesParaAdmin('rojo nevado corregido'));
+        self::assertSame([], $this->servicio->listarVariedadesParaAdmin('sin coincidencias xyz'));
+
+        // Auditoría de las tres operaciones, con el usuario de la sesión (SEG-003)
+        $pdo = self::$pdoCompartido;
+        self::assertInstanceOf(PDO::class, $pdo);
+        $filas = $pdo->query(
+            "SELECT usuario_id, accion, entidad, entidad_id FROM auditoria
+             WHERE entidad IN ('variedad', 'factor') ORDER BY id"
+        )->fetchAll();
+
+        self::assertCount(3, $filas);
+        self::assertSame(
+            ["crear factor {$factorId}", 'crear variedad D.900', 'actualizar variedad D.050'],
+            array_map(
+                static fn (array $fila): string => "{$fila['accion']} {$fila['entidad']} {$fila['entidad_id']}",
+                $filas,
+            ),
+        );
+        foreach ($filas as $fila) {
+            self::assertSame($adminId, (int) $fila['usuario_id']);
+        }
+    }
+
+    /**
+     * Contrato §5 y §6: la vista recibe exactamente las variables y las formas que acuerdan
+     * backend y frontend para el mantenimiento del catálogo (SRS-RF032).
+     */
+    public function testLosDatosParaLasVistasTienenLaFormaDelContrato(): void
+    {
+        $variedades = $this->servicio->listarVariedadesParaAdmin('D.049');
+        self::assertCount(1, $variedades);
+        self::assertSame(['codigo', 'nombre', 'sexo', 'factores'], array_keys($variedades[0]));
+        self::assertSame('D.049', $variedades[0]['codigo']);
+        self::assertSame(['ROJO', 'INTENSO'], $variedades[0]['factores']);
+
+        $variedad = $this->servicio->obtenerVariedad('D.049');
+        self::assertIsArray($variedad);
+        self::assertSame(['codigo', 'nombre', 'sexo', 'tipo', 'rasgo', 'factores'], array_keys($variedad));
+        self::assertSame(['id', 'nombre', 'tipo_herencia', 'dosis'], array_keys($variedad['factores'][0]));
+
+        $factores = $this->servicio->listarFactores();
+        self::assertNotEmpty($factores);
+        self::assertSame(['id', 'nombre', 'tipo_herencia'], array_keys($factores[0]));
+    }
+
+    /**
+     * Las cinco rutas del RF032 llevan los nombres del contrato §6, que son los que usa
+     * la vista de frontend (SRS-RF032 [Frontend] #87).
+     */
+    public function testLasRutasDelCatalogoEstanRegistradasConLosNombresDelContrato(): void
+    {
+        Rutas::definir(Aplicacion::crearRouter());
+
+        self::assertSame('/admin/variedades', ruta('admin.variedades'));
+        self::assertSame('/admin/variedades/D.049', ruta('admin.variedades.editar', ['codigo' => 'D.049']));
+        self::assertSame('/admin/variedades/D.049', ruta('admin.variedades.guardar', ['codigo' => 'D.049']));
+        self::assertSame('/admin/factores', ruta('admin.factores'));
+        self::assertSame('/admin/factores', ruta('admin.factores.guardar'));
+    }
+
+    /**
+     * Criterio negativo (SRS-RF032): código de variedad duplicado; se informa sin guardar nada.
+     */
+    public function testRechazaCodigoDeVariedadDuplicadoSinGuardarNada(): void
+    {
+        $pdo = self::$pdoCompartido;
+        self::assertInstanceOf(PDO::class, $pdo);
+
+        $variedadesAntes = $this->variedades->contar();
+        $auditoriaAntes = (int) $pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
+
+        $resultado = $this->servicio->crearVariedad([
+            'codigo' => 'D.049',
+            'nombre' => 'OTRO ROJO INTENSO',
+            'sexo' => null,
+            'tipo' => 'lipocromico',
+            'rasgo' => null,
+            'factores' => [1],
+        ]);
+
+        self::assertArrayHasKey('codigo', $resultado['errores']);
+        self::assertStringContainsString('D.049', $resultado['errores']['codigo']);
+        self::assertSame($variedadesAntes, $this->variedades->contar());
+        self::assertSame($auditoriaAntes, (int) $pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
+        self::assertSame('ROJO INTENSO', $this->servicio->obtenerVariedad('D.049')['nombre']);
+    }
+
+    /**
+     * Criterio negativo (SRS-RF032): eliminar una variedad asignada a algún canario;
+     * se informa sin guardar nada (docs/backend.md §3).
+     */
+    public function testRechazaEliminarUnaVariedadAsignadaAAlgunCanarioSinGuardarNada(): void
+    {
+        $this->crearCanarioAsignado('D.049');
+
+        $resultado = $this->servicio->eliminarVariedad('D.049');
+
+        self::assertArrayHasKey('codigo', $resultado['errores']);
+        self::assertStringContainsString('D.049', $resultado['errores']['codigo']);
+        self::assertNotNull($this->servicio->obtenerVariedad('D.049'));
+        self::assertSame(880, $this->variedades->contar());
+
+        // Una variedad sin canarios sí se elimina y la baja queda registrada (SEG-003)
+        $libre = $this->servicio->eliminarVariedad('D.880');
+        self::assertSame([], $libre['errores']);
+        self::assertNull($this->servicio->obtenerVariedad('D.880'));
+
+        $pdo = self::$pdoCompartido;
+        self::assertInstanceOf(PDO::class, $pdo);
+        $consulta = $pdo->query("SELECT accion, entidad_id FROM auditoria WHERE accion = 'eliminar'");
+        self::assertSame(['eliminar', 'D.880'], array_values($consulta->fetch()));
+    }
+
+    /**
+     * Criterio negativo (SRS-RF032): composición repetida para el mismo sexo; se informa
+     * sin guardar nada, tanto al corregir una variedad como al crearla (DAT-004).
+     */
+    public function testRechazaComposicionRepetidaParaElMismoSexoSinGuardarNada(): void
+    {
+        // Corregir D.050 con la misma combinación que D.049 (ROJO + INTENSO, sexo sin indicar, lipocrómica, sin rasgo)
+        $resultado = $this->servicio->actualizarVariedad('D.050', [
+            'nombre' => 'ROJO INTENSO COPIA',
+            'sexo' => null,
+            'tipo' => 'lipocromico',
+            'rasgo' => null,
+            'factores' => [1, 4],
+        ]);
+
+        self::assertArrayHasKey('factores', $resultado['errores']);
+        self::assertStringContainsString('D.049', $resultado['errores']['factores']);
+
+        $variedad = $this->servicio->obtenerVariedad('D.050');
+        self::assertSame('ROJO NEVADO', $variedad['nombre']);
+        self::assertSame(['ROJO'], array_column($variedad['factores'], 'nombre'));
+
+        // Crear una variedad con esa misma combinación también se rechaza
+        $nueva = $this->servicio->crearVariedad([
+            'codigo' => 'D.900',
+            'nombre' => 'ROJO INTENSO COPIA',
+            'sexo' => null,
+            'tipo' => 'lipocromico',
+            'rasgo' => null,
+            'factores' => [1, 4],
+        ]);
+
+        self::assertArrayHasKey('factores', $nueva['errores']);
+        self::assertNull($this->variedades->buscarPorCodigo('D.900'));
+        self::assertSame(880, $this->variedades->contar());
+    }
+
+    /**
+     * Criterio negativo (SRS-RF032): un criador que entra a estas rutas recibe 403.
+     */
+    public function testUnCriadorQueEntraALasRutasDelCatalogoRecibe403(): void
+    {
+        $_SESSION['usuario_id'] = 100;
+        $_SESSION['rol'] = 'criador';
+        $_SESSION['criadero_id'] = 1;
+        $_SESSION['nombre'] = 'Criador de prueba';
+
+        $controlador = new AdminCatalogoController();
+        $rutas = [
+            'admin.variedades' => static fn (): mixed => $controlador->variedades(),
+            'admin.variedades.editar' => static fn (): mixed => $controlador->variedadesEditar('D.049'),
+            'admin.variedades.guardar' => static fn (): mixed => $controlador->variedadesGuardar('D.049'),
+            'admin.factores' => static fn (): mixed => $controlador->factores(),
+            'admin.factores.guardar' => static fn (): mixed => $controlador->factoresGuardar(),
+        ];
+
+        foreach ($rutas as $nombre => $ruta) {
+            try {
+                $ruta();
+                self::fail("Un criador debe recibir 403 en {$nombre}.");
+            } catch (HttpException $error) {
+                self::assertSame(403, $error->codigo());
+            }
+        }
+    }
+
+    /**
+     * Criterio negativo (SRS-RF032): ninguna vista de administración muestra datos de un criadero.
+     * Las respuestas solo traen campos del catálogo y son iguales sin importar el criadero de la sesión.
+     */
+    public function testLasRespuestasDeAdministracionNoIncluyenDatosDeUnCriadero(): void
+    {
+        $_SESSION['usuario_id'] = 42;
+        $_SESSION['rol'] = 'admin';
+        $_SESSION['criadero_id'] = 1001;
+
+        $variedades = $this->servicio->listarVariedadesParaAdmin(null);
+        $factores = $this->servicio->listarFactores();
+        $variedad = $this->servicio->obtenerVariedad('D.049');
+
+        $_SESSION['criadero_id'] = 1002;
+
+        self::assertSame($variedades, $this->servicio->listarVariedadesParaAdmin(null));
+        self::assertSame($factores, $this->servicio->listarFactores());
+        self::assertSame($variedad, $this->servicio->obtenerVariedad('D.049'));
+
+        foreach ($variedades as $opcion) {
+            self::assertSame(['codigo', 'nombre', 'sexo', 'factores'], array_keys($opcion));
+        }
+
+        foreach ([$variedad, $factores[0]] as $registro) {
+            foreach (array_keys($registro) as $clave) {
+                self::assertStringNotContainsString('criadero', $clave);
+                self::assertStringNotContainsString('canario', $clave);
+                self::assertStringNotContainsString('jaula', $clave);
+                self::assertStringNotContainsString('cruce', $clave);
+            }
+        }
+    }
+
+    /**
+     * Criterio negativo (SRS-RF032, admin.factores.guardar): un factor repetido, sin nombre o
+     * con un tipo de herencia inválido se informa como `['campo' => 'mensaje']` sin guardar nada.
+     */
+    public function testCrearFactorInformaLosErroresPorCampoSinGuardarNada(): void
+    {
+        $factoresAntes = count($this->servicio->listarFactores());
+
+        // «MARFIL» ya existe: el nombre se compara en mayúsculas, como se guarda
+        $repetido = $this->servicio->crearFactor('marfil', 'recesivo');
+        self::assertArrayHasKey('nombre', $repetido['errores']);
+
+        $sinHerencia = $this->servicio->crearFactor('factor de prueba', '');
+        self::assertArrayHasKey('tipo_herencia', $sinHerencia['errores']);
+
+        $herenciaInvalida = $this->servicio->crearFactor('factor de prueba', 'parcial');
+        self::assertArrayHasKey('tipo_herencia', $herenciaInvalida['errores']);
+
+        $sinNombre = $this->servicio->crearFactor('   ', 'recesivo');
+        self::assertArrayHasKey('nombre', $sinNombre['errores']);
+
+        self::assertSame($factoresAntes, count($this->servicio->listarFactores()));
+    }
+
+    /** Crea una cuenta inventada y devuelve su id (en MySQL `auditoria` tiene clave foránea a `usuario`). */
+    private function crearUsuarioDePrueba(string $rol): int
+    {
+        $pdo = self::$pdoCompartido;
+        self::assertInstanceOf(PDO::class, $pdo);
+
+        $correo = 'rf032.' . uniqid('', true) . '@tucriadero.cl';
+        $pdo->prepare(
+            'INSERT INTO usuario (nombre, correo, contrasena_hash, rol, estado) VALUES (?, ?, ?, ?, ?)'
+        )->execute(['Cuenta RF032', $correo, password_hash('ClaveValida2026', PASSWORD_DEFAULT), $rol, 'activa']);
+
+        return (int) $pdo->lastInsertId();
+    }
+
+    /** Crea un canario de un criadero inventado que tiene la variedad indicada asignada (RF032). */
+    private function crearCanarioAsignado(string $codigo): void
+    {
+        $pdo = self::$pdoCompartido;
+        self::assertInstanceOf(PDO::class, $pdo);
+
+        $usuarioId = $this->crearUsuarioDePrueba('criador');
+        $pdo->prepare('INSERT INTO criadero (usuario_id) VALUES (?)')->execute([$usuarioId]);
+        $criaderoId = (int) $pdo->lastInsertId();
+
+        $pdo->prepare(
+            "INSERT INTO canario (criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club,
+                                  fecha_anillado, sexo, variedad_codigo, estado)
+             VALUES (?, 'S-032', 2026, 1, 'Club RF032', '2026-11-22', 'macho', ?, 'activo')"
+        )->execute([$criaderoId, $codigo]);
+    }
+
     private static function conectarBaseDePruebas(): PDO
     {
         $archivoEnv = dirname(__DIR__, 2) . '/.env';
@@ -294,6 +627,48 @@ final class CatalogoServiceTest extends TestCase
                 PRIMARY KEY (variedad_codigo, factor_id),
                 FOREIGN KEY (variedad_codigo) REFERENCES variedad (codigo) ON DELETE CASCADE,
                 FOREIGN KEY (factor_id) REFERENCES factor (id) ON DELETE CASCADE
+            )'
+        );
+        $pdo->exec(
+            'CREATE TABLE auditoria (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                usuario_id INTEGER NULL,
+                accion VARCHAR(50) NOT NULL,
+                entidad VARCHAR(50) NOT NULL,
+                entidad_id VARCHAR(50) NOT NULL,
+                fecha_hora TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )'
+        );
+        // Tablas de cuentas y de canarios que la prueba de RF032 necesita para comprobar
+        // que no se elimina una variedad asignada (en MySQL ya existen, con sus claves foráneas).
+        $pdo->exec(
+            'CREATE TABLE usuario (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre VARCHAR(100) NOT NULL,
+                correo VARCHAR(150) NOT NULL UNIQUE,
+                contrasena_hash VARCHAR(255) NOT NULL,
+                rol TEXT NOT NULL,
+                estado TEXT NOT NULL
+            )'
+        );
+        $pdo->exec(
+            'CREATE TABLE criadero (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                usuario_id INTEGER NOT NULL UNIQUE
+            )'
+        );
+        $pdo->exec(
+            'CREATE TABLE canario (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                criadero_id INTEGER NOT NULL,
+                anillo_socio VARCHAR(50) NOT NULL,
+                anillo_anio INTEGER NOT NULL,
+                anillo_correlativo INTEGER NOT NULL,
+                anillo_club VARCHAR(50) NOT NULL,
+                fecha_anillado TEXT NULL,
+                sexo TEXT NOT NULL,
+                variedad_codigo CHAR(5) NULL,
+                estado TEXT NOT NULL DEFAULT \'activo\'
             )'
         );
 

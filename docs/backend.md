@@ -64,7 +64,7 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 | `ubicacion` | id, canario_id, jaula_id, fecha_desde, fecha_hasta | `jaula_id` NULL = jaula grande. `fecha_hasta` NULL = ubicación actual. |
 | `baja` | id, canario_id, motivo (`venta` / `muerte` / `otra`), fecha | `canario_id` UNIQUE (una baja por canario). |
 | `factor_portado` | canario_id, factor_id, origen (`deducido` / `criador`) | PK (`canario_id`, `factor_id`). |
-| `auditoria` | id, usuario_id, accion, entidad, entidad_id, fecha_hora | Se conserva 1 año (SEG-003). |
+| `auditoria` | id, usuario_id, accion, entidad, entidad_id (id numérico o código, por ejemplo la variedad `D.049`; migración 016), fecha_hora | Se conserva 1 año (SEG-003). |
 
 Notas del modelo:
 - `padre_id` y `madre_id` son **dos claves foráneas** a `canario`; `macho_id` y `hembra_id` también. En la Figura 2 aparecen como columnas FK separadas.
