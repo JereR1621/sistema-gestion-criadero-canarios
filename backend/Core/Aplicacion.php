@@ -10,6 +10,7 @@ use TuCriadero\Controllers\AdminCuentaController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
+use TuCriadero\Controllers\JaulaController;
 use TuCriadero\Models\UsuarioModel;
 
 final class Aplicacion
@@ -62,6 +63,9 @@ final class Aplicacion
 
             new Ruta('perfil', 'GET', '/perfil', CuentaController::class, 'perfil'),
             new Ruta('perfil.guardar', 'POST', '/perfil', CuentaController::class, 'perfilGuardar'),
+
+            new Ruta('jaulas', 'GET', '/jaulas', JaulaController::class, 'index'),
+            new Ruta('jaulas.guardar', 'POST', '/jaulas', JaulaController::class, 'guardar'),
 
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
 
