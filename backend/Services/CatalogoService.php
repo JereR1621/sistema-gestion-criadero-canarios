@@ -6,12 +6,13 @@ namespace TuCriadero\Services;
 
 use DomainException;
 use InvalidArgumentException;
+use TuCriadero\Core\HttpException;
 use TuCriadero\Models\FactorModel;
 use TuCriadero\Models\VariedadModel;
 
 /**
- * Reglas del catálogo global de variedades de color y factores genéticos (SRS-RF028, SRS-RF031,
- * SRS-RF032, DAT-004, DAT-005).
+ * Reglas del catálogo global de variedades de color y factores genéticos (SRS-RF028, SRS-RF030,
+ * SRS-RF031, SRS-RF032, DAT-004, DAT-005).
  *
  * Lee siempre a través de `VariedadModel` y `FactorModel` (sin consultar PDO directamente).
  * El catálogo es global: no se filtra por `criadero_id`.
@@ -265,6 +266,8 @@ final class CatalogoService
      */
     public function cargarFactor(string $nombre, ?string $tipoHerencia): int
     {
+        $this->impedirModificacionPorCriador();
+
         $nombreNormalizado = mb_strtoupper(trim($nombre), 'UTF-8');
         if ($nombreNormalizado === '') {
             throw new InvalidArgumentException('El nombre del factor es obligatorio.');
@@ -294,6 +297,8 @@ final class CatalogoService
      */
     public function crearFactor(string $nombre, ?string $tipoHerencia): array
     {
+        $this->impedirModificacionPorCriador();
+
         $nombreNormalizado = mb_strtoupper(trim($nombre), 'UTF-8');
 
         $errores = [];
@@ -428,6 +433,8 @@ final class CatalogoService
         ?string $rasgo,
         array $composicion = [],
     ): void {
+        $this->impedirModificacionPorCriador();
+
         $codigo = trim($codigo);
         $nombre = trim($nombre);
 
@@ -496,6 +503,8 @@ final class CatalogoService
      */
     public function crearVariedad(array $datos): array
     {
+        $this->impedirModificacionPorCriador();
+
         $codigo = trim((string) ($datos['codigo'] ?? ''));
         if ($codigo === '') {
             return ['errores' => ['codigo' => 'El código de la variedad es obligatorio.']];
@@ -554,6 +563,8 @@ final class CatalogoService
      */
     public function actualizarVariedad(string $codigo, array $datos): array
     {
+        $this->impedirModificacionPorCriador();
+
         $codigo = trim($codigo);
         if ($this->variedades->buscarPorCodigo($codigo) === null) {
             return ['errores' => ['codigo' => "La variedad «{$codigo}» no existe en el catálogo."]];
@@ -619,6 +630,8 @@ final class CatalogoService
      */
     public function eliminarVariedad(string $codigo): array
     {
+        $this->impedirModificacionPorCriador();
+
         $codigo = trim($codigo);
         if ($this->variedades->buscarPorCodigo($codigo) === null) {
             return ['errores' => ['codigo' => "La variedad «{$codigo}» no existe en el catálogo."]];
@@ -795,6 +808,17 @@ final class CatalogoService
             throw new DomainException(
                 "El factor «{$factor['nombre']}» no tiene un tipo de herencia válido en el catálogo."
             );
+        }
+    }
+
+    /**
+     * Defensa en profundidad (SRS-RF030): el catálogo es de solo lectura para los criadores.
+     * Si la sesión activa pertenece a un criador, se bloquea cualquier escritura con 403.
+     */
+    private function impedirModificacionPorCriador(): void
+    {
+        if (($_SESSION['rol'] ?? null) === 'criador') {
+            throw HttpException::prohibido();
         }
     }
 }

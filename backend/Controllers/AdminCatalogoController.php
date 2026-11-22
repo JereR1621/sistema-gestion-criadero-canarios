@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace TuCriadero\Controllers;
 
-use TuCriadero\Core\HttpException;
 use TuCriadero\Core\Vista;
 use TuCriadero\Services\CatalogoService;
 
 /**
- * Mantenimiento del catálogo de variedades y factores para el administrador (SRS-RF032).
+ * Mantenimiento del catálogo de variedades y factores para el administrador (SRS-RF030, SRS-RF032).
  *
  * Solo rol `admin`: un criador recibe 403. El catálogo es global, así que estas operaciones
  * usan datos globales, no se filtran por `criadero_id` y nunca entregan canarios, jaulas ni cruces.
