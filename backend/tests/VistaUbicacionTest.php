@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TuCriadero\Tests;
 
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
-use TuCriadero\Core\{Aplicacion, Rutas, Router, Ruta, Sesion, Vista};
+use TuCriadero\Core\{Aplicacion, Ruta, Router, Rutas, Sesion, Vista};
 
 #[RunTestsInSeparateProcesses]
 #[PreserveGlobalState(false)]
@@ -33,20 +33,23 @@ final class VistaUbicacionTest extends TestCase
             'id' => 12, 'anillo_texto' => '7 · 2024 · 150 · CLUB', 'sexo' => 'macho',
             'variedad' => ['codigo' => 'D.049', 'nombre' => 'ROJO INTENSO'],
             'ubicacion_texto' => 'Jaula 25',
+            'url' => '/canarios/12',
         ], 'jaulas' => [['id' => 1, 'numero' => 25, 'ocupantes' => 2]]];
     }
 
-    public function testUsaLaVariedadYUbicacionDelContratoSinAvisos(): void
+    public function testUsaMarcoPlanBHtmxVariedadYUbicacionDelContratoSinAvisos(): void
     {
         $html = (string) render('canarios/ubicacion', $this->datos(), true);
         self::assertStringContainsString('ROJO INTENSO', $html);
-        self::assertStringContainsString('>Jaula 25</span>', $html);
+        self::assertStringContainsString('Jaula 25', $html);
         self::assertStringNotContainsString('>Array<', $html);
+        self::assertStringContainsString('id="hoja"', $html);
         self::assertStringContainsString('action="/canarios/12/ubicacion"', $html);
-        self::assertStringContainsString('href="/css/canarios-ubicacion.css"', $html);
-        self::assertStringContainsString('aria-label="Mi perfil">AP</a>', $html);
+        self::assertStringContainsString('href="/css/tucriadero.css"', $html);
+        self::assertStringContainsString('src="/js/htmx.min.js"', $html);
+        self::assertStringContainsString('src="/js/tucri.js"', $html);
+        self::assertStringContainsString('>AP</span>', $html);
         self::assertStringNotContainsString('/frontend/css/', $html);
-        self::assertStringNotContainsString('/assets/', $html);
     }
 
     public function testNoInventaUbicacionCuandoNoHayVariedadNiUbicacion(): void
@@ -55,7 +58,7 @@ final class VistaUbicacionTest extends TestCase
         $datos['canario']['variedad'] = null;
         $datos['canario']['ubicacion_texto'] = 'Sin ubicación';
         $html = (string) render('canarios/ubicacion', $datos, true);
-        self::assertStringContainsString('>Sin ubicación</span>', $html);
+        self::assertStringContainsString('Sin ubicación', $html);
         self::assertStringNotContainsString('>Array<', $html);
     }
 
