@@ -40,7 +40,7 @@ final class JaulaController extends BaseController
                 'jaulas' => $servicio->listarResumenes($criaderoId),
                 'errores' => $resultado['errores'],
                 'viejo' => [
-                    'numero' => trim((string) $datos['numero']),
+                    'numero' => trim(texto_de($datos['numero'])),
                 ],
             ]);
             return;

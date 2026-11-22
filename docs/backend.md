@@ -97,7 +97,7 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 
 | Módulo | RF | Lo esencial para backend |
 |---|---|---|
-| Cuentas y acceso | RF001–RF006 | Autorregistro solo como criador; crea el criadero vacío. La cuenta de administrador se crea por seed, nunca por autorregistro. Una cuenta desactivada no inicia sesión y conserva sus datos. El administrador ve los datos de registro de las cuentas, no los criaderos. |
+| Cuentas y acceso | RF001–RF006 | Autorregistro solo como criador; crea el criadero vacío. La cuenta de administrador se crea por seed, nunca por autorregistro. Una cuenta desactivada no inicia sesión y conserva sus datos; si se desactiva o se cierra con una sesión abierta, esa sesión termina en la siguiente petición. El administrador ve los datos de registro de las cuentas, no los criaderos. No tiene criadero: al ingresar va a `/admin/cuentas` (#120), recibe 403 en las rutas de criador, y un criador recibe 403 en las de administración. |
 | Individuos | RF007–RF013 | El anillo es obligatorio (sus cuatro partes); sexo y variedad pueden quedar "sin determinar". Padre y madre son opcionales: un canario sin padres es un fundador; con padres indicados a mano se reconstruye la genealogía de canarios nacidos antes de usar el sistema. Si el anillo está duplicado, se informa qué canario lo usa. Un canario adquirido se guarda sin padres y con su procedencia. La baja lo saca de los listados de activos, pero conserva su genealogía. Un canario puede quedar **reservado** (AC-03): sigue activo en listados y búsquedas, pero no forma cruces nuevos; un dado de baja no se reserva. |
 | Jaulas | RF014–RF017 | El número de jaula es único por criadero. Asignar o trasladar a un canario cierra su ubicación anterior y abre otra (la jaula grande es `jaula_id` NULL). El historial de la jaula se arma con ubicaciones y cruces ordenados por fecha. |
 | Libro de crías | RF018–RF022 | Para crear un cruce se exige macho, hembra, jaula, temporada y fecha de inicio. Solo se ofrecen y se aceptan canarios disponibles: no reservados ni dados de baja (AC-02). Una hembra con varios machos, o un macho con varias hembras, son cruces independientes. Al anillar, cada pichón queda con padre, madre y cruce de origen. Terminar un cruce registra su `fecha_fin`. |
@@ -148,7 +148,13 @@ Caso de prueba que dio el cliente (RF037, audio del 09/11/2026): negro ópalo am
 
 ## 7. Seguridad (SEG-001 a SEG-005)
 
-- **Contraseñas:** `password_hash()` / `password_verify()` (bcrypt o Argon2), con un mínimo de 8 caracteres.
+- **Contraseñas:** `password_hash()` / `password_verify()` (bcrypt o Argon2). Según NIST SP 800-63B:
+  - al menos 8 caracteres sin contar los espacios;
+  - hasta 72 bytes y sin byte nulo (límites de bcrypt);
+  - se rechazan las contraseñas muy usadas (`backend/recursos/contrasenas-comunes.txt`), un solo carácter repetido y las secuencias (`12345678`, `abcdefgh`, `qwertyui` y al revés);
+  - se rechazan las que contienen el correo o el nombre;
+  - no se exigen mayúsculas, números ni símbolos.
+- **Campos de formulario:** se leen con `texto_de()`. Un campo que llega como lista (`nombre[]=x`) cuenta como vacío y da el error del campo, nunca un aviso de PHP.
 - **Inyección SQL:** solo consultas preparadas (PDO); nunca concatenar datos del usuario en el SQL.
 - **CSRF:** token en todo formulario que modifique datos; el backend lo valida.
 - **XSS:** las vistas escapan todo dato con `htmlspecialchars` (lo hace frontend, pero el backend no entrega HTML armado con datos del usuario).

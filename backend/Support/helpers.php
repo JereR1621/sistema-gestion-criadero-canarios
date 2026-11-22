@@ -47,3 +47,12 @@ function render(string $vista, array $datos = [], bool $devolverHtml = false): ?
 {
     return Vista::renderizar($vista, $datos, $devolverHtml);
 }
+
+/**
+ * Valor de un campo de formulario como texto. Si llega como lista u objeto (por ejemplo `nombre[]=x`), cuenta como
+ * vacío: así la validación responde con el error del campo, sin avisos de PHP ni el texto «Array» guardado.
+ */
+function texto_de(mixed $valor): string
+{
+    return is_scalar($valor) ? (string) $valor : '';
+}

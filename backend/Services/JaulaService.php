@@ -66,7 +66,7 @@ final class JaulaService
      */
     public function registrar(int $criaderoId, array $datos): array
     {
-        $numeroCrudo = trim((string) ($datos['numero'] ?? ''));
+        $numeroCrudo = trim(texto_de($datos['numero'] ?? ''));
 
         if ($numeroCrudo === '') {
             return [

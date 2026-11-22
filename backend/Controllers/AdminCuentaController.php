@@ -36,7 +36,7 @@ final class AdminCuentaController extends BaseController
                 'cuentas' => $servicio->listarCuentasParaAdmin(),
                 'errores' => $resultado['errores'],
                 'viejo' => [
-                    'estado' => trim((string) $datos['estado']),
+                    'estado' => trim(texto_de($datos['estado'])),
                 ],
             ]);
             return;

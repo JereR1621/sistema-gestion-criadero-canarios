@@ -21,7 +21,7 @@ final class AdminCatalogoController extends BaseController
     {
         $this->exigirAdmin();
 
-        $q = trim((string) ($_GET['q'] ?? ''));
+        $q = trim(texto_de($_GET['q'] ?? ''));
 
         render('admin/variedades', [
             'variedades' => (new CatalogoService())->listarVariedadesParaAdmin($q),

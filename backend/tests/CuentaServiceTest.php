@@ -127,7 +127,8 @@ final class CuentaServiceTest extends TestCase
         $larga = $this->servicio->registrar([
             'nombre' => 'Ana Criadora',
             'correo' => 'ana.larga@tucriadero.cl',
-            'contrasena' => str_repeat('a', 73),
+            // 73 bytes sin repetir un solo carácter (eso se rechaza aparte, por fácil de adivinar).
+            'contrasena' => substr(str_repeat('jaula-patio-', 7), 0, 73),
             'consentimiento' => '1',
         ]);
         self::assertArrayHasKey('contrasena', $larga['errores']);
@@ -147,7 +148,7 @@ final class CuentaServiceTest extends TestCase
         $resultado = $this->servicio->registrar([
             'nombre' => 'Ana Criadora',
             'correo' => 'ana.limite@tucriadero.cl',
-            'contrasena' => str_repeat('a', 72),
+            'contrasena' => substr(str_repeat('jaula-patio-', 7), 0, 72),
             'consentimiento' => '1',
         ]);
 
@@ -765,5 +766,49 @@ final class CuentaServiceTest extends TestCase
 
         self::assertArrayNotHasKey('usuario_id', $_SESSION);
         self::assertArrayNotHasKey('rol', $_SESSION);
+    }
+
+    /** Un campo enviado como lista (`nombre[]=x`) cuenta como vacío: error del campo, sin avisos de PHP ni «Array» guardado. */
+    public function testCamposEnviadosComoListaSeRechazanSinGuardar(): void
+    {
+        $resultado = $this->servicio->registrar(['nombre' => ['Ana'], 'correo' => ['ana@tucriadero.cl'], 'contrasena' => ['x'], 'consentimiento' => '1']);
+
+        self::assertSame(['nombre', 'correo', 'contrasena'], array_keys($resultado['errores']));
+        self::assertSame(0, (int) $this->pdo->query("SELECT COUNT(*) FROM usuario WHERE nombre = 'Array'")->fetchColumn());
+        self::assertArrayHasKey('_general', $this->servicio->autenticar(['correo' => ['a@b.cl'], 'contrasena' => 'ClaveValida2026'])['errores']);
+    }
+
+    /** Un byte nulo en la contraseña es un error del campo, no un 500 (bcrypt no lo admite en PHP 8.3). */
+    public function testContrasenaConByteNuloSeRechaza(): void
+    {
+        $resultado = $this->servicio->registrar(['nombre' => 'Ana Criadora', 'correo' => 'ana.nulo@tucriadero.cl',
+            'contrasena' => "jaula\0patio-norte", 'consentimiento' => '1']);
+
+        self::assertArrayHasKey('contrasena', $resultado['errores']);
+    }
+
+    /** NIST SP 800-63B: sin solo espacios, contraseñas comunes, secuencias, repetidas ni el correo o el nombre. */
+    public function testContrasenasFacilesDeAdivinarSeRechazanYUnaFraseSeAcepta(): void
+    {
+        // Pares [clave, motivo]: una clave numérica como índice de arreglo se volvería un entero.
+        $casos = [
+            ['        ', 'sin contar los espacios'],
+            ['12345678', 'muy común'],
+            ['87654321', 'muy común'],
+            ['aaaaaaaa', 'muy común'],
+            ['Password123', 'muy común'],
+            ['contraseña', 'muy común'],
+            ['ana.maria@tucriadero.cl', 'correo ni tu nombre'],
+            ['clave anamaria 26', 'correo ni tu nombre'],
+        ];
+        foreach ($casos as [$clave, $motivo]) {
+            $resultado = $this->servicio->registrar(['nombre' => 'Ana María', 'correo' => 'ana.maria@tucriadero.cl',
+                'contrasena' => $clave, 'consentimiento' => '1']);
+            self::assertStringContainsString($motivo, $resultado['errores']['contrasena'] ?? '', "Debió rechazar «{$clave}».");
+        }
+
+        $frase = $this->servicio->registrar(['nombre' => 'Ana María', 'correo' => 'ana.maria@tucriadero.cl',
+            'contrasena' => 'mi jaula del patio', 'consentimiento' => '1']);
+        self::assertSame([], $frase['errores']);
     }
 }

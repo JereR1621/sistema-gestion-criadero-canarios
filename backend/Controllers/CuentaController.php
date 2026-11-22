@@ -33,8 +33,8 @@ final class CuentaController extends BaseController
             render('cuentas/registro', [
                 'errores' => $resultado['errores'],
                 'viejo' => [
-                    'nombre' => trim((string) $datos['nombre']),
-                    'correo' => trim((string) $datos['correo']),
+                    'nombre' => trim(texto_de($datos['nombre'])),
+                    'correo' => trim(texto_de($datos['correo'])),
                 ],
             ]);
             return;
@@ -44,7 +44,7 @@ final class CuentaController extends BaseController
             (int) $resultado['usuario_id'],
             'criador',
             (int) $resultado['criadero_id'],
-            trim((string) $datos['nombre'])
+            trim(texto_de($datos['nombre']))
         );
 
         Vista::guardarFlash([
@@ -76,7 +76,7 @@ final class CuentaController extends BaseController
             render('cuentas/ingresar', [
                 'errores' => $resultado['errores'],
                 'viejo' => [
-                    'correo' => trim((string) $datos['correo']),
+                    'correo' => trim(texto_de($datos['correo'])),
                 ],
             ]);
             return;
@@ -154,8 +154,8 @@ final class CuentaController extends BaseController
                 'perfil' => $perfil,
                 'errores' => $resultado['errores'],
                 'viejo' => [
-                    'numero_socio' => trim((string) $datos['numero_socio']),
-                    'club' => trim((string) $datos['club']),
+                    'numero_socio' => trim(texto_de($datos['numero_socio'])),
+                    'club' => trim(texto_de($datos['club'])),
                 ],
             ]);
             return;
