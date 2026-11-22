@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace TuCriadero\Core;
 
 use Throwable;
+use TuCriadero\Controllers\AdminCatalogoController;
 use TuCriadero\Controllers\AdminCuentaController;
-use TuCriadero\Controllers\CanarioController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
+use TuCriadero\Controllers\JaulaController;
 use TuCriadero\Models\UsuarioModel;
 
 final class Aplicacion
@@ -50,6 +51,7 @@ final class Aplicacion
     public static function crearRouter(): Router
     {
         return new Router([
+            new Ruta('raiz', 'GET', '/', InicioController::class, 'raiz'),
             new Ruta('inicio', 'GET', '/inicio', InicioController::class, 'mostrar'),
             new Ruta('inicio.pdf', 'GET', '/inicio/pdf', InicioController::class, 'descargarPdf'),
 
@@ -63,14 +65,22 @@ final class Aplicacion
             new Ruta('perfil', 'GET', '/perfil', CuentaController::class, 'perfil'),
             new Ruta('perfil.guardar', 'POST', '/perfil', CuentaController::class, 'perfilGuardar'),
 
-            new Ruta('canarios', 'GET', '/canarios', CanarioController::class, 'index'),
-            new Ruta('canarios.nuevo', 'GET', '/canarios/nuevo', CanarioController::class, 'nuevo'),
-            new Ruta('canarios.guardar', 'POST', '/canarios', CanarioController::class, 'guardar'),
-            new Ruta('canarios.ficha', 'GET', '/canarios/{id}', CanarioController::class, 'ficha'),
-            new Ruta('canarios.editar', 'GET', '/canarios/{id}/editar', CanarioController::class, 'editar'),
-            new Ruta('canarios.actualizar', 'POST', '/canarios/{id}', CanarioController::class, 'actualizar'),
+            new Ruta('jaulas', 'GET', '/jaulas', JaulaController::class, 'index'),
+            new Ruta('jaulas.guardar', 'POST', '/jaulas', JaulaController::class, 'guardar'),
 
+            new Ruta('admin.cuentas', 'GET', '/admin/cuentas', AdminCuentaController::class, 'index'),
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
+
+            new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
+            new Ruta('admin.variedades.nueva', 'GET', '/admin/variedades/nueva', AdminCatalogoController::class, 'variedadesNueva'),
+            new Ruta('admin.variedades.crear', 'POST', '/admin/variedades', AdminCatalogoController::class, 'variedadesCrear'),
+            new Ruta('admin.variedades.editar', 'GET', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesEditar'),
+            new Ruta('admin.variedades.guardar', 'POST', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesGuardar'),
+            new Ruta('admin.variedades.eliminar', 'POST', '/admin/variedades/{codigo}/eliminar', AdminCatalogoController::class, 'variedadesEliminar'),
+            new Ruta('admin.factores', 'GET', '/admin/factores', AdminCatalogoController::class, 'factores'),
+            new Ruta('admin.factores.guardar', 'POST', '/admin/factores', AdminCatalogoController::class, 'factoresGuardar'),
+            new Ruta('admin.factores.editar', 'GET', '/admin/factores/{id}', AdminCatalogoController::class, 'factoresEditar'),
+            new Ruta('admin.factores.actualizar', 'POST', '/admin/factores/{id}', AdminCatalogoController::class, 'factoresActualizar'),
         ]);
     }
 
