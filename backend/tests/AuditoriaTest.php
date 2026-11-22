@@ -43,4 +43,21 @@ final class AuditoriaTest extends TestCase
 
         self::assertNull($this->pdo->query('SELECT usuario_id FROM auditoria')->fetchColumn());
     }
+
+    /**
+     * RF032: el catálogo se audita con su código alfanumérico (la variedad es D.049, no un id
+     * numérico). La columna `entidad_id` es VARCHAR(50) desde la migración 016.
+     */
+    public function testGuardaUnCodigoDeCatalogoComoEntidadId(): void
+    {
+        $_SESSION['usuario_id'] = 42;
+
+        \auditar('actualizar', 'variedad', 'D.049');
+
+        $fila = $this->pdo->query('SELECT usuario_id, entidad, entidad_id FROM auditoria')->fetch(PDO::FETCH_ASSOC);
+        self::assertSame(
+            [42, 'variedad', 'D.049'],
+            [(int) $fila['usuario_id'], $fila['entidad'], (string) $fila['entidad_id']],
+        );
+    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TuCriadero\Core;
 
 use Throwable;
+use TuCriadero\Controllers\AdminCatalogoController;
 use TuCriadero\Controllers\AdminCuentaController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
@@ -63,6 +64,12 @@ final class Aplicacion
             new Ruta('perfil.guardar', 'POST', '/perfil', CuentaController::class, 'perfilGuardar'),
 
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
+
+            new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
+            new Ruta('admin.variedades.editar', 'GET', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesEditar'),
+            new Ruta('admin.variedades.guardar', 'POST', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesGuardar'),
+            new Ruta('admin.factores', 'GET', '/admin/factores', AdminCatalogoController::class, 'factores'),
+            new Ruta('admin.factores.guardar', 'POST', '/admin/factores', AdminCatalogoController::class, 'factoresGuardar'),
         ]);
     }
 

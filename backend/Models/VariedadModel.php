@@ -160,4 +160,114 @@ final class VariedadModel
             throw $error;
         }
     }
+
+    /**
+     * Actualiza los datos de una variedad y reemplaza su composición por la indicada,
+     * de forma atómica (SRS-RF032).
+     *
+     * @param array<int, int> $composicion mapa factor_id => dosis (1 o 2)
+     */
+    public function actualizar(
+        string $codigo,
+        string $nombre,
+        ?string $sexo,
+        string $tipo,
+        ?string $rasgo,
+        array $composicion,
+    ): void {
+        $pdo = Conexion::obtener();
+        $iniciaTransaccion = !$pdo->inTransaction();
+
+        if ($iniciaTransaccion) {
+            $pdo->beginTransaction();
+        }
+
+        try {
+            $actualizarVariedad = $pdo->prepare(
+                'UPDATE variedad SET nombre = ?, sexo = ?, tipo = ?, rasgo = ? WHERE codigo = ?'
+            );
+            $actualizarVariedad->execute([$nombre, $sexo, $tipo, $rasgo, $codigo]);
+
+            $borrarComposicion = $pdo->prepare('DELETE FROM variedad_factor WHERE variedad_codigo = ?');
+            $borrarComposicion->execute([$codigo]);
+
+            if ($composicion !== []) {
+                $insertarFactor = $pdo->prepare(
+                    'INSERT INTO variedad_factor (variedad_codigo, factor_id, dosis) VALUES (?, ?, ?)'
+                );
+                foreach ($composicion as $factorId => $dosis) {
+                    $insertarFactor->execute([$codigo, (int) $factorId, (int) $dosis]);
+                }
+            }
+
+            if ($iniciaTransaccion) {
+                $pdo->commit();
+            }
+        } catch (Throwable $error) {
+            if ($iniciaTransaccion && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $error;
+        }
+    }
+
+    /**
+     * Elimina una variedad y su composición (RF032).
+     * Si algún canario la usa, `canario.variedad_codigo` la retiene con `ON DELETE RESTRICT`
+     * y la operación falla; el servicio lo avisa antes de llegar acá.
+     */
+    public function eliminar(string $codigo): void
+    {
+        $consulta = Conexion::obtener()->prepare('DELETE FROM variedad WHERE codigo = ?');
+        $consulta->execute([$codigo]);
+    }
+
+    /**
+     * Cantidad de canarios (de cualquier criadero) que tienen esta variedad asignada (RF032).
+     * El catálogo es global: no se filtra por `criadero_id`.
+     * Con `$distintoDeSexo`, cuenta solo los que no son de ese sexo (RF012).
+     */
+    public function contarCanariosAsignados(string $codigo, ?string $distintoDeSexo = null): int
+    {
+        if ($distintoDeSexo === null) {
+            $consulta = Conexion::obtener()->prepare('SELECT COUNT(*) FROM canario WHERE variedad_codigo = ?');
+            $consulta->execute([$codigo]);
+        } else {
+            $consulta = Conexion::obtener()->prepare('SELECT COUNT(*) FROM canario WHERE variedad_codigo = ? AND sexo <> ?');
+            $consulta->execute([$codigo, $distintoDeSexo]);
+        }
+
+        return (int) $consulta->fetchColumn();
+    }
+
+    /**
+     * Ejecuta una operación dentro de una transacción (si no hay una ya abierta).
+     *
+     * @template T
+     * @param callable(): T $operacion
+     * @return T
+     */
+    public function enTransaccion(callable $operacion): mixed
+    {
+        $pdo = Conexion::obtener();
+        $iniciaTransaccion = !$pdo->inTransaction();
+
+        if ($iniciaTransaccion) {
+            $pdo->beginTransaction();
+        }
+
+        try {
+            $resultado = $operacion();
+            if ($iniciaTransaccion) {
+                $pdo->commit();
+            }
+
+            return $resultado;
+        } catch (Throwable $error) {
+            if ($iniciaTransaccion && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $error;
+        }
+    }
 }

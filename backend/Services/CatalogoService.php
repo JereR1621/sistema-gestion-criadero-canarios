@@ -10,10 +10,14 @@ use TuCriadero\Models\FactorModel;
 use TuCriadero\Models\VariedadModel;
 
 /**
- * Reglas del catálogo global de variedades de color y factores genéticos (SRS-RF028, SRS-RF031, DAT-004, DAT-005).
+ * Reglas del catálogo global de variedades de color y factores genéticos (SRS-RF028, SRS-RF031,
+ * SRS-RF032, DAT-004, DAT-005).
  *
  * Lee siempre a través de `VariedadModel` y `FactorModel` (sin consultar PDO directamente).
  * El catálogo es global: no se filtra por `criadero_id`.
+ *
+ * Los métodos que usa el administrador para mantener el catálogo (RF032) devuelven sus errores
+ * como `['errores' => ['campo' => 'mensaje']]`, sin guardar nada cuando hay errores.
  */
 final class CatalogoService
 {
@@ -64,6 +68,40 @@ final class CatalogoService
         foreach ($variedades as $variedad) {
             $variedad['factores'] = $composiciones[$variedad['codigo']] ?? [];
             $resultado[] = $variedad;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * Variedades del catálogo para la pantalla de administración (SRS-RF032, contrato §5):
+     * `VariedadOpcion` más los nombres de los factores de su composición.
+     *
+     * `$q` filtra por código o por nombre (sin distinguir mayúsculas); vacío lista las 880.
+     * El catálogo es global: la respuesta no depende del `criadero_id` de la sesión.
+     *
+     * @return list<array{codigo: string, nombre: string, sexo: ?string, factores: list<string>}>
+     */
+    public function listarVariedadesParaAdmin(?string $q = null): array
+    {
+        $busqueda = mb_strtoupper(trim((string) $q), 'UTF-8');
+        $resultado = [];
+
+        foreach ($this->listarVariedadesConComposicion() as $variedad) {
+            $coincide = $busqueda === ''
+                || str_contains(mb_strtoupper($variedad['codigo'], 'UTF-8'), $busqueda)
+                || str_contains(mb_strtoupper($variedad['nombre'], 'UTF-8'), $busqueda);
+
+            if (!$coincide) {
+                continue;
+            }
+
+            $resultado[] = [
+                'codigo' => $variedad['codigo'],
+                'nombre' => $variedad['nombre'],
+                'sexo' => $variedad['sexo'],
+                'factores' => array_column($variedad['factores'], 'nombre'),
+            ];
         }
 
         return $resultado;
@@ -223,10 +261,11 @@ final class CatalogoService
     /**
      * Registra un factor en el catálogo validando que tenga nombre y tipo de herencia (SRS-RF031).
      * Si falta el tipo de herencia o no es válido, informa el error sin guardar nada.
+     * El nombre se guarda en mayúsculas, como el resto del catálogo («MARFIL»).
      */
     public function cargarFactor(string $nombre, ?string $tipoHerencia): int
     {
-        $nombreNormalizado = trim($nombre);
+        $nombreNormalizado = mb_strtoupper(trim($nombre), 'UTF-8');
         if ($nombreNormalizado === '') {
             throw new InvalidArgumentException('El nombre del factor es obligatorio.');
         }
@@ -243,6 +282,43 @@ final class CatalogoService
 
             return $id;
         });
+    }
+
+    /**
+     * Crea un factor del catálogo para el administrador (SRS-RF032, admin.factores.guardar).
+     * Devuelve los errores como `['campo' => 'mensaje']` en lugar de lanzar excepciones:
+     * `nombre` para el factor vacío o repetido y `tipo_herencia` cuando falta o no es válido.
+     * El nombre se guarda en mayúsculas, como el resto del catálogo («MARFIL»).
+     *
+     * @return array{errores: array<string, string>, factor_id?: int}
+     */
+    public function crearFactor(string $nombre, ?string $tipoHerencia): array
+    {
+        $nombreNormalizado = mb_strtoupper(trim($nombre), 'UTF-8');
+
+        $errores = [];
+        if ($nombreNormalizado === '') {
+            $errores['nombre'] = 'El nombre del factor es obligatorio.';
+        }
+
+        try {
+            $herenciaNormalizada = self::validarTipoHerencia($tipoHerencia, $nombreNormalizado);
+        } catch (InvalidArgumentException $error) {
+            $herenciaNormalizada = '';
+            $errores['tipo_herencia'] = $error->getMessage();
+        }
+
+        if ($errores !== []) {
+            return ['errores' => $errores];
+        }
+
+        try {
+            $factorId = $this->cargarFactor($nombreNormalizado, $herenciaNormalizada);
+        } catch (DomainException $error) {
+            return ['errores' => ['nombre' => $error->getMessage()]];
+        }
+
+        return ['errores' => [], 'factor_id' => $factorId];
     }
 
     /**
@@ -397,28 +473,289 @@ final class CatalogoService
         // Si el código aún no existe, se verifica DAT-004 (combinación única por sexo, tipo y rasgo).
         // Si el código ya existe, se delega a VariedadModel::insertar() para que falle por clave primaria `codigo`.
         if ($this->variedades->buscarPorCodigo($codigo) === null) {
-            $claveNueva = self::claveCombinacion($sexo, $tipo, $rasgo, $composicionNormalizada);
-            foreach ($this->listarVariedadesConComposicion() as $existente) {
-                $compExistente = [];
-                foreach ($existente['factores'] as $factor) {
-                    $compExistente[$factor['id']] = $factor['dosis'];
-                }
-                $claveExistente = self::claveCombinacion(
-                    $existente['sexo'],
-                    $existente['tipo'],
-                    $existente['rasgo'],
-                    $compExistente
-                );
-                if ($claveExistente === $claveNueva) {
-                    throw new DomainException(sprintf(
-                        'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
-                        $existente['codigo']
-                    ));
-                }
+            $repetida = $this->buscarCombinacionRepetida($sexo, $tipo, $rasgo, $composicionNormalizada);
+            if ($repetida !== null) {
+                throw new DomainException(sprintf(
+                    'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
+                    $repetida
+                ));
             }
         }
 
         $this->variedades->insertar($codigo, $nombre, $sexo, $tipo, $rasgo, $composicionNormalizada);
+    }
+
+    /**
+     * Crea una variedad del catálogo para el administrador (SRS-RF032).
+     * Valida cada caso negativo antes de tocar la base: código duplicado, datos inválidos y
+     * combinación de factores repetida para el mismo sexo, tipo y rasgo (DAT-004).
+     * Si hay errores, los devuelve como `['campo' => 'mensaje']` sin guardar nada.
+     *
+     * @param array<string, mixed> $datos codigo, nombre, sexo, tipo, rasgo y factores[]
+     * @return array{errores: array<string, string>}
+     */
+    public function crearVariedad(array $datos): array
+    {
+        $codigo = trim((string) ($datos['codigo'] ?? ''));
+        if ($codigo === '') {
+            return ['errores' => ['codigo' => 'El código de la variedad es obligatorio.']];
+        }
+
+        if (!preg_match('/^D\.\d{3}$/', $codigo)) {
+            return ['errores' => ['codigo' => "El código «{$codigo}» no corresponde a la sección D de canarios de color (D.001–D.880)."]];
+        }
+
+        if ($this->variedades->buscarPorCodigo($codigo) !== null) {
+            return ['errores' => ['codigo' => "Ya existe una variedad con el código «{$codigo}» en el catálogo."]];
+        }
+
+        $validado = $this->validarDatosDeVariedad($datos);
+        if ($validado['errores'] !== []) {
+            return ['errores' => $validado['errores']];
+        }
+
+        $composicion = [];
+        foreach ($validado['factores'] as $factorId) {
+            $composicion[$factorId] = 1;
+        }
+
+        $repetida = $this->buscarCombinacionRepetida($validado['sexo'], $validado['tipo'], $validado['rasgo'], $composicion);
+        if ($repetida !== null) {
+            return ['errores' => ['factores' => sprintf(
+                'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
+                $repetida
+            )]];
+        }
+
+        $this->variedades->enTransaccion(function () use ($codigo, $validado, $composicion): void {
+            $this->cargarVariedad(
+                $codigo,
+                $validado['nombre'],
+                $validado['sexo'],
+                $validado['tipo'],
+                $validado['rasgo'],
+                $composicion,
+            );
+            \auditar('crear', 'variedad', $codigo);
+        });
+
+        return ['errores' => []];
+    }
+
+    /**
+     * Corrige una variedad del catálogo y su composición para el administrador (SRS-RF032).
+     * Si la variedad no existe, si los datos no son válidos, si el sexo no coincide con el de los
+     * canarios que ya la tienen (RF012) o si la composición repetiría la de otra variedad del
+     * mismo sexo, tipo y rasgo (DAT-004), devuelve los errores como
+     * `['campo' => 'mensaje']` sin guardar nada.
+     *
+     * @param array<string, mixed> $datos nombre, sexo, tipo, rasgo y factores[]
+     * @return array{errores: array<string, string>}
+     */
+    public function actualizarVariedad(string $codigo, array $datos): array
+    {
+        $codigo = trim($codigo);
+        if ($this->variedades->buscarPorCodigo($codigo) === null) {
+            return ['errores' => ['codigo' => "La variedad «{$codigo}» no existe en el catálogo."]];
+        }
+
+        $validado = $this->validarDatosDeVariedad($datos);
+        if ($validado['errores'] !== []) {
+            return ['errores' => $validado['errores']];
+        }
+
+        // Una variedad con sexo solo se asigna a un canario de ese sexo (RF012, docs/backend.md §3).
+        $sexo = $validado['sexo'];
+        if ($sexo !== null && $this->variedades->contarCanariosAsignados($codigo, $sexo) > 0) {
+            return ['errores' => ['sexo' => 'Hay canarios registrados con esta variedad que no son '
+                . ($sexo === 'macho' ? 'machos' : 'hembras') . '.']];
+        }
+
+        // La dosis no viene del formulario: cada factor conserva la suya y los nuevos entran con una copia.
+        $dosisActuales = [];
+        foreach ($this->variedades->obtenerComposicion($codigo) as $factor) {
+            $dosisActuales[$factor['id']] = $factor['dosis'];
+        }
+
+        $composicion = [];
+        foreach ($validado['factores'] as $factorId) {
+            $composicion[$factorId] = $dosisActuales[$factorId] ?? 1;
+        }
+
+        $repetida = $this->buscarCombinacionRepetida(
+            $validado['sexo'],
+            $validado['tipo'],
+            $validado['rasgo'],
+            $composicion,
+            $codigo,
+        );
+        if ($repetida !== null) {
+            return ['errores' => ['factores' => sprintf(
+                'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
+                $repetida
+            )]];
+        }
+
+        $this->variedades->enTransaccion(function () use ($codigo, $validado, $composicion): void {
+            $this->variedades->actualizar(
+                $codigo,
+                $validado['nombre'],
+                $validado['sexo'],
+                $validado['tipo'],
+                $validado['rasgo'],
+                $composicion,
+            );
+            \auditar('actualizar', 'variedad', $codigo);
+        });
+
+        return ['errores' => []];
+    }
+
+    /**
+     * Elimina una variedad del catálogo (SRS-RF032).
+     * Si algún canario la tiene asignada, se informa y no se guarda nada (docs/backend.md §3).
+     *
+     * @return array{errores: array<string, string>}
+     */
+    public function eliminarVariedad(string $codigo): array
+    {
+        $codigo = trim($codigo);
+        if ($this->variedades->buscarPorCodigo($codigo) === null) {
+            return ['errores' => ['codigo' => "La variedad «{$codigo}» no existe en el catálogo."]];
+        }
+
+        if ($this->variedades->contarCanariosAsignados($codigo) > 0) {
+            return ['errores' => ['codigo' => "La variedad «{$codigo}» está asignada a algún canario y no se puede eliminar."]];
+        }
+
+        $this->variedades->enTransaccion(function () use ($codigo): void {
+            $this->variedades->eliminar($codigo);
+            \auditar('eliminar', 'variedad', $codigo);
+        });
+
+        return ['errores' => []];
+    }
+
+    /**
+     * Valida los datos del formulario de mantenimiento de una variedad (SRS-RF032) y devuelve
+     * los errores como `['campo' => 'mensaje']`, junto con los valores ya normalizados.
+     *
+     * @param array<string, mixed> $datos
+     * @return array{
+     *     errores: array<string, string>,
+     *     nombre: string,
+     *     sexo: ?string,
+     *     tipo: string,
+     *     rasgo: ?string,
+     *     factores: list<int>
+     * }
+     */
+    private function validarDatosDeVariedad(array $datos): array
+    {
+        $errores = [];
+
+        $nombre = trim((string) ($datos['nombre'] ?? ''));
+        if ($nombre === '') {
+            $errores['nombre'] = 'El nombre de la variedad es obligatorio.';
+        } elseif (mb_strlen($nombre) > 150) {
+            $errores['nombre'] = 'El nombre de la variedad no puede superar los 150 caracteres.';
+        }
+
+        $sexo = trim((string) ($datos['sexo'] ?? ''));
+        $sexo = $sexo === '' ? null : $sexo;
+        if ($sexo !== null && !in_array($sexo, self::SEXOS_VALIDOS, true)) {
+            $errores['sexo'] = "El sexo «{$sexo}» no es válido. Debe ser macho o hembra.";
+        }
+
+        $tipo = trim((string) ($datos['tipo'] ?? ''));
+        if ($tipo === '') {
+            $errores['tipo'] = 'El tipo de la variedad es obligatorio.';
+        } elseif (!in_array($tipo, self::TIPOS_VALIDOS, true)) {
+            $errores['tipo'] = "El tipo «{$tipo}» no es válido. Debe ser melanico o lipocromico.";
+        }
+
+        $rasgo = trim((string) ($datos['rasgo'] ?? ''));
+        $rasgo = $rasgo === '' ? null : $rasgo;
+        if ($rasgo !== null && !in_array($rasgo, self::RASGOS_VALIDOS, true)) {
+            $errores['rasgo'] = "El rasgo «{$rasgo}» no es válido. Debe ser ala_blanca o alas_grises.";
+        }
+
+        $factores = [];
+        if (array_key_exists('factores', $datos) && !is_array($datos['factores'])) {
+            $errores['factores'] = 'La lista de factores enviada no es válida.';
+        } else {
+            foreach ((array) ($datos['factores'] ?? []) as $id) {
+                if ($id === null || $id === '') {
+                    continue;
+                }
+
+                if (!is_numeric($id) || (int) $id != $id || (int) $id <= 0) {
+                    $errores['factores'] = 'La lista de factores enviada no es válida.';
+                    break;
+                }
+
+                $factores[] = (int) $id;
+            }
+            $factores = array_values(array_unique($factores));
+        }
+
+        if ($factores !== []) {
+            $existentes = $this->factores->buscarPorIds($factores);
+            foreach ($factores as $factorId) {
+                if (!isset($existentes[$factorId])) {
+                    $errores['factores'] = "El factor con id {$factorId} no existe en el catálogo.";
+                    break;
+                }
+            }
+        }
+
+        return [
+            'errores' => $errores,
+            'nombre' => $nombre,
+            'sexo' => $sexo,
+            'tipo' => $tipo,
+            'rasgo' => $rasgo,
+            'factores' => $factores,
+        ];
+    }
+
+    /**
+     * Busca otra variedad con la misma combinación de factores y dosis para el mismo sexo,
+     * tipo y rasgo (DAT-004, docs/backend.md §3). Devuelve su código o `null` si no la hay.
+     *
+     * @param array<int, int> $composicion mapa factor_id => dosis
+     */
+    private function buscarCombinacionRepetida(
+        ?string $sexo,
+        string $tipo,
+        ?string $rasgo,
+        array $composicion,
+        ?string $excluirCodigo = null,
+    ): ?string {
+        $clave = self::claveCombinacion($sexo, $tipo, $rasgo, $composicion);
+
+        foreach ($this->listarVariedadesConComposicion() as $existente) {
+            if ($excluirCodigo !== null && $existente['codigo'] === $excluirCodigo) {
+                continue;
+            }
+
+            $composicionExistente = [];
+            foreach ($existente['factores'] as $factor) {
+                $composicionExistente[$factor['id']] = $factor['dosis'];
+            }
+
+            $claveExistente = self::claveCombinacion(
+                $existente['sexo'],
+                $existente['tipo'],
+                $existente['rasgo'],
+                $composicionExistente,
+            );
+            if ($claveExistente === $clave) {
+                return $existente['codigo'];
+            }
+        }
+
+        return null;
     }
 
     /**
