@@ -54,20 +54,15 @@ final class FactoresManifestadosService
     }
 
     /**
-     * Obtiene los factores manifestados en el formato exacto del contrato `CanarioFicha.factores_manifestados`
-     * (`docs/contrato-back-front.md` §5: `[['nombre' => ..., 'tipo_herencia' => ...], ...]`).
+     * Obtiene los factores manifestados para `CanarioFicha.factores_manifestados`
+     * (`docs/contrato-back-front.md` §5: `[['nombre' => ..., 'tipo_herencia' => ...], ...]`), más la `dosis`:
+     * sin ella, la ficha no distingue jaspe SD (dosis 1) de DD (dosis 2) (backend.md §3 y §5).
      *
-     * @return list<array{nombre: string, tipo_herencia: string}>
+     * @return list<array{nombre: string, tipo_herencia: string, dosis: int}>
      */
     public function paraFichaDesdeVariedad(?string $variedadCodigo): array
     {
-        return array_map(
-            static fn (array $factor): array => [
-                'nombre' => $factor['nombre'],
-                'tipo_herencia' => $factor['tipo_herencia'],
-            ],
-            $this->obtenerDesdeVariedad($variedadCodigo)
-        );
+        return self::paraFicha($this->obtenerDesdeVariedad($variedadCodigo));
     }
 
     /**
@@ -87,15 +82,14 @@ final class FactoresManifestadosService
     }
 
     /**
-     * Obtiene los factores completos que manifiesta un canario registrado,
-     * tomando `criadero_id` exclusivamente desde la sesión (RF003, RF033).
+     * Obtiene los factores completos que manifiesta un canario del criadero indicado (RF003, RF033).
+     * El `criadero_id` lo pasa el controlador, tomado de la sesión con el control común de acceso (#17).
      * Responde 404 si el canario no existe o pertenece a otro criadero.
      *
      * @return list<array{id: int, nombre: string, tipo_herencia: string, dosis: int}>
      */
-    public function obtenerPorCanarioId(int $canarioId): array
+    public function obtenerPorCanarioId(int $canarioId, int $criaderoId): array
     {
-        $criaderoId = $this->criaderoIdDeSesion();
         $canario = $this->canarios->buscarPorIdEnCriadero($canarioId, $criaderoId);
         if ($canario === null) {
             throw HttpException::noEncontrado();
@@ -105,33 +99,28 @@ final class FactoresManifestadosService
     }
 
     /**
-     * Obtiene `CanarioFicha.factores_manifestados` para un canario del criadero de la sesión (RF003, RF033).
+     * Obtiene `CanarioFicha.factores_manifestados` (con la dosis) para un canario del criadero indicado (RF003, RF033).
      *
-     * @return list<array{nombre: string, tipo_herencia: string}>
+     * @return list<array{nombre: string, tipo_herencia: string, dosis: int}>
      */
-    public function paraFichaPorCanarioId(int $canarioId): array
+    public function paraFichaPorCanarioId(int $canarioId, int $criaderoId): array
+    {
+        return self::paraFicha($this->obtenerPorCanarioId($canarioId, $criaderoId));
+    }
+
+    /**
+     * @param list<array{id: int, nombre: string, tipo_herencia: string, dosis: int}> $factores
+     * @return list<array{nombre: string, tipo_herencia: string, dosis: int}>
+     */
+    private static function paraFicha(array $factores): array
     {
         return array_map(
             static fn (array $factor): array => [
                 'nombre' => $factor['nombre'],
                 'tipo_herencia' => $factor['tipo_herencia'],
+                'dosis' => $factor['dosis'],
             ],
-            $this->obtenerPorCanarioId($canarioId)
+            $factores
         );
-    }
-
-    private function criaderoIdDeSesion(): int
-    {
-        $valor = $_SESSION['criadero_id'] ?? null;
-        if (!is_int($valor) && !(is_string($valor) && ctype_digit($valor))) {
-            throw HttpException::sesionExpirada();
-        }
-
-        $criaderoId = (int) $valor;
-        if ($criaderoId <= 0) {
-            throw HttpException::sesionExpirada();
-        }
-
-        return $criaderoId;
     }
 }

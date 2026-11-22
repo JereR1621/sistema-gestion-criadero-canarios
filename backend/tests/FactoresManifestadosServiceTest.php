@@ -44,7 +44,6 @@ final class FactoresManifestadosServiceTest extends TestCase
             $this->pdo->rollBack();
         }
         Conexion::usar(null);
-        unset($_SESSION['criadero_id'], $_SESSION['usuario_id'], $_SESSION['rol']);
     }
 
     /**
@@ -55,12 +54,11 @@ final class FactoresManifestadosServiceTest extends TestCase
     public function testObtieneFactoresManifestadosDesdeComposicionDeLaVariedad(): void
     {
         $criaderoId = $this->crearCriaderoDePrueba('rf033.criador@tucriadero.cl');
-        $_SESSION['criadero_id'] = $criaderoId;
 
         // D.265: BRUNO OPALO AMARILLO MOSAICO MACHO → MOSAICO (recesivo), BRUNO (ligado_sexo), ÓPALO (recesivo)
         $canarioId = $this->insertarCanario($criaderoId, 1, 'macho', 'D.265');
 
-        $completos = $this->servicio->obtenerPorCanarioId($canarioId);
+        $completos = $this->servicio->obtenerPorCanarioId($canarioId, $criaderoId);
         self::assertSame([
             ['id' => 5, 'nombre' => 'MOSAICO', 'tipo_herencia' => 'recesivo', 'dosis' => 1],
             ['id' => 7, 'nombre' => 'BRUNO', 'tipo_herencia' => 'ligado_sexo', 'dosis' => 1],
@@ -68,16 +66,16 @@ final class FactoresManifestadosServiceTest extends TestCase
         ], $completos);
 
         // Formato del contrato CanarioFicha.factores_manifestados (docs/contrato-back-front.md §5)
-        $paraFicha = $this->servicio->paraFichaPorCanarioId($canarioId);
+        $paraFicha = $this->servicio->paraFichaPorCanarioId($canarioId, $criaderoId);
         self::assertSame([
-            ['nombre' => 'MOSAICO', 'tipo_herencia' => 'recesivo'],
-            ['nombre' => 'BRUNO', 'tipo_herencia' => 'ligado_sexo'],
-            ['nombre' => 'ÓPALO', 'tipo_herencia' => 'recesivo'],
+            ['nombre' => 'MOSAICO', 'tipo_herencia' => 'recesivo', 'dosis' => 1],
+            ['nombre' => 'BRUNO', 'tipo_herencia' => 'ligado_sexo', 'dosis' => 1],
+            ['nombre' => 'ÓPALO', 'tipo_herencia' => 'recesivo', 'dosis' => 1],
         ], $paraFicha);
 
         // Variedad codominante con dosis 2: D.737 NEGRO JASPE DD BLANCO
         $jaspeDdId = $this->insertarCanario($criaderoId, 2, 'macho', 'D.737');
-        $factoresJaspe = $this->servicio->obtenerPorCanarioId($jaspeDdId);
+        $factoresJaspe = $this->servicio->obtenerPorCanarioId($jaspeDdId, $criaderoId);
         self::assertSame([
             ['id' => 2, 'nombre' => 'BLANCO RECESIVO', 'tipo_herencia' => 'recesivo', 'dosis' => 1],
             ['id' => 18, 'nombre' => 'JASPE', 'tipo_herencia' => 'codominante', 'dosis' => 2],
@@ -108,15 +106,14 @@ final class FactoresManifestadosServiceTest extends TestCase
     public function testVariedadSinDeterminarOFormaNormalDevuelvenListaVacia(): void
     {
         $criaderoId = $this->crearCriaderoDePrueba('rf033.normal@tucriadero.cl');
-        $_SESSION['criadero_id'] = $criaderoId;
 
         $sinVariedadId = $this->insertarCanario($criaderoId, 10, 'sin_determinar', null);
         $formaNormalId = $this->insertarCanario($criaderoId, 11, 'hembra', 'D.004'); // AMARILLO NEVADO
 
-        self::assertSame([], $this->servicio->obtenerPorCanarioId($sinVariedadId));
-        self::assertSame([], $this->servicio->paraFichaPorCanarioId($sinVariedadId));
-        self::assertSame([], $this->servicio->obtenerPorCanarioId($formaNormalId));
-        self::assertSame([], $this->servicio->paraFichaPorCanarioId($formaNormalId));
+        self::assertSame([], $this->servicio->obtenerPorCanarioId($sinVariedadId, $criaderoId));
+        self::assertSame([], $this->servicio->paraFichaPorCanarioId($sinVariedadId, $criaderoId));
+        self::assertSame([], $this->servicio->obtenerPorCanarioId($formaNormalId, $criaderoId));
+        self::assertSame([], $this->servicio->paraFichaPorCanarioId($formaNormalId, $criaderoId));
         self::assertSame([], $this->servicio->obtenerDesdeVariedad(''));
     }
 
@@ -127,16 +124,15 @@ final class FactoresManifestadosServiceTest extends TestCase
     public function testLosFactoresSeObtienenSiempreDesdeElCatalogoSinGuardarseEnElCanario(): void
     {
         $criaderoId = $this->crearCriaderoDePrueba('rf033.dinamico@tucriadero.cl');
-        $_SESSION['criadero_id'] = $criaderoId;
 
         $canarioId = $this->insertarCanario($criaderoId, 20, 'macho', 'D.049'); // ROJO INTENSO
-        self::assertSame(['ROJO', 'INTENSO'], array_column($this->servicio->paraFichaPorCanarioId($canarioId), 'nombre'));
+        self::assertSame(['ROJO', 'INTENSO'], array_column($this->servicio->paraFichaPorCanarioId($canarioId, $criaderoId), 'nombre'));
 
         // Al cambiar la variedad del canario a D.051 (ROJO MARFIL INTENSO), manifiesta MARFIL automáticamente
         $this->pdo->prepare('UPDATE canario SET variedad_codigo = ? WHERE id = ?')->execute(['D.051', $canarioId]);
         self::assertSame(
             ['ROJO', 'INTENSO', 'MARFIL'],
-            array_column($this->servicio->paraFichaPorCanarioId($canarioId), 'nombre')
+            array_column($this->servicio->paraFichaPorCanarioId($canarioId, $criaderoId), 'nombre')
         );
     }
 
@@ -160,17 +156,16 @@ final class FactoresManifestadosServiceTest extends TestCase
         $criadero2 = $this->crearCriaderoDePrueba('rf033.c2@tucriadero.cl');
         $canarioAjeno = $this->insertarCanario($criadero2, 1, 'macho', 'D.049');
 
-        $_SESSION['criadero_id'] = $criadero1;
 
         try {
-            $this->servicio->obtenerPorCanarioId($canarioAjeno);
+            $this->servicio->obtenerPorCanarioId($canarioAjeno, $criadero1);
             self::fail('Un canario de otro criadero debe responder 404.');
         } catch (HttpException $error) {
             self::assertSame(404, $error->codigo());
         }
 
         try {
-            $this->servicio->obtenerPorCanarioId(999999);
+            $this->servicio->obtenerPorCanarioId(999999, $criadero1);
             self::fail('Un canario inexistente debe responder 404.');
         } catch (HttpException $error) {
             self::assertSame(404, $error->codigo());
@@ -178,18 +173,14 @@ final class FactoresManifestadosServiceTest extends TestCase
     }
 
     /**
-     * Negativo (RF003): sin `criadero_id` en la sesión, rechaza la operación.
+     * La ficha distingue jaspe SD de DD por la dosis (backend.md §3 y §5).
      */
-    public function testSinCriaderoEnSesionResponde419(): void
+    public function testLaFichaDistingueJaspeSimpleDeDoble(): void
     {
-        unset($_SESSION['criadero_id']);
+        $jaspe = static fn (array $ficha): array => array_values(array_filter($ficha, static fn (array $f): bool => $f['nombre'] === 'JASPE'));
 
-        try {
-            $this->servicio->obtenerPorCanarioId(1);
-            self::fail('Sin criadero_id en sesión debe fallar con 419.');
-        } catch (HttpException $error) {
-            self::assertSame(419, $error->codigo());
-        }
+        self::assertSame([['nombre' => 'JASPE', 'tipo_herencia' => 'codominante', 'dosis' => 1]], $jaspe($this->servicio->paraFichaDesdeVariedad('D.665')));
+        self::assertSame([['nombre' => 'JASPE', 'tipo_herencia' => 'codominante', 'dosis' => 2]], $jaspe($this->servicio->paraFichaDesdeVariedad('D.737')));
     }
 
     private function crearCriaderoDePrueba(string $correo): int
