@@ -53,7 +53,7 @@ Para responder un error desde un controlador, lanza `HttpException::noEncontrado
 
 ## Auditoría: `auditar()`
 
-Toda operación que guarda datos llama a `auditar($accion, $entidad, $entidadId)` (SEG-003), definida en `backend/Models/AuditoriaHelper.php` y cargada por `backend/autoload.php`. Inserta en la tabla `auditoria` el usuario de la sesión, la acción, la entidad, su id y la fecha y hora.
+Toda operación que guarda datos llama a `auditar($accion, $entidad, $entidadId)` (SEG-003), definida en `backend/Models/AuditoriaHelper.php` y cargada por `backend/autoload.php`. Inserta en la tabla `auditoria` el usuario de la sesión, la acción, la entidad, su id y la fecha y hora. El `$entidadId` puede ser un id numérico (un canario) o un código (una variedad del catálogo, `D.049`; migración `016`).
 
 ```php
 // En el servicio, dentro de la misma transacción que el cambio:
@@ -63,3 +63,51 @@ auditar('crear', 'canario', $canarioId);
 - Usa `Conexion::obtener()`: si la transacción se deshace, el registro de auditoría también.
 - Sin sesión iniciada (por ejemplo, en el registro), guarda la acción con `usuario_id` NULL.
 - No oculta errores: si no puede guardar, la operación falla.
+
+## Aislamiento entre criaderos y control de rol (RF003)
+
+Todo controlador de criador o de administración hereda de `TuCriadero\Controllers\BaseController`, y todo modelo de datos de criadero (`canario`, `jaula`, `cruce`, `ubicacion`, `baja` y `factor_portado`) hereda de `TuCriadero\Models\ModeloCriadero`.
+
+### 1. En los controladores (`BaseController`)
+
+- `$sesion = $this->exigirCriador()`: comprueba sesión activa con rol `criador` y `criadero_id` válido. Redirige a `/ingresar` si no hay sesión y responde **403** si entra un administrador.
+- `$criaderoId = $this->criaderoIdDeSesion()`: devuelve el `criadero_id` **de la sesión** (nunca de `$_GET`, `$_POST` ni de la URL).
+- `$sesion = $this->exigirAdmin()`: comprueba sesión activa con rol `admin`. Responde **403** si entra un criador.
+- `$id = $this->exigirIdPositivo($parametro)`: valida el `{id}` de la ruta o responde **404**.
+- `$registro = $this->exigirRegistroPropio($resultado)`: si el modelo devolvió `null` (no existe o es de otro criadero), responde **404** sin mostrar datos.
+
+```php
+final class JaulaController extends BaseController
+{
+    public function ficha(string $id): void
+    {
+        $criaderoId = $this->criaderoIdDeSesion();
+        $jaulaId = $this->exigirIdPositivo($id);
+        $jaula = $this->exigirRegistroPropio((new JaulaModel())->buscarPorIdEnCriadero($jaulaId, $criaderoId));
+
+        render('jaulas/ficha', ['jaula' => $jaula]);
+    }
+}
+```
+
+### 2. En los modelos de criadero (`ModeloCriadero`)
+
+Usa `buscarUnoDelCriadero()`, `buscarTodosDelCriadero()`, `ejecutarEnCriadero()` y `exigirDelCriadero()`. Toda consulta debe incluir `criadero_id = :criadero_id` (en `ubicacion`, `baja` y `factor_portado`, mediante `INNER JOIN canario c ON c.id = ... WHERE c.criadero_id = :criadero_id`); el parámetro `:criadero_id` siempre lo vincula `ModeloCriadero` con el `$criaderoId` de la sesión.
+
+```php
+$fila = $this->buscarUnoDelCriadero(
+    'SELECT id, criadero_id, numero FROM jaula WHERE criadero_id = :criadero_id AND id = :id LIMIT 1',
+    $criaderoId,
+    [':id' => $id]
+);
+```
+
+### 3. En los servicios (`AislamientoService`)
+
+Antes de guardar relaciones enviadas desde un formulario (`canario_id`, `jaula_id`, `cruce_id`, `padre_id`, `madre_id`), valida pertenencia con `TuCriadero\Services\AislamientoService`:
+
+- `exigirCanarioPropio()` / `exigirJaulaPropia()` / `exigirCrucePropio()` → responden **404** si el registro es de otro criadero.
+- `validarCanarioYJaulaDelCriadero()` → rechaza canario o jaula ajena sin guardar nada.
+- `validarCruceActivoDelCriadero()` → rechaza cruce terminado o de otro criadero.
+- `validarPadresDelCriadero()` → rechaza padre o madre de otro criadero.
+- `validarCanarioParaBajaEnCriadero()` → rechaza canario de otro criadero o ya dado de baja.

@@ -1,0 +1,58 @@
+# Prueba automática de cada PR hacia develop o main: sintaxis PHP, migraciones desde cero (base de trabajo y de
+# pruebas, con seeds) y PHPUnit con MySQL 8.4. Es lo mismo que la revisión manual de cada PR; así el equipo ve
+# las fallas en el PR sin esperar la revisión. Las claves de abajo son solo para esta base temporal de CI.
+name: Pruebas
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: raiz-ci
+          MYSQL_DATABASE: tucriadero
+          MYSQL_USER: tucriadero
+          MYSQL_PASSWORD: clave-ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -praiz-ci"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring
+          coverage: none
+
+      - name: Dependencias (Composer)
+        run: composer install --no-interaction --no-progress
+
+      - name: Base de pruebas y .env de CI
+        run: |
+          mysql -h 127.0.0.1 -uroot -praiz-ci -e "CREATE DATABASE IF NOT EXISTS tucriadero_pruebas; GRANT ALL ON tucriadero_pruebas.* TO 'tucriadero'@'%';"
+          printf '%s\n' APP_ENV=local DB_HOST=127.0.0.1 DB_PORT=3306 DB_NAME=tucriadero DB_NAME_PRUEBAS=tucriadero_pruebas \
+            DB_USER=tucriadero DB_PASS=clave-ci DB_ROOT_PASS=raiz-ci ADMIN_CORREO=admin@ci.local ADMIN_CONTRASENA=jaula-patio-ci-2026 > .env
+
+      - name: Sintaxis PHP
+        run: find backend public frontend -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Migraciones desde cero
+        run: |
+          php backend/database/migrar.php --desde-cero --seeds
+          php backend/database/migrar.php --pruebas --desde-cero --seeds
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit

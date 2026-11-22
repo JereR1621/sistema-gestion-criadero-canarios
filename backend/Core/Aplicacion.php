@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace TuCriadero\Core;
 
 use Throwable;
+use TuCriadero\Controllers\AdminCatalogoController;
+use TuCriadero\Controllers\AdminCuentaController;
+use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
+use TuCriadero\Controllers\JaulaController;
+use TuCriadero\Models\UsuarioModel;
 
 final class Aplicacion
 {
@@ -29,10 +34,11 @@ final class Aplicacion
             }
 
             Sesion::iniciar();
+            self::cerrarSesionSiLaCuentaNoEstaActiva();
 
             $router = self::crearRouter();
             Rutas::definir($router);
-            // La conexión a MySQL no se abre aquí: los modelos la piden con Conexion::obtener().
+            // Sin sesión iniciada, la conexión a MySQL no se abre aquí: los modelos la piden con Conexion::obtener().
             (new self($raiz, $router))->manejar();
         } catch (HttpException $error) {
             self::mostrarError($error->codigo(), $error->getMessage());
@@ -47,7 +53,44 @@ final class Aplicacion
         return new Router([
             new Ruta('inicio', 'GET', '/inicio', InicioController::class, 'mostrar'),
             new Ruta('inicio.pdf', 'GET', '/inicio/pdf', InicioController::class, 'descargarPdf'),
+
+            new Ruta('registro', 'GET', '/registro', CuentaController::class, 'registro'),
+            new Ruta('registro.guardar', 'POST', '/registro', CuentaController::class, 'registroGuardar'),
+
+            new Ruta('ingreso', 'GET', '/ingresar', CuentaController::class, 'ingreso'),
+            new Ruta('ingreso.enviar', 'POST', '/ingresar', CuentaController::class, 'ingresoEnviar'),
+            new Ruta('salida', 'POST', '/salir', CuentaController::class, 'salida'),
+
+            new Ruta('perfil', 'GET', '/perfil', CuentaController::class, 'perfil'),
+            new Ruta('perfil.guardar', 'POST', '/perfil', CuentaController::class, 'perfilGuardar'),
+
+            new Ruta('jaulas', 'GET', '/jaulas', JaulaController::class, 'index'),
+            new Ruta('jaulas.guardar', 'POST', '/jaulas', JaulaController::class, 'guardar'),
+
+            new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
+
+            new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
+            new Ruta('admin.variedades.editar', 'GET', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesEditar'),
+            new Ruta('admin.variedades.guardar', 'POST', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesGuardar'),
+            new Ruta('admin.factores', 'GET', '/admin/factores', AdminCatalogoController::class, 'factores'),
+            new Ruta('admin.factores.guardar', 'POST', '/admin/factores', AdminCatalogoController::class, 'factoresGuardar'),
         ]);
+    }
+
+    /**
+     * RF005: una cuenta desactivada o cerrada deja de usar el sistema en su siguiente petición, aunque ya
+     * tuviera la sesión abierta. Sin esto, el criador desactivado seguiría entrando hasta que venza la sesión (7 días).
+     */
+    public static function cerrarSesionSiLaCuentaNoEstaActiva(): void
+    {
+        if (!isset($_SESSION['usuario_id'])) {
+            return;
+        }
+
+        $cuenta = (new UsuarioModel())->buscarPorId((int) $_SESSION['usuario_id']);
+        if ($cuenta === null || ($cuenta['estado'] ?? '') !== 'activa') {
+            Sesion::cerrarAutenticada();
+        }
     }
 
     /**
@@ -72,6 +115,8 @@ final class Aplicacion
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
         $ruta = parse_url($uri, PHP_URL_PATH) ?: '/';
 
+        self::enviarCabecerasDeSeguridad();
+
         if (str_starts_with($ruta, '/css/')) {
             $this->servirCss($ruta);
             return;
@@ -79,6 +124,35 @@ final class Aplicacion
 
         self::comprobarCsrf($metodo, $_POST);
         $this->router->despachar($metodo, $ruta);
+    }
+
+    /**
+     * Cabeceras que el navegador aplica a toda respuesta (SEG-005, OWASP).
+     *
+     * @return array<string, string>
+     */
+    public static function cabecerasDeSeguridad(): array
+    {
+        return [
+            // Ningún otro sitio puede mostrar TuCriadero dentro de un marco (clickjacking).
+            'X-Frame-Options' => 'DENY',
+            'Content-Security-Policy' => "frame-ancestors 'none'",
+            // El navegador no adivina el tipo de archivo: usa el Content-Type que enviamos.
+            'X-Content-Type-Options' => 'nosniff',
+            // Al seguir un enlace externo, no se envía la URL interna de la que viene.
+            'Referrer-Policy' => 'same-origin',
+        ];
+    }
+
+    private static function enviarCabecerasDeSeguridad(): void
+    {
+        if (headers_sent()) {
+            return;
+        }
+
+        foreach (self::cabecerasDeSeguridad() as $nombre => $valor) {
+            header("{$nombre}: {$valor}");
+        }
     }
 
     private function servirCss(string $ruta): void
@@ -95,7 +169,6 @@ final class Aplicacion
         }
 
         header('Content-Type: text/css; charset=UTF-8');
-        header('X-Content-Type-Options: nosniff');
         readfile($archivo);
     }
 

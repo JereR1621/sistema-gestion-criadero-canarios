@@ -61,6 +61,10 @@ Backend valida y devuelve el error; la vista lo muestra junto al campo afectado,
 | Variedad incompatible con el sexo | "Esta variedad es solo para hembras" (o para machos). | RF012 |
 | Hembra portadora de un factor ligado al sexo | "Una hembra no puede ser portadora de este factor: lo manifiesta o no lo tiene". | RF013 |
 | Factor sin regla de herencia | "No se puede calcular el resultado para el factor …". | RF039 |
+| Un progenitor melánico y el otro lipocrómico (`pio`) | "Las crías salen pías, con manchas: ese reparto no sigue la tabla de Mendel y no se calcula". Sin porcentajes. | RF035 |
+| Resultado que combina 2 o más factores ligados al sexo (`aproximado`) | "El resultado es aproximado: estos factores se heredan juntos". | RF036, SUP-004 |
+| Jaspe en una ficha o un resultado | Se indica la dosis: SD (simple, `dosis = 1`) o DD (doble, `dosis = 2`). | RF033, RF035 |
+| Contraseña fácil de adivinar | "Esa contraseña es muy común y fácil de adivinar…" o "La contraseña no puede contener tu correo ni tu nombre". | RF001 |
 | Canario reservado o dado de baja en un cruce | "Este canario está reservado: no puede formar un cruce" (o "está dado de baja"). | RF018, AC-02 |
 | Reservar un canario dado de baja | "Un canario dado de baja no se puede reservar". | AC-03 |
 | Sin conexión o servidor caído | Aviso de que no se pueden consultar ni guardar datos. | SRS §2.5 |

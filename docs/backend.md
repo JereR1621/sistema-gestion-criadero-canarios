@@ -56,15 +56,15 @@ Versiones vectoriales: [`er-01-mer.svg`](img/er-01-mer.svg) y [`er-02-mr.svg`](i
 | `usuario` | id, nombre, correo, contrasena_hash, rol (`criador` / `admin`), estado (`activa` / `desactivada` / `cerrada`), fecha_registro, fecha_consentimiento, fecha_cierre, numero_socio, club | `correo` UNIQUE. `fecha_registro` la pone el sistema al crear la cuenta (la muestra la administración de cuentas, RF006; es un dato técnico que la Figura 2 no dibuja). `fecha_consentimiento` registra cuándo el criador aceptó el uso de sus datos al registrarse (POL-001; también es un dato técnico). `fecha_cierre` solo si estado = cerrada: la registra el administrador al cerrar la cuenta a pedido del criador (RF005). Socio y club solo para criadores. |
 | `criadero` | id, usuario_id | `usuario_id` UNIQUE (un criadero por criador; el administrador no tiene). |
 | `jaula` | id, criadero_id, numero | UNIQUE (`criadero_id`, `numero`). |
-| `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). |
-| `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante`) | `nombre` UNIQUE. |
-| `variedad_factor` | variedad_codigo, factor_id | PK compuesta. Es la **composición de la variedad**. |
+| `variedad` | codigo (CHAR 5, por ejemplo `D.049`), nombre, sexo (`macho` / `hembra` / NULL), tipo (`melanico` / `lipocromico`), rasgo (`ala_blanca` / `alas_grises` / NULL) | PK `codigo`. `sexo` solo si el nombre lo indica ("… MACHO", "… HEMBRA"). `tipo` y `rasgo` no son factores: no tienen tipo de herencia (ver §6). |
+| `factor` | id, nombre, tipo_herencia (`ligado_sexo` / `recesivo` / `dominante` / `codominante`) | `nombre` UNIQUE. |
+| `variedad_factor` | variedad_codigo, factor_id, dosis (1 / 2) | PK compuesta. Es la **composición de la variedad**. `dosis` = copias de un factor codominante (jaspe SD = 1, DD = 2); en los demás factores vale 1. |
 | `canario` | id, criadero_id, anillo_socio, anillo_anio, anillo_correlativo, anillo_club, fecha_anillado, fecha_nacimiento, sexo (`macho` / `hembra` / `sin_determinar`), variedad_codigo, padre_id, madre_id, cruce_origen_id, procedencia, estado (`activo` / `reservado` / `baja`) | UNIQUE (`criadero_id`, `anillo_socio`, `anillo_anio`, `anillo_correlativo`, `anillo_club`). Índices en (`criadero_id`, `anillo_correlativo`) y (`criadero_id`, `variedad_codigo`). `variedad_codigo`, padres, cruce y fechas pueden ser NULL. |
 | `cruce` | id, criadero_id, macho_id, hembra_id, jaula_id, temporada (año), fecha_inicio, fecha_fin | `fecha_fin` NULL = cruce activo. CHECK `fecha_fin >= fecha_inicio`. |
 | `ubicacion` | id, canario_id, jaula_id, fecha_desde, fecha_hasta | `jaula_id` NULL = jaula grande. `fecha_hasta` NULL = ubicación actual. |
 | `baja` | id, canario_id, motivo (`venta` / `muerte` / `otra`), fecha | `canario_id` UNIQUE (una baja por canario). |
 | `factor_portado` | canario_id, factor_id, origen (`deducido` / `criador`) | PK (`canario_id`, `factor_id`). |
-| `auditoria` | id, usuario_id, accion, entidad, entidad_id, fecha_hora | Se conserva 1 año (SEG-003). |
+| `auditoria` | id, usuario_id, accion, entidad, entidad_id (id numérico o código, por ejemplo la variedad `D.049`; migración 016), fecha_hora | Se conserva 1 año (SEG-003). |
 
 Notas del modelo:
 - `padre_id` y `madre_id` son **dos claves foráneas** a `canario`; `macho_id` y `hembra_id` también. En la Figura 2 aparecen como columnas FK separadas.
@@ -86,18 +86,18 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 | Un canario no es padre ni madre de sí mismo ni de ninguno de sus antepasados. | RF007 |
 | Una variedad con sexo solo se asigna a un canario de ese sexo. | RF012 |
 | Cada canario tiene como máximo una ubicación con `fecha_hasta` NULL. | DAT-004, RF015, RF016 |
-| Solo se es portador de factores recesivos o ligados al sexo. Una hembra no porta factores ligados al sexo. Nadie porta un factor que ya manifiesta su variedad. | DAT-004, RF013 |
+| Solo se es portador de factores recesivos o ligados al sexo (un dominante o codominante se ve con una copia). Una hembra no porta factores ligados al sexo. Nadie porta un factor que ya manifiesta su variedad. | DAT-004, RF013 |
 | La baja crea el registro en `baja` y cambia `canario.estado` en la misma operación. Un canario dado de baja no se da de baja otra vez. | DAT-004, RF011 |
 | La baja cierra la ubicación abierta del canario con la fecha de la baja (deja de ser ocupante de su jaula y el historial lo muestra como salida). Un canario dado de baja no se ubica en jaulas. | RF011, RF015, RF016 (decisión del PM, 09/11/2026) |
 | Un canario reservado o dado de baja no forma un cruce nuevo; uno con un cruce activo sí puede formar otro (RF019 y RF020). | RF018, AC-02 |
-| Dos variedades del mismo sexo no tienen la misma combinación de factores (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
+| Dos variedades del mismo sexo, tipo y rasgo no tienen la misma combinación de factores y dosis (se valida al cargar el catálogo). | DAT-004, RF028, RF032 |
 | No se elimina una variedad asignada a algún canario. | RF032 |
 
 ## 4. Lógica por módulo
 
 | Módulo | RF | Lo esencial para backend |
 |---|---|---|
-| Cuentas y acceso | RF001–RF006 | Autorregistro solo como criador; crea el criadero vacío. La cuenta de administrador se crea por seed, nunca por autorregistro. Una cuenta desactivada no inicia sesión y conserva sus datos. El administrador ve los datos de registro de las cuentas, no los criaderos. |
+| Cuentas y acceso | RF001–RF006 | Autorregistro solo como criador; crea el criadero vacío. La cuenta de administrador se crea por seed, nunca por autorregistro. Una cuenta desactivada no inicia sesión y conserva sus datos; si se desactiva o se cierra con una sesión abierta, esa sesión termina en la siguiente petición. El administrador ve los datos de registro de las cuentas, no los criaderos. No tiene criadero: al ingresar va a `/admin/cuentas` (#120), recibe 403 en las rutas de criador, y un criador recibe 403 en las de administración. Una cuenta cerrada se puede reactivar: se anula el cierre (`fecha_cierre` vuelve a NULL) y, si se cierra otra vez, los 90 días de DAT-002 empiezan de nuevo (decisión del PM, 22/11/2026). |
 | Individuos | RF007–RF013 | El anillo es obligatorio (sus cuatro partes); sexo y variedad pueden quedar "sin determinar". Padre y madre son opcionales: un canario sin padres es un fundador; con padres indicados a mano se reconstruye la genealogía de canarios nacidos antes de usar el sistema. Si el anillo está duplicado, se informa qué canario lo usa. Un canario adquirido se guarda sin padres y con su procedencia. La baja lo saca de los listados de activos, pero conserva su genealogía. Un canario puede quedar **reservado** (AC-03): sigue activo en listados y búsquedas, pero no forma cruces nuevos; un dado de baja no se reserva. |
 | Jaulas | RF014–RF017 | El número de jaula es único por criadero. Asignar o trasladar a un canario cierra su ubicación anterior y abre otra (la jaula grande es `jaula_id` NULL). El historial de la jaula se arma con ubicaciones y cruces ordenados por fecha. |
 | Libro de crías | RF018–RF022 | Para crear un cruce se exige macho, hembra, jaula, temporada y fecha de inicio. Solo se ofrecen y se aceptan canarios disponibles: no reservados ni dados de baja (AC-02). Una hembra con varios machos, o un macho con varias hembras, son cruces independientes. Al anillar, cada pichón queda con padre, madre y cruce de origen. Terminar un cruce registra su `fecha_fin`. |
@@ -107,7 +107,7 @@ Van en la capa de servicios, dentro de una transacción (o en triggers, si el eq
 
 ## 5. Genética: cómo se calcula
 
-La "tabla de Mendel" **no se carga como datos**: son tres reglas que se programan una vez, una por tipo de herencia. Lo que se carga es el tipo de herencia de cada factor (`factor.tipo_herencia`) y la composición de cada variedad (`variedad_factor`). Agregar un factor nuevo no debe requerir tocar código (RNF007).
+La "tabla de Mendel" **no se carga como datos**: son cuatro reglas que se programan una vez, una por tipo de herencia. Lo que se carga es el tipo de herencia de cada factor (`factor.tipo_herencia`) y la composición de cada variedad (`variedad_factor`). Agregar un factor nuevo no debe requerir tocar código (RNF007).
 
 **Previsualización de un cruce (RF035–RF039).** Cálculo exacto y determinista:
 
@@ -115,11 +115,13 @@ La "tabla de Mendel" **no se carga como datos**: son tres reglas que se programa
    - Recesivo: manifiesta = 2 copias; portador = 1; nada = 0.
    - Ligado al sexo: el macho tiene dos cromosomas Z (manifiesta = 2, portador = 1, nada = 0); la hembra tiene uno (manifiesta = 1, nada = 0).
    - Dominante: si lo manifiesta, se supone **una sola dosis** (SUP-004).
+   - Codominante (jaspe): se cuentan las copias con la `dosis` de la composición (SD = 1, DD = 2). Se cruza como un recesivo autosómico (cada padre pasa una copia), pero las dos dosis se ven: 1 copia = SD y 2 = DD. Por ejemplo, DD × sin jaspe = 100% SD y SD × SD = 25% sin jaspe, 50% SD y 25% DD (guía de la calculadora del cliente). **Decisión del PM (21/11/2026):** el SRS (RF038, SUP-004) solo prevé dominantes con una dosis; el jaspe se calcula por dosis porque así lo hace la calculadora del cliente. El cálculo va con RF038.
 2. Cruzar cada factor por separado con su regla y obtener las proporciones por sexo.
 3. Combinar los factores multiplicando probabilidades (se suponen independientes; SUP-004).
-4. Traducir cada combinación a una variedad buscando en `variedad_factor` (con su sexo, si la variedad lo indica). Si una combinación no corresponde a ninguna variedad, se muestra como lista de factores (RF035).
+4. Traducir cada combinación a una variedad buscando en `variedad_factor` (con su sexo, si la variedad lo indica), con el tipo de los padres y sin rasgo. Si una combinación no corresponde a ninguna variedad, se muestra como lista de factores (RF035).
 5. Devolver variedades y porcentajes, separados para machos y para hembras.
-6. Si un factor no tiene regla de herencia cargada, informar que ese factor no se puede calcular (RF039).
+6. Si un factor no tiene regla de herencia cargada, informar que ese factor no se puede calcular (RF039). Lo mismo con el rasgo: si un padre tiene ala blanca o alas grises, se avisa que no se calcula.
+7. Si un padre es melánico y el otro lipocrómico, no se calcula: se avisa que la descendencia sale pía (con manchas), porque ese reparto no sigue las leyes de Mendel. Así lo hace la calculadora que entregó el cliente.
 
 Caso de prueba que dio el cliente (RF036): macho marfil × hembra normal → 100% de hembras marfil y 100% de machos portadores de marfil.
 
@@ -139,10 +141,20 @@ Caso de prueba que dio el cliente (RF037, audio del 09/11/2026): negro ópalo am
 - **Líneas con dos códigos:** el nomenclador trae líneas como `D.001-D.002 BLANCO - DOMINANTE`, que agrupan dos variedades. No son una variedad: cada código se carga por separado. El CSV ya viene separado (880 filas, sin huecos ni duplicados).
 - **Composición:** la arma el equipo descomponiendo cada nombre en sus factores (serie, mutación, lipocromo y categoría). Cada factor es una mutación presente; su ausencia equivale a la forma normal (por ejemplo, nevado = sin el factor intenso). Los nombres siguen la nomenclatura 2026 (por ejemplo, «bruno», no «canela»; el cliente usa canela, marrón y bruno como sinónimos). Los conceptos que explicó el cliente están en [`ajustes-cliente.md`](ajustes-cliente.md). La composición se valida antes de cargarla, incluida la regla de que no haya combinaciones repetidas por sexo.
 - **Sexo:** 408 variedades indican el sexo en el nombre ("… MACHO", "… HEMBRA").
+- **Tipo:** todo canario de color es melánico (con dibujo: negro, bruno, ágata, isabel y feo) o lipocrómico (sin dibujo: blanco, amarillo, rojo, lutino, rubino y albino). Es lo primero que se elige en la calculadora del cliente; no es un factor. En el seed: 784 melánicos y 96 lipocrómicos.
+- **Rasgo:** ala blanca (32 variedades) y alas grises (18) no llevan fila en `factor` porque no tienen una herencia respaldada: la calculadora del cliente no calcula alas grises (herencia sin consenso) y el estándar OMJ-COM trata ala blanca como un grupo de lipocromos que se juzga aparte.
+- **Feo:** es el phaeo, el factor `INO` sobre un melánico (guía de la calculadora del cliente y estándar OMJ-COM). No es un factor aparte: una variedad «FEO …» se compone con `INO` y tipo melánico.
+- **Fuentes:** guía de la calculadora del cliente (<https://animalesbiologia.com/calculadoras/guia-uso-calculadora-canarios>) y estándar OMJ-COM de canarios de color (<https://www.focde.com/contenidos/focde/PDF%20COMISIONES/COLOR%20PDF/Coleur_Espanol_Standard.pdf>).
 
 ## 7. Seguridad (SEG-001 a SEG-005)
 
-- **Contraseñas:** `password_hash()` / `password_verify()` (bcrypt o Argon2), con un mínimo de 8 caracteres.
+- **Contraseñas:** `password_hash()` / `password_verify()` (bcrypt o Argon2). Según NIST SP 800-63B:
+  - al menos 8 caracteres sin contar los espacios;
+  - hasta 72 bytes y sin byte nulo (límites de bcrypt);
+  - se rechazan las contraseñas muy usadas (`backend/recursos/contrasenas-comunes.txt`), un solo carácter repetido y las secuencias (`12345678`, `abcdefgh`, `qwertyui` y al revés);
+  - se rechazan las que contienen el correo o el nombre;
+  - no se exigen mayúsculas, números ni símbolos.
+- **Campos de formulario:** se leen con `texto_de()`. Un campo que llega como lista (`nombre[]=x`) cuenta como vacío y da el error del campo, nunca un aviso de PHP.
 - **Inyección SQL:** solo consultas preparadas (PDO); nunca concatenar datos del usuario en el SQL.
 - **CSRF:** token en todo formulario que modifique datos; el backend lo valida.
 - **XSS:** las vistas escapan todo dato con `htmlspecialchars` (lo hace frontend, pero el backend no entrega HTML armado con datos del usuario).
