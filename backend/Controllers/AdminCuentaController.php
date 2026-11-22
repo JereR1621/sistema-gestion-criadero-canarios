@@ -6,7 +6,6 @@ namespace TuCriadero\Controllers;
 
 use Throwable;
 use TuCriadero\Core\HttpException;
-use TuCriadero\Core\Sesion;
 use TuCriadero\Core\Vista;
 use TuCriadero\Services\CuentaService;
 
@@ -14,17 +13,13 @@ use TuCriadero\Services\CuentaService;
  * Administración de cuentas de criadores (SRS-RF005, SRS-RF006).
  * Solo accesible para el rol `admin`; un criador recibe 403 y nunca se exponen datos de criaderos.
  */
-final class AdminCuentaController
+final class AdminCuentaController extends BaseController
 {
     public function estado(string $id): void
     {
         $sesion = $this->exigirAdmin();
+        $cuentaId = $this->exigirIdPositivo($id);
 
-        if (!ctype_digit($id) || (int) $id <= 0) {
-            throw HttpException::noEncontrado();
-        }
-
-        $cuentaId = (int) $id;
         $datos = [
             'estado' => $_POST['estado'] ?? '',
         ];
@@ -59,24 +54,7 @@ final class AdminCuentaController
             'mensaje' => $mensajes[$estadoFinal] ?? 'Estado de la cuenta actualizado correctamente.',
         ]);
 
-        header('Location: ' . $this->urlAdminCuentas(), true, 303);
-        exit;
-    }
-
-    /** @return array{usuario_id: int, nombre: string, rol: string} */
-    private function exigirAdmin(): array
-    {
-        $sesion = Sesion::paraVista();
-        if ($sesion === null) {
-            header('Location: ' . ruta('ingreso'), true, 303);
-            exit;
-        }
-
-        if ($sesion['rol'] !== 'admin') {
-            throw HttpException::prohibido();
-        }
-
-        return $sesion;
+        $this->redirigir($this->urlAdminCuentas());
     }
 
     private function urlAdminCuentas(): string
