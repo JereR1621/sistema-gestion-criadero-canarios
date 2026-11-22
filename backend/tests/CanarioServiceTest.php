@@ -626,6 +626,92 @@ final class CanarioServiceTest extends TestCase
         }
     }
 
+    public function testEditarProgenitoresPreservaSexoYAnioDeSusHijos(): void
+    {
+        $padre = $this->insertarCanario($this->criaderoA, 801, 2024, 'macho');
+        $madre = $this->insertarCanario($this->criaderoA, 802, 2024, 'hembra');
+        $hijo = $this->insertarCanario($this->criaderoA, 803, 2025, 'macho', $padre, $madre);
+        $auditoriaAntes = (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
+        foreach ([[$padre, 801, 'macho', 'hembra'], [$madre, 802, 'hembra', 'macho']] as [$id, $n, $sexo, $incorrecto]) {
+            $datos = $this->datosEdicion($n, $sexo);
+            foreach ([$incorrecto, 'sin_determinar'] as $cambio) {
+                $resultado = $this->servicio->actualizar($id, $this->criaderoA, array_replace($datos, ['sexo' => $cambio]));
+                self::assertArrayHasKey('sexo', $resultado['errores']);
+                self::assertSame($sexo, $this->servicio->obtenerFicha($id, $this->criaderoA)['sexo']);
+            }
+            $resultado = $this->servicio->actualizar($id, $this->criaderoA, array_replace($datos, ['anillo_anio' => '2026']));
+            self::assertArrayHasKey('anillo_anio', $resultado['errores']);
+            self::assertSame(2024, $this->servicio->obtenerFicha($id, $this->criaderoA)['anillo']['anio']);
+        }
+        self::assertSame($auditoriaAntes, (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
+        self::assertSame($padre, $this->servicio->obtenerFicha($hijo, $this->criaderoA)['padre']['id']);
+        // Una corrección compatible sigue permitida.
+        self::assertSame([], $this->servicio->actualizar($padre, $this->criaderoA,
+            array_replace($this->datosEdicion(801, 'macho'), ['anillo_anio' => '2023']))['errores']);
+    }
+
+    public function testRechazoNoGuardaNiCierraLaTransaccionDelLlamador(): void
+    {
+        $id = $this->insertarCanario($this->criaderoA, 804, 2024, 'macho');
+        $antes = $this->servicio->obtenerFicha($id, $this->criaderoA);
+        $resultado = $this->servicio->actualizar($id, $this->criaderoA,
+            array_replace($this->datosEdicion(804, 'macho'), ['padre_id' => (string) $id]));
+        self::assertArrayHasKey('padre_id', $resultado['errores']);
+        self::assertTrue($this->pdo->inTransaction());
+        self::assertSame($antes, $this->servicio->obtenerFicha($id, $this->criaderoA));
+    }
+
+    public function testDosSesionesNoPuedenGuardarUnCicloGenealogico(): void
+    {
+        $a = $this->insertarCanario($this->criaderoA, 805, 2024, 'macho');
+        $b = $this->insertarCanario($this->criaderoA, 806, 2024, 'macho');
+        // Las conexiones independientes necesitan fixtures confirmadas; solo son las creadas por este test.
+        $this->pdo->commit();
+        $proceso = null;
+        $pipes = [];
+        try {
+            $proceso = proc_open([PHP_BINARY, __DIR__ . '/helpers/canario_concurrencia.php',
+                (string) $this->usuarioA, (string) $this->criaderoA, (string) $a, (string) $b],
+                [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $pipes);
+            self::assertIsResource($proceso);
+            stream_set_timeout($pipes[1], 10);
+            self::assertSame("LISTO\n", fgets($pipes[1]));
+            // La otra sesión enlaza B -> A mientras la primera espera antes de abrir su transacción.
+            $segundo = $this->servicio->actualizar($b, $this->criaderoA,
+                array_replace($this->datosEdicion(806, 'macho'), ['padre_id' => (string) $a]));
+            self::assertSame([], $segundo['errores']);
+            fwrite($pipes[0], "CONTINUAR\n");
+            fclose($pipes[0]);
+            unset($pipes[0]);
+            $primero = json_decode(stream_get_contents($pipes[1]), true, 512, JSON_THROW_ON_ERROR);
+            self::assertArrayHasKey('padre_id', $primero['errores']);
+            self::assertNull($this->servicio->obtenerFicha($a, $this->criaderoA)['padre']);
+            self::assertSame($a, $this->servicio->obtenerFicha($b, $this->criaderoA)['padre']['id']);
+        } finally {
+            if (is_resource($proceso)) {
+                proc_terminate($proceso);
+            }
+            foreach ($pipes as $pipe) {
+                if (is_resource($pipe)) {
+                    fclose($pipe);
+                }
+            }
+            if (is_resource($proceso)) {
+                proc_close($proceso);
+            }
+            $this->pdo->prepare('DELETE FROM auditoria WHERE usuario_id IN (?, ?)')->execute([$this->usuarioA, $this->usuarioB]);
+            $this->pdo->prepare('DELETE FROM usuario WHERE id IN (?, ?)')->execute([$this->usuarioA, $this->usuarioB]);
+        }
+    }
+
+    /** @return array<string,string> */
+    private function datosEdicion(int $correlativo, string $sexo): array
+    {
+        return ['anillo_socio' => 'S-77', 'anillo_anio' => '2024', 'anillo_correlativo' => (string) $correlativo,
+            'anillo_club' => 'Club Norte', 'sexo' => $sexo, 'variedad_codigo' => '', 'fecha_anillado' => '',
+            'fecha_nacimiento' => '', 'padre_id' => '', 'madre_id' => '', 'procedencia' => ''];
+    }
+
     /** @return array{int, int} */
     private function crearCriadero(string $correo, string $socio, string $club): array
     {

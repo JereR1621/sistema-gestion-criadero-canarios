@@ -120,6 +120,34 @@ final class CanarioModel extends ModeloCriadero
         return $this->buscarPorIdEnCriadero($id, $criaderoId) !== null;
     }
 
+    /** Dentro de una transacción, serializa las escrituras antes de leer y validar la genealogía (RF007, DAT-004). */
+    public function bloquearGenealogiaEnCriadero(int $criaderoId): void
+    {
+        $pdo = $this->pdo();
+        if ($pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) !== 'mysql') {
+            return;
+        }
+        $consulta = $pdo->prepare('SELECT id FROM criadero WHERE id = ? FOR UPDATE');
+        $consulta->execute([$criaderoId]);
+        $consulta->fetchAll();
+    }
+
+    /** @return list<array{id:int, anillo_anio:int, padre_id:?int, madre_id:?int}> */
+    public function listarHijosEnCriadero(int $canarioId, int $criaderoId): array
+    {
+        $filas = $this->buscarTodosDelCriadero(
+            'SELECT id, anillo_anio, padre_id, madre_id FROM canario
+             WHERE criadero_id = :criadero_id AND (padre_id = :padre_id OR madre_id = :madre_id)',
+            $criaderoId,
+            [':padre_id' => $canarioId, ':madre_id' => $canarioId]
+        );
+        return array_map(static fn (array $f): array => [
+            'id' => (int) $f['id'], 'anillo_anio' => (int) $f['anillo_anio'],
+            'padre_id' => $f['padre_id'] !== null ? (int) $f['padre_id'] : null,
+            'madre_id' => $f['madre_id'] !== null ? (int) $f['madre_id'] : null,
+        ], $filas);
+    }
+
     /**
      * Cuenta los canarios activos (estados `activo` y `reservado`) del criadero (RF011, AC-03).
      */

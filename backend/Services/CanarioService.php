@@ -144,45 +144,18 @@ final class CanarioService
      */
     public function registrar(int $criaderoId, array $datos): array
     {
-        $validacion = $this->validarYNormalizar($criaderoId, $datos, null);
-        if ($validacion['errores'] !== []) {
-            return ['errores' => $validacion['errores']];
-        }
-
-        $pdo = Conexion::obtener();
-        $transaccionPropia = !$pdo->inTransaction();
-
-        try {
-            if ($transaccionPropia) {
-                $pdo->beginTransaction();
+        return $this->modificarEnCriadero($criaderoId, function () use ($criaderoId, $datos): array {
+            $validacion = $this->validarYNormalizar($criaderoId, $datos, null);
+            if ($validacion['errores'] !== []) {
+                return ['errores' => $validacion['errores']];
             }
-
             $canarioId = $this->canarios->crearEnCriadero($criaderoId, $validacion['limpios']);
             \auditar('crear', 'canario', $canarioId);
-
-            if ($transaccionPropia) {
-                $pdo->commit();
-            }
-
             return [
                 'errores' => [],
                 'canario_id' => $canarioId,
             ];
-        } catch (Throwable $error) {
-            if ($transaccionPropia && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-
-            if (self::esErrorAnilloDuplicado($error)) {
-                return [
-                    'errores' => [
-                        'anillo_correlativo' => 'Ya existe un canario registrado con ese anillo en tu criadero.',
-                    ],
-                ];
-            }
-
-            throw $error;
-        }
+        });
     }
 
     /**
@@ -193,37 +166,36 @@ final class CanarioService
      */
     public function actualizar(int $canarioId, int $criaderoId, array $datos): array
     {
-        $existente = $this->canarios->buscarDetallePorIdEnCriadero($canarioId, $criaderoId);
-        if ($existente === null) {
-            return [
-                'errores' => [
-                    '_general' => 'El canario indicado no existe.',
-                ],
-                'no_encontrado' => true,
-            ];
-        }
+        return $this->modificarEnCriadero($criaderoId, function () use ($canarioId, $criaderoId, $datos): array {
+            $existente = $this->canarios->buscarDetallePorIdEnCriadero($canarioId, $criaderoId);
+            if ($existente === null) {
+                return ['errores' => ['_general' => 'El canario indicado no existe.'], 'no_encontrado' => true];
+            }
+            $validacion = $this->validarYNormalizar($criaderoId, $datos, $existente);
+            if ($validacion['errores'] !== []) {
+                return ['errores' => $validacion['errores']];
+            }
+            $this->canarios->actualizarEnCriadero($canarioId, $criaderoId, $validacion['limpios']);
+            \auditar('actualizar', 'canario', $canarioId);
+            return ['errores' => []];
+        });
+    }
 
-        $validacion = $this->validarYNormalizar($criaderoId, $datos, $existente);
-        if ($validacion['errores'] !== []) {
-            return ['errores' => $validacion['errores']];
-        }
-
+    /** Valida sobre el estado protegido, no sobre una lectura anterior a la transacción. @return array<string,mixed> */
+    private function modificarEnCriadero(int $criaderoId, callable $operacion): array
+    {
         $pdo = Conexion::obtener();
         $transaccionPropia = !$pdo->inTransaction();
-
         try {
             if ($transaccionPropia) {
                 $pdo->beginTransaction();
             }
-
-            $this->canarios->actualizarEnCriadero($canarioId, $criaderoId, $validacion['limpios']);
-            \auditar('actualizar', 'canario', $canarioId);
-
+            $this->canarios->bloquearGenealogiaEnCriadero($criaderoId);
+            $resultado = $operacion();
             if ($transaccionPropia) {
                 $pdo->commit();
             }
-
-            return ['errores' => []];
+            return $resultado;
         } catch (Throwable $error) {
             if ($transaccionPropia && $pdo->inTransaction()) {
                 $pdo->rollBack();
@@ -405,6 +377,21 @@ final class CanarioService
                 }
                 if ($canarioIdActual !== null && ($madreId === $canarioIdActual || $this->esDescendienteDe($madreId, $canarioIdActual, $criaderoId))) {
                     $errores['madre_id'] = 'Una canaria no puede ser madre de sí misma ni de ninguno de sus antepasados.';
+                }
+            }
+        }
+
+        // Editar un progenitor también debe preservar a los hijos que ya lo referencian.
+        if ($canarioIdActual !== null) {
+            foreach ($this->canarios->listarHijosEnCriadero($canarioIdActual, $criaderoId) as $hijo) {
+                if ($hijo['padre_id'] === $canarioIdActual && $sexo !== 'macho') {
+                    $errores['sexo'] ??= 'Este canario ya es padre de otros canarios y debe conservar el sexo macho.';
+                }
+                if ($hijo['madre_id'] === $canarioIdActual && $sexo !== 'hembra') {
+                    $errores['sexo'] ??= 'Esta canaria ya es madre de otros canarios y debe conservar el sexo hembra.';
+                }
+                if ($anilloAnio !== null && $anilloAnio > $hijo['anillo_anio']) {
+                    $errores['anillo_anio'] ??= 'El año del anillo no puede ser posterior al de sus hijos registrados.';
                 }
             }
         }
