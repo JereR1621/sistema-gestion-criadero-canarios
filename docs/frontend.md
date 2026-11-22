@@ -4,7 +4,7 @@ Guía de trabajo para el equipo de frontend del **Sistema de Gestión de Criader
 
 ## 1. Qué es "frontend" en este proyecto
 
-El stack es **PHP con HTML embebido**: cada pantalla es una vista HTML que el servidor genera con PHP. **No hay JavaScript en el stack**, así que todo tiene que funcionar con formularios y enlaces normales:
+El stack es **PHP con HTML embebido**: cada pantalla es una vista HTML que el servidor genera con PHP. Todo tiene que funcionar con formularios y enlaces normales. **Por autorización del PM del 22/11/2026**, se permite htmx dentro de las vistas PHP como mejora opcional, con respuestas HTML y sin API JSON; los flujos siguen funcionando sin JavaScript (contrato §8):
 
 - Una "pestaña" (por ejemplo, "Posible resultado") es una sección o una página que el servidor arma al enviar el formulario.
 - Los buscadores son formularios que envían la búsqueda y muestran los resultados en la página siguiente.
@@ -12,7 +12,7 @@ El stack es **PHP con HTML embebido**: cada pantalla es una vista HTML que el se
 
 El trabajo de frontend vive en la carpeta `frontend/`: las vistas en `frontend/views/<modulo>/<vista>.php` y los estilos en `frontend/css/` (ver `frontend/README.md`). Backend entrega a cada vista los datos ya filtrados por el criador que inició sesión. **Qué variables recibe cada vista y cómo se llaman los campos de cada formulario está en `docs/contrato-back-front.md`.**
 
-> **Diseño responsivo:** cumplir el ancho de 360 px (RNF001) requiere estilos CSS junto al HTML. Si se acuerda un archivo `.css` propio (contrato §8), va en `frontend/css/`; la tarea de estructura base lo deja publicado en la URL `/css/`.
+> **Diseño responsivo:** cumplir el ancho de 360 px (RNF001) requiere estilos CSS junto al HTML. Los archivos `.css` van en `frontend/css/` y se publican en `/css/`. El contrato §1 define la única excepción para el ancho numérico de las barras de porcentaje; el resto del estilo va en esas hojas.
 
 ## 2. Usuarios
 

@@ -34,7 +34,7 @@ backend/                  ← equipo de backend
   tests/                  pruebas PHPUnit
 frontend/                 ← equipo de frontend
   views/                  una carpeta por módulo: views/cruces/formulario.php, …
-  css/                    estilos (si se acuerda un archivo aparte)
+  css/                    hojas de estilo, publicadas en /css/
 public/
   index.php               punto de entrada de la web: solo carga el backend
 docs/                     ← todos
