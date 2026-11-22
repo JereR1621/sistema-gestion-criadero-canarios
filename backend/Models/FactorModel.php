@@ -140,6 +140,94 @@ final class FactorModel
         return (int) $pdo->lastInsertId();
     }
 
+    public function actualizar(int $id, string $nombre, string $tipoHerencia): void
+    {
+        $consulta = Conexion::obtener()->prepare(
+            'UPDATE factor SET nombre = ?, tipo_herencia = ? WHERE id = ?'
+        );
+        $consulta->execute([$nombre, $tipoHerencia, $id]);
+    }
+
+    public function contarComposicionesConDosisDoble(int $factorId): int
+    {
+        $pdo = Conexion::obtener();
+        $bloqueo = $this->clausulaBloqueo($pdo);
+        $consulta = $pdo->prepare(
+            "SELECT COUNT(*) FROM variedad_factor WHERE factor_id = ? AND dosis = 2{$bloqueo}"
+        );
+        $consulta->execute([$factorId]);
+
+        return (int) $consulta->fetchColumn();
+    }
+
+    public function contarCanariosPortadores(int $factorId): int
+    {
+        try {
+            $pdo = Conexion::obtener();
+            $bloqueo = $this->clausulaBloqueo($pdo);
+            $consulta = $pdo->prepare(
+                "SELECT COUNT(*) FROM factor_portado WHERE factor_id = ?{$bloqueo}"
+            );
+            $consulta->execute([$factorId]);
+
+            return (int) $consulta->fetchColumn();
+        } catch (Throwable) {
+            return 0;
+        }
+    }
+
+    /**
+     * Lee y bloquea (`FOR UPDATE` en MySQL dentro de una transacción) los factores indicados
+     * en orden ascendente por `id` para evitar interbloqueos y carreras entre edición de factores
+     * y creación/edición de variedades.
+     *
+     * @param list<int> $ids
+     * @return array<int, array{id: int, nombre: string, tipo_herencia: string}>
+     */
+    public function bloquearPorIds(array $ids): array
+    {
+        $unicos = array_values(array_unique(array_map('intval', $ids)));
+        if ($unicos === []) {
+            return [];
+        }
+
+        sort($unicos);
+        $pdo = Conexion::obtener();
+        $bloqueo = $this->clausulaBloqueo($pdo);
+        $marcadores = implode(', ', array_fill(0, count($unicos), '?'));
+        $consulta = $pdo->prepare(
+            "SELECT id, nombre, tipo_herencia FROM factor WHERE id IN ({$marcadores}) ORDER BY id{$bloqueo}"
+        );
+        $consulta->execute($unicos);
+
+        $porId = [];
+        foreach ($consulta->fetchAll() as $fila) {
+            $id = (int) $fila['id'];
+            $porId[$id] = [
+                'id' => $id,
+                'nombre' => (string) $fila['nombre'],
+                'tipo_herencia' => $fila['tipo_herencia'] !== null ? (string) $fila['tipo_herencia'] : '',
+            ];
+        }
+
+        return $porId;
+    }
+
+    /**
+     * @return array{id: int, nombre: string, tipo_herencia: string}|null
+     */
+    public function bloquearPorId(int $id): ?array
+    {
+        return $this->bloquearPorIds([$id])[$id] ?? null;
+    }
+
+    private function clausulaBloqueo(\PDO $pdo): string
+    {
+        return $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql' && $pdo->inTransaction()
+            ? ' FOR UPDATE'
+            : '';
+    }
+
     /**
      * Ejecuta una operación dentro de una transacción (si no hay una ya abierta).
      *

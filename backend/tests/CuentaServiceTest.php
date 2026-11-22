@@ -728,11 +728,74 @@ final class CuentaServiceTest extends TestCase
         self::assertSame($auditoriaAntes, (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
     }
 
+//    public function testRutaAdminCuentasEstadoEstaRegistradaSegunContrato(): void
+//    {
+//        $router = Aplicacion::crearRouter();
+//
+//        self::assertSame('/admin/cuentas/42/estado', $router->url('admin.cuentas.estado', ['id' => 42]));
+//    }
     public function testRutaAdminCuentasEstadoEstaRegistradaSegunContrato(): void
     {
         $router = Aplicacion::crearRouter();
 
         self::assertSame('/admin/cuentas/42/estado', $router->url('admin.cuentas.estado', ['id' => 42]));
+    }
+
+    // -------------------------------------------------------------------------
+    // RF006: Listado de cuentas (administrador)
+    // -------------------------------------------------------------------------
+
+    public function testRutaAdminCuentasEstaRegistradaSegunContrato(): void
+    {
+        $router = Aplicacion::crearRouter();
+
+        self::assertSame('/admin/cuentas', $router->url('admin.cuentas'));
+    }
+
+    public function testCriadorQueEntraAAdminCuentasIndexRecibe403(): void
+    {
+        $_SESSION['usuario_id'] = 1001;
+        $_SESSION['rol'] = 'criador';
+        $_SESSION['criadero_id'] = 1001;
+        $_SESSION['nombre'] = 'Criador Común';
+
+        try {
+            (new AdminCuentaController())->index();
+            self::fail('Un criador que intenta acceder a admin.cuentas debe recibir 403.');
+        } catch (HttpException $error) {
+            self::assertSame(403, $error->codigo());
+        }
+    }
+
+    public function testListarCuentasParaAdminEntregaCamposDelContratoSinDatosDeCriadero(): void
+    {
+        $registro = $this->servicio->registrar([
+            'nombre' => 'Clara Criadora',
+            'correo' => 'clara.rf006@tucriadero.cl',
+            'contrasena' => 'ClaveValida2026',
+            'consentimiento' => '1',
+        ]);
+        $criadorId = (int) $registro['usuario_id'];
+
+        $cuentas = $this->servicio->listarCuentasParaAdmin();
+        self::assertNotEmpty($cuentas);
+
+        $encontrada = null;
+        foreach ($cuentas as $cuenta) {
+            self::assertSame(['id', 'nombre', 'correo', 'estado', 'fecha_registro'], array_keys($cuenta));
+            self::assertArrayNotHasKey('criadero_id', $cuenta);
+            self::assertArrayNotHasKey('canarios', $cuenta);
+            self::assertArrayNotHasKey('jaulas', $cuenta);
+            self::assertArrayNotHasKey('cruces', $cuenta);
+            if ($cuenta['id'] === $criadorId) {
+                $encontrada = $cuenta;
+            }
+        }
+
+        self::assertNotNull($encontrada);
+        self::assertSame('Clara Criadora', $encontrada['nombre']);
+        self::assertSame('clara.rf006@tucriadero.cl', $encontrada['correo']);
+        self::assertSame('activa', $encontrada['estado']);
     }
 
     private function crearAdminDePrueba(string $correo): int
@@ -810,5 +873,19 @@ final class CuentaServiceTest extends TestCase
         $frase = $this->servicio->registrar(['nombre' => 'Ana María', 'correo' => 'ana.maria@tucriadero.cl',
             'contrasena' => 'mi jaula del patio', 'consentimiento' => '1']);
         self::assertSame([], $frase['errores']);
+    }
+
+    /** Compatibilidad con vistas de registro que envían `consentimiento=si` (RF001 / #71). */
+    public function testRegistroAceptaConsentimientoSi(): void
+    {
+        $resultado = $this->servicio->registrar([
+            'nombre' => 'Lucía Criadora',
+            'correo' => 'lucia.si@tucriadero.cl',
+            'contrasena' => 'mi jaula del sur',
+            'consentimiento' => 'si',
+        ]);
+
+        self::assertSame([], $resultado['errores']);
+        self::assertArrayHasKey('usuario_id', $resultado);
     }
 }

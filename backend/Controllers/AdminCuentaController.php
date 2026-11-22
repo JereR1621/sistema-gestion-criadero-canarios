@@ -14,7 +14,18 @@ use TuCriadero\Services\CuentaService;
  * Solo accesible para el rol `admin`; un criador recibe 403 y nunca se exponen datos de criaderos.
  */
 final class AdminCuentaController extends BaseController
-{
+{   
+    public function index(): void
+    {
+        $this->exigirAdmin();
+
+        $cuentas = (new CuentaService())->listarCuentasParaAdmin();
+
+        render('admin/cuentas', [
+            'cuentas' => $cuentas,
+        ]);
+    }
+    
     public function estado(string $id): void
     {
         $sesion = $this->exigirAdmin();

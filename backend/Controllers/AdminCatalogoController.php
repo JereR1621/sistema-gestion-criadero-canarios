@@ -31,12 +31,65 @@ final class AdminCatalogoController extends BaseController
         ]);
     }
 
+    public function variedadesNueva(): void
+    {
+        $this->exigirAdmin();
+
+        render('admin/variedad', [
+            'variedad' => null,
+            'factores' => (new CatalogoService())->listarFactores(),
+            'errores' => [],
+            'viejo' => [],
+        ]);
+    }
+
+    public function variedadesCrear(): void
+    {
+        $this->exigirAdmin();
+
+        $servicio = new CatalogoService();
+        $datos = [
+            'codigo' => is_string($_POST['codigo'] ?? null) ? $_POST['codigo'] : '',
+            'nombre' => is_string($_POST['nombre'] ?? null) ? $_POST['nombre'] : '',
+            'sexo' => is_string($_POST['sexo'] ?? null) ? $_POST['sexo'] : '',
+            'tipo' => is_string($_POST['tipo'] ?? null) ? $_POST['tipo'] : '',
+            'rasgo' => is_string($_POST['rasgo'] ?? null) ? $_POST['rasgo'] : '',
+            'factores' => $_POST['factores'] ?? [],
+        ];
+
+        $resultado = $servicio->crearVariedad($datos);
+
+        if ($resultado['errores'] !== []) {
+            render('admin/variedad', [
+                'variedad' => null,
+                'factores' => $servicio->listarFactores(),
+                'errores' => $resultado['errores'],
+                'viejo' => [
+                    'codigo' => trim($datos['codigo']),
+                    'nombre' => trim($datos['nombre']),
+                    'sexo' => $datos['sexo'],
+                    'tipo' => $datos['tipo'],
+                    'rasgo' => $datos['rasgo'],
+                    'factores' => is_array($datos['factores']) ? $datos['factores'] : [],
+                ],
+            ]);
+            return;
+        }
+
+        Vista::guardarFlash([
+            'tipo' => 'exito',
+            'mensaje' => 'La variedad se ha creado correctamente y aplica para todos los criadores.',
+        ]);
+
+        $this->redirigir(ruta('admin.variedades'));
+    }
+
     public function variedadesEditar(string $codigo): void
     {
         $this->exigirAdmin();
 
         $servicio = new CatalogoService();
-        $variedad = $this->exigirRegistroPropio($servicio->obtenerVariedad($codigo));
+        $variedad = $this->exigirRegistroPropio($servicio->obtenerVariedadParaAdmin($codigo));
 
         render('admin/variedad', [
             'variedad' => $variedad,
@@ -51,7 +104,7 @@ final class AdminCatalogoController extends BaseController
         $this->exigirAdmin();
 
         $servicio = new CatalogoService();
-        $variedadActual = $this->exigirRegistroPropio($servicio->obtenerVariedad($codigo));
+        $variedadActual = $this->exigirRegistroPropio($servicio->obtenerVariedadParaAdmin($codigo));
 
         // `tipo` y `rasgo` vienen del formulario cuando la vista los pide (nota de la issue #86);
         // si el formulario no los envía, se conservan los de la variedad.
@@ -84,6 +137,32 @@ final class AdminCatalogoController extends BaseController
         Vista::guardarFlash([
             'tipo' => 'exito',
             'mensaje' => 'La variedad se ha actualizado correctamente y aplica para todos los criadores.',
+        ]);
+
+        $this->redirigir(ruta('admin.variedades'));
+    }
+
+    public function variedadesEliminar(string $codigo): void
+    {
+        $this->exigirAdmin();
+
+        $servicio = new CatalogoService();
+        $this->exigirRegistroPropio($servicio->obtenerVariedad($codigo));
+
+        $resultado = $servicio->eliminarVariedad($codigo);
+
+        if ($resultado['errores'] !== []) {
+            $mensaje = reset($resultado['errores']) ?: 'No se pudo eliminar la variedad.';
+            Vista::guardarFlash([
+                'tipo' => 'error',
+                'mensaje' => $mensaje,
+            ]);
+            $this->redirigir(ruta('admin.variedades'));
+        }
+
+        Vista::guardarFlash([
+            'tipo' => 'exito',
+            'mensaje' => 'La variedad se ha eliminado correctamente.',
         ]);
 
         $this->redirigir(ruta('admin.variedades'));
@@ -132,10 +211,62 @@ final class AdminCatalogoController extends BaseController
         $this->redirigir(ruta('admin.factores'));
     }
 
+    public function factoresEditar(string $id): void
+    {
+        $this->exigirAdmin();
+
+        $factorId = $this->exigirIdPositivo($id);
+        $factor = $this->exigirRegistroPropio((new CatalogoService())->buscarFactor($factorId));
+
+        render('admin/factor', [
+            'factor' => $factor,
+            'errores' => [],
+            'viejo' => [
+                'nombre' => $factor['nombre'],
+                'tipo_herencia' => $factor['tipo_herencia'],
+            ],
+        ]);
+    }
+
+    public function factoresActualizar(string $id): void
+    {
+        $this->exigirAdmin();
+
+        $factorId = $this->exigirIdPositivo($id);
+        $servicio = new CatalogoService();
+        $factor = $this->exigirRegistroPropio($servicio->buscarFactor($factorId));
+
+        $datos = [
+            'nombre' => is_string($_POST['nombre'] ?? null) ? $_POST['nombre'] : '',
+            'tipo_herencia' => is_string($_POST['tipo_herencia'] ?? null) ? $_POST['tipo_herencia'] : null,
+        ];
+
+        $resultado = $servicio->actualizarFactor($factorId, $datos['nombre'], $datos['tipo_herencia']);
+
+        if ($resultado['errores'] !== []) {
+            render('admin/factor', [
+                'factor' => $factor,
+                'errores' => $resultado['errores'],
+                'viejo' => [
+                    'nombre' => trim($datos['nombre']),
+                    'tipo_herencia' => $datos['tipo_herencia'] ?? '',
+                ],
+            ]);
+            return;
+        }
+
+        Vista::guardarFlash([
+            'tipo' => 'exito',
+            'mensaje' => 'El factor se ha actualizado correctamente y aplica para todos los criadores.',
+        ]);
+
+        $this->redirigir(ruta('admin.factores'));
+    }
+
     /**
-     * Valores con los que se llena el formulario de una variedad (contrato §2, `$viejo`).
+     * Valores con los que se llena el formulario de una variedad (contrato §2 y §6, `$viejo`).
      *
-     * @param array{codigo: string, nombre: string, sexo: ?string, tipo: string, rasgo: ?string, factores: list<array{id: int, nombre: string, tipo_herencia: string, dosis: int}>} $variedad
+     * @param array{codigo: string, nombre: string, sexo: ?string, tipo: string, rasgo: ?string, factores: list<array{factor_id: int, nombre: string, dosis: int}>} $variedad
      * @return array<string, mixed>
      */
     private function viejoDeVariedad(array $variedad): array
@@ -145,7 +276,13 @@ final class AdminCatalogoController extends BaseController
             'sexo' => $variedad['sexo'] ?? '',
             'tipo' => $variedad['tipo'],
             'rasgo' => $variedad['rasgo'] ?? '',
-            'factores' => array_column($variedad['factores'], 'id'),
+            'factores' => array_map(
+                static fn (array $factor): array => [
+                    'factor_id' => $factor['factor_id'],
+                    'dosis' => $factor['dosis'],
+                ],
+                $variedad['factores'],
+            ),
         ];
     }
 }

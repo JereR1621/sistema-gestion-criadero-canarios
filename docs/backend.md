@@ -15,7 +15,7 @@ Todos los valores del SRS, incluidos los numéricos de los requisitos no funcion
 | Base de datos | MySQL | Usar **MySQL 8.0.16 o superior** (recomendado 8.4 LTS): antes de esa versión MySQL ignora las restricciones `CHECK` que pide IF-002. Instalación, migraciones y qué se sube a GitHub: [`base-de-datos.md`](base-de-datos.md). |
 | Despliegue | AWS | Entorno de pruebas (staging) y producción. |
 | Pruebas | PHPUnit (código) y Apache JMeter (carga) | Sujetas a cambio, según el SRS. |
-| PDF de la ficha | Dompdf (propuesta), instalado con Composer | AC-04. La librería y el uso de Composer los confirma la tarea de estructura base. |
+| PDF de la ficha | Dompdf, instalado con Composer | AC-04. Dependencia ya incorporada en la estructura base; contrato §8. |
 | Repositorio | GitHub | Ver `CONTRIBUTING.md`. |
 
 ## 2. Arquitectura propuesta
@@ -147,6 +147,8 @@ Caso de prueba que dio el cliente (RF037, audio del 09/11/2026): negro ópalo am
 - **Fuentes:** guía de la calculadora del cliente (<https://animalesbiologia.com/calculadoras/guia-uso-calculadora-canarios>) y estándar OMJ-COM de canarios de color (<https://www.focde.com/contenidos/focde/PDF%20COMISIONES/COLOR%20PDF/Coleur_Espanol_Standard.pdf>).
 
 ## 7. Seguridad (SEG-001 a SEG-005)
+
+**Decisión del PM (22/11/2026), recuperación de contraseña por correo:** se incorpora al producto como extensión del SRS v1.1. El contrato §6 y §8 define sus cuatro rutas, el enlace de un solo uso con vencimiento de 1 hora, el aviso que no revela si una cuenta existe y la invalidación de sesiones al restablecer. Requiere implementación y transporte de correo verificado; esta decisión no acredita que el flujo ya exista en `develop`.
 
 - **Contraseñas:** `password_hash()` / `password_verify()` (bcrypt o Argon2). Según NIST SP 800-63B:
   - al menos 8 caracteres sin contar los espacios;
