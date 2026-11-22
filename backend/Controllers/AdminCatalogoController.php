@@ -89,7 +89,7 @@ final class AdminCatalogoController extends BaseController
         $this->exigirAdmin();
 
         $servicio = new CatalogoService();
-        $variedad = $this->exigirRegistroPropio($servicio->obtenerVariedad($codigo));
+        $variedad = $this->exigirRegistroPropio($servicio->obtenerVariedadParaAdmin($codigo));
 
         render('admin/variedad', [
             'variedad' => $variedad,
@@ -104,7 +104,7 @@ final class AdminCatalogoController extends BaseController
         $this->exigirAdmin();
 
         $servicio = new CatalogoService();
-        $variedadActual = $this->exigirRegistroPropio($servicio->obtenerVariedad($codigo));
+        $variedadActual = $this->exigirRegistroPropio($servicio->obtenerVariedadParaAdmin($codigo));
 
         // `tipo` y `rasgo` vienen del formulario cuando la vista los pide (nota de la issue #86);
         // si el formulario no los envía, se conservan los de la variedad.
@@ -264,9 +264,9 @@ final class AdminCatalogoController extends BaseController
     }
 
     /**
-     * Valores con los que se llena el formulario de una variedad (contrato §2, `$viejo`).
+     * Valores con los que se llena el formulario de una variedad (contrato §2 y §6, `$viejo`).
      *
-     * @param array{codigo: string, nombre: string, sexo: ?string, tipo: string, rasgo: ?string, factores: list<array{id: int, nombre: string, tipo_herencia: string, dosis: int}>} $variedad
+     * @param array{codigo: string, nombre: string, sexo: ?string, tipo: string, rasgo: ?string, factores: list<array{factor_id: int, nombre: string, dosis: int}>} $variedad
      * @return array<string, mixed>
      */
     private function viejoDeVariedad(array $variedad): array
@@ -276,7 +276,13 @@ final class AdminCatalogoController extends BaseController
             'sexo' => $variedad['sexo'] ?? '',
             'tipo' => $variedad['tipo'],
             'rasgo' => $variedad['rasgo'] ?? '',
-            'factores' => array_column($variedad['factores'], 'id'),
+            'factores' => array_map(
+                static fn (array $factor): array => [
+                    'factor_id' => $factor['factor_id'],
+                    'dosis' => $factor['dosis'],
+                ],
+                $variedad['factores'],
+            ),
         ];
     }
 }

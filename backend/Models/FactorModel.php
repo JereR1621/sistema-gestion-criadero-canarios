@@ -148,6 +148,30 @@ final class FactorModel
         $consulta->execute([$nombre, $tipoHerencia, $id]);
     }
 
+    public function contarComposicionesConDosisDoble(int $factorId): int
+    {
+        $consulta = Conexion::obtener()->prepare(
+            'SELECT COUNT(*) FROM variedad_factor WHERE factor_id = ? AND dosis = 2'
+        );
+        $consulta->execute([$factorId]);
+
+        return (int) $consulta->fetchColumn();
+    }
+
+    public function contarCanariosPortadores(int $factorId): int
+    {
+        try {
+            $consulta = Conexion::obtener()->prepare(
+                'SELECT COUNT(*) FROM factor_portado WHERE factor_id = ?'
+            );
+            $consulta->execute([$factorId]);
+
+            return (int) $consulta->fetchColumn();
+        } catch (Throwable) {
+            return 0;
+        }
+    }
+
     /**
      * Ejecuta una operación dentro de una transacción (si no hay una ya abierta).
      *

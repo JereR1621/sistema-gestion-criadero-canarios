@@ -303,10 +303,10 @@ final class CatalogoServiceTest extends TestCase
 
         $porCodigo = array_column($lista, null, 'codigo');
         self::assertSame('VARIANTE DE PRUEBA', $porCodigo['D.900']['nombre']);
-        self::assertSame(['FACTOR DE PRUEBA RF032'], $porCodigo['D.900']['factores']);
+        self::assertSame(['FACTOR DE PRUEBA RF032'], array_column($porCodigo['D.900']['factores'], 'nombre'));
         self::assertSame('ROJO NEVADO CORREGIDO', $porCodigo['D.050']['nombre']);
         self::assertSame('hembra', $porCodigo['D.050']['sexo']);
-        self::assertSame(['ROJO', 'FACTOR DE PRUEBA RF032'], $porCodigo['D.050']['factores']);
+        self::assertSame(['ROJO', 'FACTOR DE PRUEBA RF032'], array_column($porCodigo['D.050']['factores'], 'nombre'));
 
         // El parámetro q= filtra por código o por nombre, sin distinguir mayúsculas
         self::assertCount(1, $this->servicio->listarVariedadesParaAdmin('D.900'));
@@ -344,7 +344,15 @@ final class CatalogoServiceTest extends TestCase
         self::assertCount(1, $variedades);
         self::assertSame(['codigo', 'nombre', 'sexo', 'factores'], array_keys($variedades[0]));
         self::assertSame('D.049', $variedades[0]['codigo']);
-        self::assertSame(['ROJO', 'INTENSO'], $variedades[0]['factores']);
+        self::assertSame(['factor_id', 'nombre', 'dosis'], array_keys($variedades[0]['factores'][0]));
+        self::assertSame(['ROJO', 'INTENSO'], array_column($variedades[0]['factores'], 'nombre'));
+        self::assertSame([1, 1], array_column($variedades[0]['factores'], 'dosis'));
+
+        $variedadAdmin = $this->servicio->obtenerVariedadParaAdmin('D.737');
+        self::assertIsArray($variedadAdmin);
+        self::assertSame(['codigo', 'nombre', 'sexo', 'tipo', 'rasgo', 'factores'], array_keys($variedadAdmin));
+        self::assertSame(['factor_id', 'nombre', 'dosis'], array_keys($variedadAdmin['factores'][0]));
+        self::assertSame(['BLANCO RECESIVO' => 1, 'JASPE' => 2], array_column($variedadAdmin['factores'], 'dosis', 'nombre'));
 
         $variedad = $this->servicio->obtenerVariedad('D.049');
         self::assertIsArray($variedad);
@@ -354,6 +362,89 @@ final class CatalogoServiceTest extends TestCase
         $factores = $this->servicio->listarFactores();
         self::assertNotEmpty($factores);
         self::assertSame(['id', 'nombre', 'tipo_herencia'], array_keys($factores[0]));
+    }
+
+    public function testActualizarFactorRechazaQuitarCodominanteSiHayVariedadesConDosisDoble(): void
+    {
+        $_SESSION['rol'] = 'admin';
+
+        $jaspe = null;
+        foreach ($this->servicio->listarFactores() as $f) {
+            if ($f['nombre'] === 'JASPE') {
+                $jaspe = $f;
+                break;
+            }
+        }
+        self::assertNotNull($jaspe);
+        self::assertSame('codominante', $jaspe['tipo_herencia']);
+
+        $rechazado = $this->servicio->actualizarFactor($jaspe['id'], 'JASPE', 'recesivo');
+        self::assertArrayHasKey('tipo_herencia', $rechazado['errores']);
+        self::assertStringContainsString('dosis 2', $rechazado['errores']['tipo_herencia']);
+
+        // El catálogo sigue intacto y válido
+        self::assertSame('codominante', $this->servicio->obtenerTipoHerencia($jaspe['id']));
+        $resumen = $this->servicio->validarCatalogoPrecargado();
+        self::assertSame(880, $resumen['total_variedades']);
+    }
+
+    public function testCrearYEditarVariedadConFormatoDeContratoFactoresYDosis(): void
+    {
+        $_SESSION['rol'] = 'admin';
+
+        $porNombre = array_column($this->servicio->listarFactores(), 'id', 'nombre');
+        $jaspeId = $porNombre['JASPE'];
+        $rojoId = $porNombre['ROJO'];
+        $intensoId = $porNombre['INTENSO'];
+
+        // Rechaza dosis 2 en un factor no codominante (ROJO)
+        $dosisInvalida = $this->servicio->crearVariedad([
+            'codigo' => 'D.901',
+            'nombre' => 'PRUEBA DOSIS INVALIDA',
+            'sexo' => '',
+            'tipo' => 'lipocromico',
+            'rasgo' => '',
+            'factores' => [
+                ['factor_id' => (string) $rojoId, 'dosis' => '2'],
+            ],
+        ]);
+        self::assertArrayHasKey('factores', $dosisInvalida['errores']);
+
+        // Crea variedad nueva con factores[n][factor_id] y factores[n][dosis] (JASPE DD)
+        $creada = $this->servicio->crearVariedad([
+            'codigo' => 'D.902',
+            'nombre' => 'PRUEBA JASPE DD CONTRATO',
+            'sexo' => 'macho',
+            'tipo' => 'lipocromico',
+            'rasgo' => '',
+            'factores' => [
+                ['factor_id' => (string) $rojoId, 'dosis' => '1'],
+                ['factor_id' => (string) $jaspeId, 'dosis' => '2'],
+            ],
+        ]);
+        self::assertSame([], $creada['errores']);
+
+        $leida = $this->servicio->obtenerVariedadParaAdmin('D.902');
+        self::assertNotNull($leida);
+        self::assertSame(['ROJO' => 1, 'JASPE' => 2], array_column($leida['factores'], 'dosis', 'nombre'));
+
+        // Edita la variedad cambiando JASPE a dosis 1 y sumando INTENSO dosis 1
+        $editada = $this->servicio->actualizarVariedad('D.902', [
+            'nombre' => 'PRUEBA JASPE SD CONTRATO',
+            'sexo' => 'macho',
+            'tipo' => 'lipocromico',
+            'rasgo' => '',
+            'factores' => [
+                ['factor_id' => (string) $rojoId, 'dosis' => '1'],
+                ['factor_id' => (string) $intensoId, 'dosis' => '1'],
+                ['factor_id' => (string) $jaspeId, 'dosis' => '1'],
+            ],
+        ]);
+        self::assertSame([], $editada['errores']);
+
+        $leidaEditada = $this->servicio->obtenerVariedadParaAdmin('D.902');
+        self::assertNotNull($leidaEditada);
+        self::assertSame(['ROJO' => 1, 'INTENSO' => 1, 'JASPE' => 1], array_column($leidaEditada['factores'], 'dosis', 'nombre'));
     }
 
     /**
