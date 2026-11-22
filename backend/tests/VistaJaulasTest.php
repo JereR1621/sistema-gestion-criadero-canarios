@@ -7,7 +7,7 @@ namespace TuCriadero\Tests;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\TestCase;
-use TuCriadero\Core\{Aplicacion, Rutas, Sesion, Vista};
+use TuCriadero\Core\{Aplicacion, Rutas, Router, Sesion, Vista};
 
 #[RunTestsInSeparateProcesses]
 #[PreserveGlobalState(false)]
@@ -16,7 +16,13 @@ final class VistaJaulasTest extends TestCase
     protected function setUp(): void
     {
         Vista::definirRaiz(dirname(__DIR__, 2));
-        Rutas::definir(Aplicacion::crearRouter());
+        // Reproduce módulos pendientes incluso cuando esas rutas se integren en el futuro.
+        $propiedad = new \ReflectionProperty(Router::class, 'rutas');
+        $rutas = array_values(array_filter(
+            $propiedad->getValue(Aplicacion::crearRouter()),
+            static fn ($ruta): bool => !in_array($ruta->nombre, ['cruces', 'buscar'], true)
+        ));
+        Rutas::definir(new Router($rutas));
         Sesion::iniciarAutenticada(1001, 'criador', 1001, 'Ana Prueba');
     }
 
