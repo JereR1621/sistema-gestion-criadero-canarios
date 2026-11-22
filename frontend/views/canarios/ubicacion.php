@@ -4,52 +4,27 @@
  * Issue: #105 (SRS-RF015 [Frontend]: Asignar canario a una jaula)
  */
 
-if (!function_exists('e')) {
-    function e(mixed $valor): string
-    {
-        return htmlspecialchars((string) $valor, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    }
-}
-
-if (!function_exists('ruta')) {
-    function ruta(string $nombre, array $params = []): string
-    {
-        return '#';
-    }
-}
-
-if (!function_exists('viejo')) {
-    function viejo(string $campo, mixed $defecto = ''): mixed
-    {
-        return $defecto;
-    }
-}
-
-if (!function_exists('error')) {
-    function error(string $campo): string
-    {
-        return '';
-    }
-}
+// Iniciales del usuario, como en el marco del Plan B; sin datos de demostración.
+$nombreSesion = (string) ($sesion['nombre'] ?? '');
+$iniciales = implode('', array_map(
+    static fn (string $parte): string => mb_strtoupper(mb_substr($parte, 0, 1)),
+    array_slice(preg_split('/\s+/', trim($nombreSesion), -1, PREG_SPLIT_NO_EMPTY) ?: [], 0, 2)
+));
+// Estos módulos tienen issues propias. No se muestran controles hasta que exista su ruta.
+$urlCruces = null;
+$urlBuscar = null;
+try { $urlCruces = ruta('cruces'); } catch (\InvalidArgumentException) {}
+try { $urlBuscar = ruta('buscar'); } catch (\InvalidArgumentException) {}
 
 $canarioData = is_array($canario ?? null) ? $canario : [];
 $idCanario = (string) ($canarioData['id'] ?? '');
 $anilloCanario = (string) ($canarioData['anillo_texto'] ?? ($canarioData['anillo'] ?? ''));
 $sexoCanario = strtolower((string) ($canarioData['sexo'] ?? ''));
-$variedadCanario = (string) ($canarioData['variedad'] ?? ($canarioData['variedad_nombre'] ?? ''));
-$ubicacionActual = $canarioData['ubicacion_actual'] ?? ($canarioData['jaula_actual'] ?? null);
-
-$textoUbicacionActual = 'Jaula grande (sin número)';
-if (is_array($ubicacionActual)) {
-    $numActual = (string) ($ubicacionActual['numero'] ?? '');
-    if ($numActual !== '') {
-        $textoUbicacionActual = 'Jaula ' . $numActual;
-    } elseif (!empty($ubicacionActual['es_grande']) || empty($ubicacionActual['id'])) {
-        $textoUbicacionActual = 'Jaula grande (sin número)';
-    }
-} elseif (is_string($ubicacionActual) && trim($ubicacionActual) !== '') {
-    $textoUbicacionActual = trim($ubicacionActual);
-}
+// CanarioResumen: variedad es un objeto de datos o null; la ubicación ya viene preparada.
+$variedadCanario = is_array($canarioData['variedad'] ?? null)
+    ? (string) $canarioData['variedad']['nombre']
+    : '';
+$textoUbicacionActual = (string) ($canarioData['ubicacion_texto'] ?? 'Sin ubicación');
 
 $jaulasLista = [];
 if (isset($jaulas) && is_iterable($jaulas)) {
@@ -74,26 +49,29 @@ $valorFecha = (string) viejo('fecha', '');
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/frontend/css/app.css">
-    <link rel="stylesheet" href="/frontend/css/jaulas.css">
-    <link rel="stylesheet" href="/frontend/css/canarios-ubicacion.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/jaulas.css">
+    <link rel="stylesheet" href="/css/canarios-ubicacion.css">
 </head>
 <body class="tucri-body">
     <header class="topbar">
         <div class="topbar__inner">
             <div class="topbar__left">
                 <a class="brand" href="<?= e(ruta('inicio')) ?>">
-                    <img class="brand__icon" src="/assets/logo.png" alt="">
+                    <svg class="brand__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 5.5a3.5 3.5 0 0 0-6.6 1.6L9 9c-3 .5-5.5 2.6-6 6 2.5 1.3 6 1.5 8.5.5L13 19h3l-1.6-3.6C17 14 18.5 11.5 18.5 9l2.5-1-2.6-1.5a3.5 3.5 0 0 0-2.9-1zM15.5 7.5h.01"/></svg>
                     <span class="brand__name">TuCri</span>
                 </a>
                 <nav class="nav" aria-label="Navegación principal">
                     <a class="nav__link" href="<?= e(ruta('inicio')) ?>">Inicio</a>
-                    <a class="nav__link" href="<?= e(ruta('cruces')) ?>">Libro de crías</a>
+                    <?php if ($urlCruces !== null): ?>
+                    <a class="nav__link" href="<?= e($urlCruces) ?>">Libro de crías</a>
+                    <?php endif; ?>
                 </nav>
             </div>
 
             <div class="topbar__right">
-                <form class="search-inline" method="get" action="<?= e(ruta('buscar')) ?>">
+                <?php if ($urlBuscar !== null): ?>
+                <form class="search-inline" method="get" action="<?= e($urlBuscar) ?>">
                     <input type="hidden" name="tipo" value="anillo">
                     <label class="sr-only" for="buscar-top">Anillo o correlativo</label>
                     <input
@@ -101,10 +79,11 @@ $valorFecha = (string) viejo('fecha', '');
                         class="search-inline__input"
                         type="search"
                         name="q"
-                        placeholder="Buscar anillo, variedad o jaula"
+                        placeholder="Anillo o correlativo"
                     >
                 </form>
-                <a class="avatar-chip" href="<?= e(ruta('perfil')) ?>" aria-label="Mi perfil">JC</a>
+                <?php endif; ?>
+                <a class="avatar-chip" href="<?= e(ruta('perfil')) ?>" aria-label="Mi perfil"><?= e($iniciales) ?></a>
             </div>
         </div>
     </header>
@@ -113,7 +92,7 @@ $valorFecha = (string) viejo('fecha', '');
         <section class="jaulas-banner" aria-labelledby="titulo-ubicacion-canario">
             <div class="jaulas-banner__info">
                 <div class="jaulas-banner__icono" aria-hidden="true">
-                    <img src="/assets/jaula.jpg" alt="">
+                    <svg class="jaula-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v15H4zM3 4h18M8 4v15M12 4v15M16 4v15M4 11.5h16M6 19v2M18 19v2"/></svg>
                 </div>
                 <div>
                     <h1 id="titulo-ubicacion-canario" class="jaulas-banner__titulo">Asignar o trasladar canario</h1>
