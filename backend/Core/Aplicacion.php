@@ -7,12 +7,12 @@ namespace TuCriadero\Core;
 use Throwable;
 use TuCriadero\Controllers\AdminCatalogoController;
 use TuCriadero\Controllers\AdminCuentaController;
+use TuCriadero\Controllers\CanarioController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
 use TuCriadero\Controllers\JaulaController;
 use TuCriadero\Models\UsuarioModel;
-use TuCriadero\Controllers\CanarioController;
 
 final class Aplicacion
 {

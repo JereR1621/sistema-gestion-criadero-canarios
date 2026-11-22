@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TuCriadero\Models;
 
+use InvalidArgumentException;
+
 /**
  * Acceso a la tabla `canario` y a sus tablas dependientes (`ubicacion`, `baja`, `factor_portado`)
  * con consultas preparadas filtradas siempre por `criadero_id` (aislamiento multicuenta, RF003).
@@ -267,7 +269,7 @@ final class CanarioModel extends ModeloCriadero
     public function crearEnCriadero(int $criaderoId, array $datos): int
     {
         if ($criaderoId <= 0) {
-            throw new \InvalidArgumentException('El identificador del criadero debe ser un entero positivo.');
+            throw new InvalidArgumentException('El identificador del criadero debe ser un entero positivo.');
         }
 
         $consulta = $this->pdo()->prepare(

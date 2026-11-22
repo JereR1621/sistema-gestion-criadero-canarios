@@ -8,27 +8,38 @@ use PDOException;
 use Throwable;
 use TuCriadero\Core\Conexion;
 use TuCriadero\Models\CanarioModel;
+use TuCriadero\Models\VariedadModel;
+use TuCriadero\Services\Genetica\FactoresManifestadosService;
 
 /**
- * Reglas de negocio para el registro, consulta y edición de canarios (SRS-RF007, DAT-004).
+ * Reglas de negocio para el registro, consulta y edición de canarios (SRS-RF007, RF033, DAT-004).
  */
 final class CanarioService
 {
     public const SEXOS_VALIDOS = ['macho', 'hembra', 'sin_determinar'];
     public const POR_PAGINA = 50;
 
+    /** Límite superior de `INT UNSIGNED` en MySQL (`007_crear_canario.sql`). */
+    private const CORRELATIVO_MAXIMO = 4294967295;
+
     private CanarioModel $canarios;
     private AislamientoService $aislamiento;
     private CuentaService $cuentas;
+    private FactoresManifestadosService $factoresManifestados;
+    private VariedadModel $variedades;
 
     public function __construct(
         ?CanarioModel $canarios = null,
         ?AislamientoService $aislamiento = null,
         ?CuentaService $cuentas = null,
+        ?FactoresManifestadosService $factoresManifestados = null,
+        ?VariedadModel $variedades = null,
     ) {
         $this->canarios = $canarios ?? new CanarioModel();
         $this->aislamiento = $aislamiento ?? new AislamientoService($this->canarios);
         $this->cuentas = $cuentas ?? new CuentaService();
+        $this->factoresManifestados = $factoresManifestados ?? new FactoresManifestadosService();
+        $this->variedades = $variedades ?? new VariedadModel();
     }
 
     /**
@@ -85,7 +96,7 @@ final class CanarioService
 
     /**
      * Obtiene la ficha completa (`CanarioFicha`) de un canario del criadero, o null si no existe
-     * o pertenece a otro criadero (RF003, RF007, contrato §5).
+     * o pertenece a otro criadero (RF003, RF007, RF033, contrato §5).
      *
      * @return array<string, mixed>|null
      */
@@ -115,7 +126,7 @@ final class CanarioService
             'medios_hermanos' => [],
             'crias' => [],
             'cruces' => [],
-            'factores_manifestados' => [],
+            'factores_manifestados' => $this->factoresManifestados->paraFichaDesdeVariedad($fila['variedad_codigo']),
             'portadores' => [],
             'baja' => $baja !== null ? ['motivo' => $baja['motivo'], 'fecha' => $baja['fecha']] : null,
             'arbol' => [
@@ -162,7 +173,7 @@ final class CanarioService
                 $pdo->rollBack();
             }
 
-            if ($error instanceof PDOException && $error->getCode() === '23000') {
+            if (self::esErrorAnilloDuplicado($error)) {
                 return [
                     'errores' => [
                         'anillo_correlativo' => 'Ya existe un canario registrado con ese anillo en tu criadero.',
@@ -218,7 +229,7 @@ final class CanarioService
                 $pdo->rollBack();
             }
 
-            if ($error instanceof PDOException && $error->getCode() === '23000') {
+            if (self::esErrorAnilloDuplicado($error)) {
                 return [
                     'errores' => [
                         'anillo_correlativo' => 'Ya existe un canario registrado con ese anillo en tu criadero.',
@@ -256,10 +267,10 @@ final class CanarioService
     {
         $errores = [];
 
-        $anilloSocio = trim((string) ($datos['anillo_socio'] ?? ''));
-        $anilloAnioCrudo = trim((string) ($datos['anillo_anio'] ?? ''));
-        $anilloCorrelativoCrudo = trim((string) ($datos['anillo_correlativo'] ?? ''));
-        $anilloClub = trim((string) ($datos['anillo_club'] ?? ''));
+        $anilloSocio = trim(self::textoDe($datos['anillo_socio'] ?? ''));
+        $anilloAnioCrudo = trim(self::textoDe($datos['anillo_anio'] ?? ''));
+        $anilloCorrelativoCrudo = trim(self::textoDe($datos['anillo_correlativo'] ?? ''));
+        $anilloClub = trim(self::textoDe($datos['anillo_club'] ?? ''));
 
         if ($anilloSocio === '') {
             $errores['anillo_socio'] = 'El número de socio del anillo es obligatorio.';
@@ -270,7 +281,7 @@ final class CanarioService
         $anilloAnio = null;
         if ($anilloAnioCrudo === '') {
             $errores['anillo_anio'] = 'El año del anillo es obligatorio.';
-        } elseif (!ctype_digit($anilloAnioCrudo) || (int) $anilloAnioCrudo < 1900 || (int) $anilloAnioCrudo > 65535) {
+        } elseif (strlen($anilloAnioCrudo) !== 4 || !ctype_digit($anilloAnioCrudo) || (int) $anilloAnioCrudo < 1900) {
             $errores['anillo_anio'] = 'El año del anillo debe ser un número válido de cuatro dígitos.';
         } else {
             $anilloAnio = (int) $anilloAnioCrudo;
@@ -279,10 +290,18 @@ final class CanarioService
         $anilloCorrelativo = null;
         if ($anilloCorrelativoCrudo === '') {
             $errores['anillo_correlativo'] = 'El número correlativo del anillo es obligatorio.';
-        } elseif (!ctype_digit($anilloCorrelativoCrudo) || (int) $anilloCorrelativoCrudo <= 0) {
+        } elseif (!ctype_digit($anilloCorrelativoCrudo)) {
             $errores['anillo_correlativo'] = 'El número correlativo del anillo debe ser un entero positivo.';
         } else {
-            $anilloCorrelativo = (int) $anilloCorrelativoCrudo;
+            $correlativoEntero = (int) $anilloCorrelativoCrudo;
+            if ($correlativoEntero <= 0
+                || $correlativoEntero > self::CORRELATIVO_MAXIMO
+                || (string) $correlativoEntero !== ltrim($anilloCorrelativoCrudo, '0')
+            ) {
+                $errores['anillo_correlativo'] = 'El número correlativo del anillo debe ser un entero positivo.';
+            } else {
+                $anilloCorrelativo = $correlativoEntero;
+            }
         }
 
         if ($anilloClub === '') {
@@ -291,19 +310,19 @@ final class CanarioService
             $errores['anillo_club'] = 'El club del anillo no puede superar los 50 caracteres.';
         }
 
-        $sexoCrudo = trim((string) ($datos['sexo'] ?? ''));
+        $sexoCrudo = trim(self::textoDe($datos['sexo'] ?? ''));
         $sexo = $sexoCrudo === '' ? 'sin_determinar' : $sexoCrudo;
         if (!in_array($sexo, self::SEXOS_VALIDOS, true)) {
             $errores['sexo'] = 'El sexo indicado no es válido.';
         }
 
-        $variedadCruda = trim((string) ($datos['variedad_codigo'] ?? ''));
+        $variedadCruda = trim(self::textoDe($datos['variedad_codigo'] ?? ''));
         $variedadCodigo = null;
         if ($variedadCruda !== '') {
             // Soporta tanto el código directo ("D.049") como el formato del datalist ("D.049 – ROJO INTENSO", contrato §4).
             $codigoExtraido = trim(explode('–', $variedadCruda, 2)[0]);
-            if (mb_strlen($codigoExtraido) > 5) {
-                $errores['variedad_codigo'] = 'El código de variedad no es válido.';
+            if ($codigoExtraido === '' || mb_strlen($codigoExtraido) > 5 || $this->variedades->buscarPorCodigo($codigoExtraido) === null) {
+                $errores['variedad_codigo'] = 'La variedad indicada no existe en el catálogo.';
             } else {
                 $variedadCodigo = $codigoExtraido;
             }
@@ -312,7 +331,7 @@ final class CanarioService
         $fechaAnillado = $this->parsearFechaOpcional($datos['fecha_anillado'] ?? null, 'fecha_anillado', 'fecha de anillado', $errores);
         $fechaNacimiento = $this->parsearFechaOpcional($datos['fecha_nacimiento'] ?? null, 'fecha_nacimiento', 'fecha de nacimiento', $errores);
 
-        $procedenciaCruda = trim((string) ($datos['procedencia'] ?? ''));
+        $procedenciaCruda = trim(self::textoDe($datos['procedencia'] ?? ''));
         if (mb_strlen($procedenciaCruda) > 150) {
             $errores['procedencia'] = 'La procedencia no puede superar los 150 caracteres.';
         }
@@ -443,17 +462,23 @@ final class CanarioService
      */
     private function parsearIdOpcional(mixed $valor, string $campo, string $etiqueta, array &$errores): ?int
     {
-        $texto = trim((string) ($valor ?? ''));
+        $texto = trim(self::textoDe($valor));
         if ($texto === '') {
             return null;
         }
 
-        if (!ctype_digit($texto) || (int) $texto <= 0) {
+        if (!ctype_digit($texto)) {
             $errores[$campo] = "El identificador de {$etiqueta} no es válido.";
             return null;
         }
 
-        return (int) $texto;
+        $entero = (int) $texto;
+        if ($entero <= 0 || (string) $entero !== ltrim($texto, '0')) {
+            $errores[$campo] = "El identificador de {$etiqueta} no es válido.";
+            return null;
+        }
+
+        return $entero;
     }
 
     /**
@@ -461,7 +486,7 @@ final class CanarioService
      */
     private function parsearFechaOpcional(mixed $valor, string $campo, string $etiqueta, array &$errores): ?string
     {
-        $texto = trim((string) ($valor ?? ''));
+        $texto = trim(self::textoDe($valor));
         if ($texto === '') {
             return null;
         }
@@ -522,7 +547,7 @@ final class CanarioService
             // RF007: se muestra como «Sin ubicación» hasta que se integre RF015 (#104).
             'ubicacion_texto' => 'Sin ubicación',
             'estado' => (string) $fila['estado'],
-            'url' => "/canarios/{$id}",
+            'url' => self::urlOAlternativa('canarios.ficha', ['id' => $id], "/canarios/{$id}"),
         ];
     }
 
@@ -554,5 +579,37 @@ final class CanarioService
                 ? $this->construirNodoArbol($fila['madre_id'], $criaderoId, $generacion + 1, $nuevosVisitados)
                 : null,
         ]);
+    }
+
+    private static function textoDe(mixed $valor): string
+    {
+        if (is_string($valor)) {
+            return $valor;
+        }
+
+        if (is_int($valor) || is_float($valor)) {
+            return (string) $valor;
+        }
+
+        return '';
+    }
+
+    private static function esErrorAnilloDuplicado(Throwable $error): bool
+    {
+        if (!$error instanceof PDOException || $error->getCode() !== '23000') {
+            return false;
+        }
+
+        return ($error->errorInfo[1] ?? null) === 1062;
+    }
+
+    /** @param array<string, scalar> $parametros */
+    private static function urlOAlternativa(string $nombreRuta, array $parametros, string $alternativa): string
+    {
+        try {
+            return \ruta($nombreRuta, $parametros);
+        } catch (Throwable) {
+            return $alternativa;
+        }
     }
 }

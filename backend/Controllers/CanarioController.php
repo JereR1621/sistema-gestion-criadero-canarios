@@ -8,13 +8,17 @@ use TuCriadero\Core\HttpException;
 use TuCriadero\Core\Vista;
 use TuCriadero\Services\CanarioService;
 
+/**
+ * Gestión de canarios del criadero autenticado (SRS-RF007, RF003).
+ * El `criadero_id` se obtiene exclusivamente desde la sesión vía `BaseController::exigirCriador()`.
+ */
 final class CanarioController extends BaseController
 {
     public function index(): void
     {
         $sesion = $this->exigirCriador();
 
-        $paginaCruda = (string) ($_GET['pagina'] ?? '1');
+        $paginaCruda = is_string($_GET['pagina'] ?? null) ? trim($_GET['pagina']) : '1';
         $pagina = ctype_digit($paginaCruda) && (int) $paginaCruda > 0 ? (int) $paginaCruda : 1;
 
         $listado = (new CanarioService())->listarActivos($sesion['criadero_id'], $pagina);
@@ -167,18 +171,25 @@ final class CanarioController extends BaseController
     private function leerCamposFormulario(): array
     {
         return [
-            'anillo_socio' => trim((string) ($_POST['anillo_socio'] ?? '')),
-            'anillo_anio' => trim((string) ($_POST['anillo_anio'] ?? '')),
-            'anillo_correlativo' => trim((string) ($_POST['anillo_correlativo'] ?? '')),
-            'anillo_club' => trim((string) ($_POST['anillo_club'] ?? '')),
-            'sexo' => trim((string) ($_POST['sexo'] ?? '')),
-            'variedad_codigo' => trim((string) ($_POST['variedad_codigo'] ?? '')),
-            'fecha_anillado' => trim((string) ($_POST['fecha_anillado'] ?? '')),
-            'fecha_nacimiento' => trim((string) ($_POST['fecha_nacimiento'] ?? '')),
-            'padre_id' => trim((string) ($_POST['padre_id'] ?? '')),
-            'madre_id' => trim((string) ($_POST['madre_id'] ?? '')),
-            'procedencia' => trim((string) ($_POST['procedencia'] ?? '')),
+            'anillo_socio' => self::leerTextoPost('anillo_socio'),
+            'anillo_anio' => self::leerTextoPost('anillo_anio'),
+            'anillo_correlativo' => self::leerTextoPost('anillo_correlativo'),
+            'anillo_club' => self::leerTextoPost('anillo_club'),
+            'sexo' => self::leerTextoPost('sexo'),
+            'variedad_codigo' => self::leerTextoPost('variedad_codigo'),
+            'fecha_anillado' => self::leerTextoPost('fecha_anillado'),
+            'fecha_nacimiento' => self::leerTextoPost('fecha_nacimiento'),
+            'padre_id' => self::leerTextoPost('padre_id'),
+            'madre_id' => self::leerTextoPost('madre_id'),
+            'procedencia' => self::leerTextoPost('procedencia'),
             'portadores' => is_array($_POST['portadores'] ?? null) ? $_POST['portadores'] : [],
         ];
+    }
+
+    private static function leerTextoPost(string $campo): string
+    {
+        $valor = $_POST[$campo] ?? '';
+
+        return is_string($valor) ? trim($valor) : '';
     }
 }
