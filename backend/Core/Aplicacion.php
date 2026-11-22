@@ -51,6 +51,7 @@ final class Aplicacion
     public static function crearRouter(): Router
     {
         return new Router([
+            new Ruta('raiz', 'GET', '/', InicioController::class, 'raiz'),
             new Ruta('inicio', 'GET', '/inicio', InicioController::class, 'mostrar'),
             new Ruta('inicio.pdf', 'GET', '/inicio/pdf', InicioController::class, 'descargarPdf'),
 
@@ -71,10 +72,15 @@ final class Aplicacion
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
 
             new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
+            new Ruta('admin.variedades.nueva', 'GET', '/admin/variedades/nueva', AdminCatalogoController::class, 'variedadesNueva'),
+            new Ruta('admin.variedades.crear', 'POST', '/admin/variedades', AdminCatalogoController::class, 'variedadesCrear'),
             new Ruta('admin.variedades.editar', 'GET', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesEditar'),
             new Ruta('admin.variedades.guardar', 'POST', '/admin/variedades/{codigo}', AdminCatalogoController::class, 'variedadesGuardar'),
+            new Ruta('admin.variedades.eliminar', 'POST', '/admin/variedades/{codigo}/eliminar', AdminCatalogoController::class, 'variedadesEliminar'),
             new Ruta('admin.factores', 'GET', '/admin/factores', AdminCatalogoController::class, 'factores'),
             new Ruta('admin.factores.guardar', 'POST', '/admin/factores', AdminCatalogoController::class, 'factoresGuardar'),
+            new Ruta('admin.factores.editar', 'GET', '/admin/factores/{id}', AdminCatalogoController::class, 'factoresEditar'),
+            new Ruta('admin.factores.actualizar', 'POST', '/admin/factores/{id}', AdminCatalogoController::class, 'factoresActualizar'),
         ]);
     }
 

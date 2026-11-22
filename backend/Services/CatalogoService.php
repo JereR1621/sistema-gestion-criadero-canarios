@@ -75,13 +75,18 @@ final class CatalogoService
     }
 
     /**
-     * Variedades del catálogo para la pantalla de administración (SRS-RF032, contrato §5):
-     * `VariedadOpcion` más los nombres de los factores de su composición.
+     * Variedades del catálogo para la pantalla de administración (SRS-RF032, contrato §5 y §6):
+     * `VariedadOpcion` más su composición de factores como `ComposicionFactor` (`factor_id`, `nombre`, `dosis`).
      *
-     * `$q` filtra por código o por nombre (sin distinguir mayúsculas); vacío lista las 880.
+     * `$q` filtra por código o por nombre (sin distinguir mayúsculas); vacío lista todas.
      * El catálogo es global: la respuesta no depende del `criadero_id` de la sesión.
      *
-     * @return list<array{codigo: string, nombre: string, sexo: ?string, factores: list<string>}>
+     * @return list<array{
+     *     codigo: string,
+     *     nombre: string,
+     *     sexo: ?string,
+     *     factores: list<array{factor_id: int, nombre: string, dosis: int}>
+     * }>
      */
     public function listarVariedadesParaAdmin(?string $q = null): array
     {
@@ -101,11 +106,57 @@ final class CatalogoService
                 'codigo' => $variedad['codigo'],
                 'nombre' => $variedad['nombre'],
                 'sexo' => $variedad['sexo'],
-                'factores' => array_column($variedad['factores'], 'nombre'),
+                'factores' => self::formatearComposicionContrato($variedad['factores']),
             ];
         }
 
         return $resultado;
+    }
+
+    /**
+     * Variedad para la pantalla de edición del administrador (contrato §5 y §6):
+     * `VariedadOpcion` + `tipo`, `rasgo`, `factores` [`ComposicionFactor`].
+     *
+     * @return array{
+     *     codigo: string,
+     *     nombre: string,
+     *     sexo: ?string,
+     *     tipo: string,
+     *     rasgo: ?string,
+     *     factores: list<array{factor_id: int, nombre: string, dosis: int}>
+     * }|null
+     */
+    public function obtenerVariedadParaAdmin(string $codigo): ?array
+    {
+        $variedad = $this->obtenerVariedad($codigo);
+        if ($variedad === null) {
+            return null;
+        }
+
+        return [
+            'codigo' => $variedad['codigo'],
+            'nombre' => $variedad['nombre'],
+            'sexo' => $variedad['sexo'],
+            'tipo' => $variedad['tipo'],
+            'rasgo' => $variedad['rasgo'],
+            'factores' => self::formatearComposicionContrato($variedad['factores']),
+        ];
+    }
+
+    /**
+     * @param list<array{id: int, nombre: string, tipo_herencia: string, dosis: int}> $factores
+     * @return list<array{factor_id: int, nombre: string, dosis: int}>
+     */
+    private static function formatearComposicionContrato(array $factores): array
+    {
+        return array_map(
+            static fn (array $factor): array => [
+                'factor_id' => $factor['id'],
+                'nombre' => $factor['nombre'],
+                'dosis' => $factor['dosis'],
+            ],
+            $factores,
+        );
     }
 
     /**
@@ -327,6 +378,83 @@ final class CatalogoService
     }
 
     /**
+     * Busca un factor por id devolviendo null si no existe (útil en controladores para 404).
+     *
+     * @return array{id: int, nombre: string, tipo_herencia: string}|null
+     */
+    public function buscarFactor(int $factorId): ?array
+    {
+        $factor = $this->factores->buscarPorId($factorId);
+        if ($factor === null) {
+            return null;
+        }
+
+        $this->asegurarTipoHerenciaEnCatalogo($factor);
+
+        return $factor;
+    }
+
+    /**
+     * Actualiza un factor existente del catálogo para el administrador (SRS-RF032, admin.factores.actualizar).
+     *
+     * @return array{errores: array<string, string>}
+     */
+    public function actualizarFactor(int $factorId, string $nombre, ?string $tipoHerencia): array
+    {
+        $this->impedirModificacionPorCriador();
+
+        $nombreNormalizado = mb_strtoupper(trim($nombre), 'UTF-8');
+
+        $errores = [];
+        if ($nombreNormalizado === '') {
+            $errores['nombre'] = 'El nombre del factor es obligatorio.';
+        } elseif (mb_strlen($nombreNormalizado) > 80) {
+            $errores['nombre'] = 'El nombre del factor no puede superar los 80 caracteres.';
+        }
+
+        try {
+            $herenciaNormalizada = self::validarTipoHerencia($tipoHerencia, $nombreNormalizado);
+        } catch (InvalidArgumentException $error) {
+            $herenciaNormalizada = '';
+            $errores['tipo_herencia'] = $error->getMessage();
+        }
+
+        if ($errores !== []) {
+            if ($this->factores->buscarPorId($factorId) === null) {
+                return ['errores' => ['nombre' => "El factor con id {$factorId} no existe en el catálogo."]];
+            }
+
+            return ['errores' => $errores];
+        }
+
+        // Bloqueo de fila sobre `factor` + lectura actual (`FOR UPDATE`) en la misma transacción:
+        // impide intercalar un cambio de herencia con un alta/edición concurrente de variedad con dosis 2.
+        return $this->factores->enTransaccion(function () use ($factorId, $nombreNormalizado, $herenciaNormalizada): array {
+            if ($this->factores->bloquearPorId($factorId) === null) {
+                return ['errores' => ['nombre' => "El factor con id {$factorId} no existe en el catálogo."]];
+            }
+
+            $existente = $this->factores->buscarPorNombre($nombreNormalizado);
+            if ($existente !== null && $existente['id'] !== $factorId) {
+                return ['errores' => ['nombre' => "Ya existe un factor con el nombre «{$nombreNormalizado}» en el catálogo."]];
+            }
+
+            if ($herenciaNormalizada !== 'codominante' && $this->factores->contarComposicionesConDosisDoble($factorId) > 0) {
+                return ['errores' => ['tipo_herencia' => 'No se puede cambiar este factor a un tipo no codominante porque hay variedades con dosis 2 que lo usan.']];
+            }
+
+            if (!in_array($herenciaNormalizada, self::TIPOS_HERENCIA_PORTABLES, true) && $this->factores->contarCanariosPortadores($factorId) > 0) {
+                return ['errores' => ['tipo_herencia' => 'No se puede cambiar este factor a un tipo no portable porque hay canarios que lo portan.']];
+            }
+
+            $this->factores->actualizar($factorId, $nombreNormalizado, $herenciaNormalizada);
+            \auditar('actualizar', 'factor', $factorId);
+
+            return ['errores' => []];
+        });
+    }
+
+    /**
      * Valida la integridad del catálogo precargado según SRS-RF028 y DAT-004:
      * - 880 variedades con códigos D.001 a D.880 sin huecos ni duplicados (solo sección D).
      * - Todas con nombre no vacío.
@@ -524,19 +652,33 @@ final class CatalogoService
         }
 
         $composicion = [];
-        foreach ($validado['factores'] as $factorId) {
-            $composicion[$factorId] = 1;
+        foreach ($validado['composicion'] as $factorId => $dosisExplicita) {
+            $composicion[$factorId] = $dosisExplicita ?? 1;
         }
 
-        $repetida = $this->buscarCombinacionRepetida($validado['sexo'], $validado['tipo'], $validado['rasgo'], $composicion);
-        if ($repetida !== null) {
-            return ['errores' => ['factores' => sprintf(
-                'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
-                $repetida
-            )]];
-        }
+        return $this->variedades->enTransaccion(function () use ($codigo, $validado, $composicion): array {
+            // Bloquea los factores involucrados (`FOR UPDATE`) antes de validar dosis 2 y guardar,
+            // serializando esta operación con cualquier cambio concurrente en `actualizarFactor()`.
+            if ($composicion !== []) {
+                $bloqueados = $this->factores->bloquearPorIds(array_keys($composicion));
+                foreach ($composicion as $factorId => $dosis) {
+                    if (!isset($bloqueados[$factorId])) {
+                        return ['errores' => ['factores' => "El factor con id {$factorId} no existe en el catálogo."]];
+                    }
+                    if ($dosis === 2 && $bloqueados[$factorId]['tipo_herencia'] !== 'codominante') {
+                        return ['errores' => ['factores' => "Solo los factores codominantes admiten dosis 2 (factor «{$bloqueados[$factorId]['nombre']}»)."]];
+                    }
+                }
+            }
 
-        $this->variedades->enTransaccion(function () use ($codigo, $validado, $composicion): void {
+            $repetida = $this->buscarCombinacionRepetida($validado['sexo'], $validado['tipo'], $validado['rasgo'], $composicion);
+            if ($repetida !== null) {
+                return ['errores' => ['factores' => sprintf(
+                    'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
+                    $repetida
+                )]];
+            }
+
             $this->cargarVariedad(
                 $codigo,
                 $validado['nombre'],
@@ -546,9 +688,9 @@ final class CatalogoService
                 $composicion,
             );
             \auditar('crear', 'variedad', $codigo);
-        });
 
-        return ['errores' => []];
+            return ['errores' => []];
+        });
     }
 
     /**
@@ -582,32 +724,46 @@ final class CatalogoService
                 . ($sexo === 'macho' ? 'machos' : 'hembras') . '.']];
         }
 
-        // La dosis no viene del formulario: cada factor conserva la suya y los nuevos entran con una copia.
-        $dosisActuales = [];
-        foreach ($this->variedades->obtenerComposicion($codigo) as $factor) {
-            $dosisActuales[$factor['id']] = $factor['dosis'];
-        }
+        return $this->variedades->enTransaccion(function () use ($codigo, $validado): array {
+            // Si el formulario envía dosis explícita (`factores[n][dosis]`), se aplica;
+            // si envía solo ids planos, cada factor conserva su dosis actual y los nuevos entran con 1.
+            $dosisActuales = [];
+            foreach ($this->variedades->obtenerComposicion($codigo) as $factor) {
+                $dosisActuales[$factor['id']] = $factor['dosis'];
+            }
 
-        $composicion = [];
-        foreach ($validado['factores'] as $factorId) {
-            $composicion[$factorId] = $dosisActuales[$factorId] ?? 1;
-        }
+            $composicion = [];
+            foreach ($validado['composicion'] as $factorId => $dosisExplicita) {
+                $composicion[$factorId] = $dosisExplicita ?? ($dosisActuales[$factorId] ?? 1);
+            }
 
-        $repetida = $this->buscarCombinacionRepetida(
-            $validado['sexo'],
-            $validado['tipo'],
-            $validado['rasgo'],
-            $composicion,
-            $codigo,
-        );
-        if ($repetida !== null) {
-            return ['errores' => ['factores' => sprintf(
-                'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
-                $repetida
-            )]];
-        }
+            // Bloquea los factores involucrados (`FOR UPDATE`) antes de validar dosis 2 y guardar.
+            if ($composicion !== []) {
+                $bloqueados = $this->factores->bloquearPorIds(array_keys($composicion));
+                foreach ($composicion as $factorId => $dosis) {
+                    if (!isset($bloqueados[$factorId])) {
+                        return ['errores' => ['factores' => "El factor con id {$factorId} no existe en el catálogo."]];
+                    }
+                    if ($dosis === 2 && $bloqueados[$factorId]['tipo_herencia'] !== 'codominante') {
+                        return ['errores' => ['factores' => "Solo los factores codominantes admiten dosis 2 (factor «{$bloqueados[$factorId]['nombre']}»)."]];
+                    }
+                }
+            }
 
-        $this->variedades->enTransaccion(function () use ($codigo, $validado, $composicion): void {
+            $repetida = $this->buscarCombinacionRepetida(
+                $validado['sexo'],
+                $validado['tipo'],
+                $validado['rasgo'],
+                $composicion,
+                $codigo,
+            );
+            if ($repetida !== null) {
+                return ['errores' => ['factores' => sprintf(
+                    'Ya existe una variedad (%s) con la misma combinación de factores y dosis para el mismo sexo, tipo y rasgo.',
+                    $repetida
+                )]];
+            }
+
             $this->variedades->actualizar(
                 $codigo,
                 $validado['nombre'],
@@ -617,9 +773,9 @@ final class CatalogoService
                 $composicion,
             );
             \auditar('actualizar', 'variedad', $codigo);
-        });
 
-        return ['errores' => []];
+            return ['errores' => []];
+        });
     }
 
     /**
@@ -693,30 +849,65 @@ final class CatalogoService
             $errores['rasgo'] = "El rasgo «{$rasgo}» no es válido. Debe ser ala_blanca o alas_grises.";
         }
 
-        $factores = [];
+        $composicion = [];
         if (array_key_exists('factores', $datos) && !is_array($datos['factores'])) {
             $errores['factores'] = 'La lista de factores enviada no es válida.';
         } else {
-            foreach ((array) ($datos['factores'] ?? []) as $id) {
-                if ($id === null || $id === '') {
+            foreach ((array) ($datos['factores'] ?? []) as $entrada) {
+                if ($entrada === null || $entrada === '') {
                     continue;
                 }
 
-                if (!is_numeric($id) || (int) $id != $id || (int) $id <= 0) {
+                if (is_array($entrada)) {
+                    $idCrudo = $entrada['factor_id'] ?? null;
+                    if ($idCrudo === null || $idCrudo === '') {
+                        continue;
+                    }
+                    if (!is_numeric($idCrudo) || (int) $idCrudo != $idCrudo || (int) $idCrudo <= 0) {
+                        $errores['factores'] = 'La lista de factores enviada no es válida.';
+                        break;
+                    }
+
+                    $dosisCruda = $entrada['dosis'] ?? 1;
+                    if ($dosisCruda === '' || $dosisCruda === null) {
+                        $dosisCruda = 1;
+                    }
+                    if (!is_numeric($dosisCruda) || (int) $dosisCruda != $dosisCruda || !in_array((int) $dosisCruda, [1, 2], true)) {
+                        $errores['factores'] = 'La dosis de cada factor debe ser 1 o 2.';
+                        break;
+                    }
+
+                    $factorId = (int) $idCrudo;
+                    $dosis = (int) $dosisCruda;
+                    if (array_key_exists($factorId, $composicion) && $composicion[$factorId] !== $dosis) {
+                        $errores['factores'] = 'No se puede repetir el mismo factor con dosis distintas.';
+                        break;
+                    }
+                    $composicion[$factorId] = $dosis;
+                    continue;
+                }
+
+                if (!is_numeric($entrada) || (int) $entrada != $entrada || (int) $entrada <= 0) {
                     $errores['factores'] = 'La lista de factores enviada no es válida.';
                     break;
                 }
 
-                $factores[] = (int) $id;
+                $factorId = (int) $entrada;
+                if (!array_key_exists($factorId, $composicion)) {
+                    $composicion[$factorId] = null;
+                }
             }
-            $factores = array_values(array_unique($factores));
         }
 
-        if ($factores !== []) {
-            $existentes = $this->factores->buscarPorIds($factores);
-            foreach ($factores as $factorId) {
+        if ($composicion !== [] && !isset($errores['factores'])) {
+            $existentes = $this->factores->buscarPorIds(array_keys($composicion));
+            foreach ($composicion as $factorId => $dosisExplicita) {
                 if (!isset($existentes[$factorId])) {
                     $errores['factores'] = "El factor con id {$factorId} no existe en el catálogo.";
+                    break;
+                }
+                if ($dosisExplicita === 2 && $existentes[$factorId]['tipo_herencia'] !== 'codominante') {
+                    $errores['factores'] = "Solo los factores codominantes admiten dosis 2 (factor «{$existentes[$factorId]['nombre']}»).";
                     break;
                 }
             }
@@ -728,7 +919,7 @@ final class CatalogoService
             'sexo' => $sexo,
             'tipo' => $tipo,
             'rasgo' => $rasgo,
-            'factores' => $factores,
+            'composicion' => $composicion,
         ];
     }
 

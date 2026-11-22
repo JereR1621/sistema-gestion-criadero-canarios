@@ -874,4 +874,18 @@ final class CuentaServiceTest extends TestCase
             'contrasena' => 'mi jaula del patio', 'consentimiento' => '1']);
         self::assertSame([], $frase['errores']);
     }
+
+    /** Compatibilidad con vistas de registro que envían `consentimiento=si` (RF001 / #71). */
+    public function testRegistroAceptaConsentimientoSi(): void
+    {
+        $resultado = $this->servicio->registrar([
+            'nombre' => 'Lucía Criadora',
+            'correo' => 'lucia.si@tucriadero.cl',
+            'contrasena' => 'mi jaula del sur',
+            'consentimiento' => 'si',
+        ]);
+
+        self::assertSame([], $resultado['errores']);
+        self::assertArrayHasKey('usuario_id', $resultado);
+    }
 }
