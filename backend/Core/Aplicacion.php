@@ -67,6 +67,7 @@ final class Aplicacion
             new Ruta('jaulas', 'GET', '/jaulas', JaulaController::class, 'index'),
             new Ruta('jaulas.guardar', 'POST', '/jaulas', JaulaController::class, 'guardar'),
 
+            new Ruta('admin.cuentas', 'GET', '/admin/cuentas', AdminCuentaController::class, 'index'),
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
 
             new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
