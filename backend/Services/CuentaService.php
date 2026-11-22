@@ -33,9 +33,9 @@ final class CuentaService
      */
     public function registrar(array $datos): array
     {
-        $nombre = trim((string) ($datos['nombre'] ?? ''));
-        $correo = mb_strtolower(trim((string) ($datos['correo'] ?? '')));
-        $contrasena = (string) ($datos['contrasena'] ?? '');
+        $nombre = trim(texto_de($datos['nombre'] ?? ''));
+        $correo = mb_strtolower(trim(texto_de($datos['correo'] ?? '')));
+        $contrasena = texto_de($datos['contrasena'] ?? '');
         $consentimiento = $datos['consentimiento'] ?? null;
 
         $errores = [];
@@ -54,13 +54,8 @@ final class CuentaService
             $errores['correo'] = 'Este correo electrónico ya está registrado.';
         }
 
-        if ($contrasena === '') {
-            $errores['contrasena'] = 'La contraseña es obligatoria.';
-        } elseif (mb_strlen($contrasena) < 8) {
-            $errores['contrasena'] = 'La contraseña debe tener al menos 8 caracteres.';
-        } elseif (strlen($contrasena) > self::CONTRASENA_MAX_BYTES) {
-            // bcrypt solo usa los primeros 72 bytes: más allá, el resto se ignoraría sin avisar.
-            $errores['contrasena'] = 'La contraseña es demasiado larga: máximo 72 caracteres (la ñ y las letras con tilde cuentan doble).';
+        if (($error = self::errorDeContrasena($contrasena, $correo, $nombre)) !== null) {
+            $errores['contrasena'] = $error;
         }
 
         if (!in_array($consentimiento, ['1', 1, true, 'on'], true)) {
@@ -136,8 +131,8 @@ final class CuentaService
      */
     public function autenticar(array $datos): array
     {
-        $correo = mb_strtolower(trim((string) ($datos['correo'] ?? '')));
-        $contrasena = (string) ($datos['contrasena'] ?? '');
+        $correo = mb_strtolower(trim(texto_de($datos['correo'] ?? '')));
+        $contrasena = texto_de($datos['contrasena'] ?? '');
 
         if ($correo === '' || $contrasena === '') {
             return [
@@ -263,8 +258,8 @@ final class CuentaService
             ];
         }
 
-        $numeroSocio = trim((string) ($datos['numero_socio'] ?? ''));
-        $club = trim((string) ($datos['club'] ?? ''));
+        $numeroSocio = trim(texto_de($datos['numero_socio'] ?? ''));
+        $club = trim(texto_de($datos['club'] ?? ''));
 
         $errores = [];
 
@@ -349,7 +344,7 @@ final class CuentaService
      */
     public function cambiarEstadoCuenta(int $cuentaId, array $datos, ?int $adminId = null): array
     {
-        $nuevoEstado = trim((string) ($datos['estado'] ?? ''));
+        $nuevoEstado = trim(texto_de($datos['estado'] ?? ''));
 
         if (!in_array($nuevoEstado, self::ESTADOS_CUENTA, true)) {
             return [
@@ -420,5 +415,53 @@ final class CuentaService
 
             throw $error;
         }
+    }
+
+    /**
+     * Contraseña nueva (NIST SP 800-63B, 5.1.1.2): al menos 8 caracteres sin contar los espacios, hasta 72 bytes y sin
+     * byte nulo (límites de bcrypt), sin contraseñas muy usadas, secuencias ni un solo carácter repetido, y sin el correo
+     * ni el nombre. No se exigen mayúsculas, números ni símbolos: llevan a contraseñas fáciles de adivinar.
+     */
+    private static function errorDeContrasena(string $contrasena, string $correo, string $nombre): ?string
+    {
+        $sinEspacios = (string) preg_replace('/\s+/u', '', $contrasena);
+        // El nombre y el correo se comparan sin tildes ni espacios: «anamaria» también es «Ana María».
+        $plano = static fn (string $t): string => strtr(mb_strtolower((string) preg_replace('/\s+/u', '', $t)),
+            ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n']);
+        $personales = array_filter([$plano($correo), $plano((string) strstr($correo, '@', true)), $plano($nombre)],
+            static fn (string $p): bool => mb_strlen($p) >= 4);
+
+        return match (true) {
+            $contrasena === '' => 'La contraseña es obligatoria.',
+            mb_strlen($sinEspacios) < 8 => 'La contraseña debe tener al menos 8 caracteres, sin contar los espacios.',
+            // bcrypt solo usa los primeros 72 bytes y no admite el byte nulo (PHP 8.3 lanzaría un error 500).
+            strlen($contrasena) > self::CONTRASENA_MAX_BYTES || str_contains($contrasena, "\0")
+                => 'La contraseña es demasiado larga o tiene caracteres no válidos: máximo 72 caracteres (la ñ y las letras con tilde cuentan doble).',
+            array_filter($personales, static fn (string $p): bool => str_contains($plano($contrasena), $p)) !== []
+                => 'La contraseña no puede contener tu correo ni tu nombre.',
+            self::esContrasenaComun(mb_strtolower($sinEspacios)) => 'Esa contraseña es muy común y fácil de adivinar. Prueba con una frase corta que recuerdes.',
+            default => null,
+        };
+    }
+
+    /** Lista de contraseñas muy usadas (backend/recursos/contrasenas-comunes.txt), un solo carácter repetido o una secuencia del teclado. */
+    private static function esContrasenaComun(string $minusculas): bool
+    {
+        static $comunes = null;
+        if ($comunes === null) {
+            $lineas = @file(dirname(__DIR__) . '/recursos/contrasenas-comunes.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+            $comunes = array_fill_keys(array_map(static fn (string $l): string => mb_strtolower(trim($l)),
+                array_filter($lineas, static fn (string $l): bool => !str_starts_with(ltrim($l), '#'))), true);
+        }
+        if (isset($comunes[$minusculas]) || preg_match('/^(.)\1*$/u', $minusculas) === 1) {
+            return true;
+        }
+        foreach (['01234567890123456789', 'abcdefghijklmnopqrstuvwxyz', 'qwertyuiopasdfghjklzxcvbnm'] as $serie) {
+            if (str_contains($serie, $minusculas) || str_contains(strrev($serie), $minusculas)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

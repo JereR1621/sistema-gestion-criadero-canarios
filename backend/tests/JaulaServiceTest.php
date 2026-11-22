@@ -192,9 +192,9 @@ final class JaulaServiceTest extends TestCase
     {
         $auditoriaAntes = (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
 
-        foreach (['', '   ', '0', '-3', '1.5', 'jaula1', '9999999999999'] as $invalido) {
+        foreach (['', '   ', '0', '-3', '1.5', 'jaula1', '9999999999999', ['7']] as $invalido) {
             $resultado = $this->servicio->registrar($this->criaderoA, ['numero' => $invalido]);
-            self::assertArrayHasKey('numero', $resultado['errores'], "Debió rechazar «{$invalido}».");
+            self::assertArrayHasKey('numero', $resultado['errores'], 'Debió rechazar «' . json_encode($invalido) . '».');
             self::assertArrayNotHasKey('jaula_id', $resultado);
         }
 

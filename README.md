@@ -4,7 +4,7 @@ Aplicación web para criadores de **canarios de color**. Reemplaza el cuaderno d
 
 | | |
 |---|---|
-| **Estado** | SRS v1.1 listo para la aceptación del cliente (todavía sin aprobar); corrige la v1.0 con el nomenclador oficial 2026 que entregó el cliente. El código está por empezar: hay estructura, sin implementación. |
+| **Estado** | SRS v1.1 listo para la aceptación del cliente (todavía sin aprobar); corrige la v1.0 con el nomenclador oficial 2026 que entregó el cliente. El desarrollo está en curso: ya están integrados en `develop` el backend de cuentas, aislamiento entre criaderos, catálogo, jaulas y parte de la genética. El avance de cada parte se sigue en las issues. |
 | **Stack** | PHP con HTML embebido · MySQL 8 · AWS · PHPUnit · Apache JMeter · Figma |
 | **Requisitos** | [`docs/srs/`](docs/srs/), SRS v1.1 (ISO/IEC/IEEE 29148): **es la fuente oficial.** Si un documento o una issue no coincide con el SRS, manda el SRS. Los pedidos que el cliente acordó después del SRS están en [`docs/ajustes-cliente.md`](docs/ajustes-cliente.md) (etiqueta `ajuste:cliente`) y lo amplían. |
 
