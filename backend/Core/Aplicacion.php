@@ -7,6 +7,7 @@ namespace TuCriadero\Core;
 use Throwable;
 use TuCriadero\Controllers\AdminCatalogoController;
 use TuCriadero\Controllers\AdminCuentaController;
+use TuCriadero\Controllers\CanarioController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
@@ -70,6 +71,13 @@ final class Aplicacion
 
             new Ruta('admin.cuentas', 'GET', '/admin/cuentas', AdminCuentaController::class, 'index'),
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
+
+            new Ruta('canarios', 'GET', '/canarios', CanarioController::class, 'index'),
+            new Ruta('canarios.nuevo', 'GET', '/canarios/nuevo', CanarioController::class, 'nuevo'),
+            new Ruta('canarios.guardar', 'POST', '/canarios', CanarioController::class, 'guardar'),
+            new Ruta('canarios.ficha', 'GET', '/canarios/{id}', CanarioController::class, 'ficha'),
+            new Ruta('canarios.editar', 'GET', '/canarios/{id}/editar', CanarioController::class, 'editar'),
+            new Ruta('canarios.actualizar', 'POST', '/canarios/{id}', CanarioController::class, 'actualizar'),
 
             new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
             new Ruta('admin.variedades.nueva', 'GET', '/admin/variedades/nueva', AdminCatalogoController::class, 'variedadesNueva'),

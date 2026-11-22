@@ -111,3 +111,14 @@ Antes de guardar relaciones enviadas desde un formulario (`canario_id`, `jaula_i
 - `validarCruceActivoDelCriadero()` → rechaza cruce terminado o de otro criadero.
 - `validarPadresDelCriadero()` → rechaza padre o madre de otro criadero.
 - `validarCanarioParaBajaEnCriadero()` → rechaza canario de otro criadero o ya dado de baja.
+
+### Escrituras genealógicas de RF007
+
+`CanarioService::registrar()` y `actualizar()` abren la transacción y bloquean la fila del criadero con
+`CanarioModel::bloquearGenealogiaEnCriadero()` antes de leer y validar padres e hijos. El bloqueo dura hasta
+confirmar o deshacer la operación; las consultas siguen filtradas por el criadero de la sesión. Las futuras
+operaciones que cambien sexo, año o relaciones genealógicas deben respetar este mismo orden.
+
+Al editar un progenitor se preservan también el sexo y la precedencia del año respecto de sus hijos ya registrados.
+La regresión de dos sesiones está en `CanarioServiceTest`, con un trabajador CLI exclusivo de la base de pruebas:
+la primera sesión espera antes de abrir la transacción y vuelve a validar el estado confirmado por la segunda.
