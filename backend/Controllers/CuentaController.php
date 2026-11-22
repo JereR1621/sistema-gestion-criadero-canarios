@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace TuCriadero\Controllers;
 
-use TuCriadero\Core\HttpException;
 use TuCriadero\Core\Sesion;
 use TuCriadero\Core\Vista;
 use TuCriadero\Services\CuentaService;
 
-final class CuentaController
+final class CuentaController extends BaseController
 {
     public function registro(): void
     {
@@ -121,12 +120,11 @@ final class CuentaController
 
     public function perfil(): void
     {
-        $sesion = $this->exigirCriadorAutenticado();
+        $sesion = $this->exigirCriador();
 
-        $perfil = (new CuentaService())->obtenerPerfil($sesion['usuario_id']);
-        if ($perfil === null) {
-            throw HttpException::noEncontrado();
-        }
+        $perfil = $this->exigirRegistroPropio(
+            (new CuentaService())->obtenerPerfil($sesion['usuario_id'])
+        );
 
         render('cuentas/perfil', [
             'perfil' => $perfil,
@@ -137,7 +135,7 @@ final class CuentaController
 
     public function perfilGuardar(): void
     {
-        $sesion = $this->exigirCriadorAutenticado();
+        $sesion = $this->exigirCriador();
 
         $datos = [
             'numero_socio' => $_POST['numero_socio'] ?? '',
@@ -148,10 +146,9 @@ final class CuentaController
         $resultado = $servicio->actualizarPerfil($sesion['usuario_id'], $datos);
 
         if ($resultado['errores'] !== []) {
-            $perfil = $servicio->obtenerPerfil($sesion['usuario_id']);
-            if ($perfil === null) {
-                throw HttpException::noEncontrado();
-            }
+            $perfil = $this->exigirRegistroPropio(
+                $servicio->obtenerPerfil($sesion['usuario_id'])
+            );
 
             render('cuentas/perfil', [
                 'perfil' => $perfil,
@@ -169,23 +166,6 @@ final class CuentaController
             'mensaje' => 'Perfil actualizado correctamente.',
         ]);
 
-        header('Location: ' . ruta('perfil'), true, 303);
-        exit;
-    }
-
-    /** @return array{usuario_id: int, nombre: string, rol: string} */
-    private function exigirCriadorAutenticado(): array
-    {
-        $sesion = Sesion::paraVista();
-        if ($sesion === null) {
-            header('Location: ' . ruta('ingreso'), true, 303);
-            exit;
-        }
-
-        if ($sesion['rol'] !== 'criador') {
-            throw HttpException::prohibido();
-        }
-
-        return $sesion;
+        $this->redirigir(ruta('perfil'));
     }
 }
