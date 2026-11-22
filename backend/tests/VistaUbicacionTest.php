@@ -19,7 +19,10 @@ final class VistaUbicacionTest extends TestCase
         Sesion::iniciarAutenticada(1001, 'criador', 1001, 'Ana Prueba');
         // Solo permite renderizar el action del formulario: no simula la implementación de #104.
         $propiedad = new \ReflectionProperty(Router::class, 'rutas');
-        $rutas = $propiedad->getValue(Aplicacion::crearRouter());
+        $rutas = array_values(array_filter(
+            $propiedad->getValue(Aplicacion::crearRouter()),
+            static fn ($ruta): bool => $ruta->nombre !== 'canarios.ubicacion.guardar'
+        ));
         $rutas[] = new Ruta('canarios.ubicacion.guardar', 'POST', '/canarios/{id}/ubicacion', '', '');
         Rutas::definir(new Router($rutas));
     }
