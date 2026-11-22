@@ -116,6 +116,36 @@ final class CatalogoServiceTest extends TestCase
         self::assertSame('hembra', $ultima['sexo']);
     }
 
+    public function testActualizarFactorModificaNombreYHerenciaYRechazaDuplicadoOCriador(): void
+    {
+        $_SESSION['rol'] = 'admin';
+
+        $creado = $this->servicio->crearFactor('FACTOR_EDITABLE', 'recesivo');
+        self::assertSame([], $creado['errores']);
+        $id = (int) ($creado['factor_id'] ?? 0);
+        self::assertGreaterThan(0, $id);
+
+        $ok = $this->servicio->actualizarFactor($id, 'factor_editado', 'ligado_sexo');
+        self::assertSame([], $ok['errores']);
+
+        $actualizado = $this->servicio->buscarFactor($id);
+        self::assertNotNull($actualizado);
+        self::assertSame('FACTOR_EDITADO', $actualizado['nombre']);
+        self::assertSame('ligado_sexo', $actualizado['tipo_herencia']);
+
+        // Nombre duplicado de otro factor existente
+        $duplicado = $this->servicio->actualizarFactor($id, 'MARFIL', 'ligado_sexo');
+        self::assertArrayHasKey('nombre', $duplicado['errores']);
+
+        // Factor inexistente
+        self::assertNull($this->servicio->buscarFactor(999999));
+
+        // Criador bloqueado con 403
+        $_SESSION['rol'] = 'criador';
+        $this->expectException(HttpException::class);
+        $this->servicio->actualizarFactor($id, 'OTRO_NOMBRE', 'recesivo');
+    }
+
     /**
      * Criterio negativo (SRS-RF028): cargar dos veces un mismo código falla por la clave primaria `codigo`
      * y el catálogo conserva exactamente las 880 variedades sin duplicados.

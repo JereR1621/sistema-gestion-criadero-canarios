@@ -140,6 +140,14 @@ final class FactorModel
         return (int) $pdo->lastInsertId();
     }
 
+    public function actualizar(int $id, string $nombre, string $tipoHerencia): void
+    {
+        $consulta = Conexion::obtener()->prepare(
+            'UPDATE factor SET nombre = ?, tipo_herencia = ? WHERE id = ?'
+        );
+        $consulta->execute([$nombre, $tipoHerencia, $id]);
+    }
+
     /**
      * Ejecuta una operación dentro de una transacción (si no hay una ya abierta).
      *

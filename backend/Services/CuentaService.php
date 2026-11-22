@@ -58,7 +58,10 @@ final class CuentaService
             $errores['contrasena'] = $error;
         }
 
-        if (!in_array($consentimiento, ['1', 1, true, 'on'], true)) {
+        $consentimientoNormalizado = is_string($consentimiento)
+            ? mb_strtolower(trim($consentimiento), 'UTF-8')
+            : $consentimiento;
+        if (!in_array($consentimientoNormalizado, ['1', 1, true, 'on', 'si', 'sí'], true)) {
             $errores['consentimiento'] = 'Para crear la cuenta debes aceptar el uso de tus datos';
         }
 

@@ -327,6 +327,69 @@ final class CatalogoService
     }
 
     /**
+     * Busca un factor por id devolviendo null si no existe (útil en controladores para 404).
+     *
+     * @return array{id: int, nombre: string, tipo_herencia: string}|null
+     */
+    public function buscarFactor(int $factorId): ?array
+    {
+        $factor = $this->factores->buscarPorId($factorId);
+        if ($factor === null) {
+            return null;
+        }
+
+        $this->asegurarTipoHerenciaEnCatalogo($factor);
+
+        return $factor;
+    }
+
+    /**
+     * Actualiza un factor existente del catálogo para el administrador (SRS-RF032, admin.factores.actualizar).
+     *
+     * @return array{errores: array<string, string>}
+     */
+    public function actualizarFactor(int $factorId, string $nombre, ?string $tipoHerencia): array
+    {
+        $this->impedirModificacionPorCriador();
+
+        if ($this->factores->buscarPorId($factorId) === null) {
+            return ['errores' => ['nombre' => "El factor con id {$factorId} no existe en el catálogo."]];
+        }
+
+        $nombreNormalizado = mb_strtoupper(trim($nombre), 'UTF-8');
+
+        $errores = [];
+        if ($nombreNormalizado === '') {
+            $errores['nombre'] = 'El nombre del factor es obligatorio.';
+        } elseif (mb_strlen($nombreNormalizado) > 80) {
+            $errores['nombre'] = 'El nombre del factor no puede superar los 80 caracteres.';
+        } else {
+            $existente = $this->factores->buscarPorNombre($nombreNormalizado);
+            if ($existente !== null && $existente['id'] !== $factorId) {
+                $errores['nombre'] = "Ya existe un factor con el nombre «{$nombreNormalizado}» en el catálogo.";
+            }
+        }
+
+        try {
+            $herenciaNormalizada = self::validarTipoHerencia($tipoHerencia, $nombreNormalizado);
+        } catch (InvalidArgumentException $error) {
+            $herenciaNormalizada = '';
+            $errores['tipo_herencia'] = $error->getMessage();
+        }
+
+        if ($errores !== []) {
+            return ['errores' => $errores];
+        }
+
+        $this->factores->enTransaccion(function () use ($factorId, $nombreNormalizado, $herenciaNormalizada): void {
+            $this->factores->actualizar($factorId, $nombreNormalizado, $herenciaNormalizada);
+            \auditar('actualizar', 'factor', $factorId);
+        });
+
+        return ['errores' => []];
+    }
+
+    /**
      * Valida la integridad del catálogo precargado según SRS-RF028 y DAT-004:
      * - 880 variedades con códigos D.001 a D.880 sin huecos ni duplicados (solo sección D).
      * - Todas con nombre no vacío.
