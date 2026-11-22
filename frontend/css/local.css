@@ -1,0 +1,128 @@
+/* Front local: lo que agregan las páginas PHP sobre las hojas de la maqueta (que no se modifican).
+   Sin JavaScript todo se ve y funciona; con JavaScript (clase .js en <html>) se pliegan pestañas y hojas. */
+
+/* Errores que devuelve el backend, junto a su campo (contrato §4). */
+.field-error { display: block; margin-top: 6px; color: #9b1c1c; font-size: 14px; font-weight: 600; }
+.has-error input, .has-error select, .has-error .segr span { border-color: #9b1c1c; }
+.check.has-error span { color: #9b1c1c; }
+
+/* Mensaje flash del backend: el aviso flotante de la maqueta, que se oculta solo. */
+#toast.flash { animation: aviso-salida 5s ease forwards; }
+#toast.flash-error { background: #8f2a1f; }
+@keyframes aviso-salida { 0%, 85% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
+
+/* Accesibilidad y apoyo. */
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.js .sin-js { display: none; }
+
+/* Pestañas de la ficha: enlaces con el aspecto de los botones de la maqueta. */
+.seg-tabs a.seg { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.tab-panel + .tab-panel { margin-top: 24px; }
+.js .tab-panel:not(.on) { display: none; }
+.js .tab-panel + .tab-panel { margin-top: 0; }
+
+/* «De mis canarios» / «Cualquier variedad» en la calculadora: radios con el aspecto de .seg-mini, sin JavaScript. */
+.seg-mini.origen label { flex: 1; position: relative; }
+.seg-mini.origen input { position: absolute; opacity: 0; inset: 0; }
+.seg-mini.origen span { display: flex; align-items: center; justify-content: center; min-height: 46px; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; }
+.seg-mini.origen input:checked + span { color: var(--green-d); border-bottom-color: var(--green); font-weight: 500; }
+.seg-mini.origen input:focus-visible + span { outline: 3px solid #aa7816; outline-offset: 2px; }
+.seg-mini.origen input:disabled + span { opacity: .45; cursor: not-allowed; }
+.cparent:has(input[value="canario"]:checked) .solo-variedad,
+.cparent:has(input[value="variedad"]:checked) .solo-canario,
+.cparent:has(input[value="mis"]:checked) .solo-nueva,
+.cparent:has(input[value="nueva"]:checked) .solo-mis { display: none; }
+
+/* Alta de canario: procedencia solo si es adquirido; padres solo si nació en el criadero. */
+form:has(input[name="origen"][value="adquirido"]:checked) .solo-criadero,
+form:has(input[name="origen"][value="criadero"]:checked) .solo-adquirido { display: none; }
+
+/* «Más acciones», «Agregar jaula», «Terminar cruce»…: sin JavaScript se despliegan en el lugar; con JavaScript abren una hoja. */
+.act-more { position: relative; }
+.act-more > summary { list-style: none; cursor: pointer; }
+.act-more > summary::-webkit-details-marker { display: none; }
+.act-more[open] > .sheet-list { margin-top: 10px; padding: 16px; min-width: min(360px, 88vw); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 28px #193F4622; }
+.act-bar .act-more[open] { flex-basis: 100%; }
+.page-head > .agregar-jaula { margin: 0; }
+.page-head > .agregar-jaula[open] { flex-basis: 100%; }
+.sheet .sheet-list form, .act-more .sheet-list form { display: grid; gap: 10px; }
+
+/* Hojas que htmx trae del servidor (#hoja). Sin JavaScript, la misma hoja se ve como tarjeta en su página. */
+.main > .hoja-form { max-width: 560px; margin: 24px auto; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.sheet .hoja-form > h2:first-child { display: none; }
+.hoja-form .sheet-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+
+/* Cerrar sesión es un formulario (POST con CSRF): se ve igual que los enlaces del menú. */
+.form-salir { margin: 0; }
+.umenu .form-salir button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border: 0; background: none; font: inherit; font-weight: 600; cursor: pointer; text-align: left; }
+.umenu .form-salir button:hover { background: var(--soft); }
+.drawer-foot form { margin: 0; }
+.drawer-foot form .side-link { width: 100%; border: 0; background: none; font: inherit; cursor: pointer; text-align: left; }
+
+/* Árbol: las tarjetas vacías y la propia son botones (muestran el parentesco); se ven igual que los enlaces. */
+button.pcard { font-family: inherit; text-align: left; cursor: pointer; }
+a.pcard, a.cage { text-decoration: none; }
+
+/* El panel que permite conservar las pestañas sin JS respeta las superficies de la maqueta. */
+.tab-panel { display: flex; flex-direction: column; gap: 24px; }
+.layout .tab-panel > .card,
+.layout .tab-panel > .grid-2 > .card {
+    background: #F7FAFA;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+}
+.layout .tab-panel > .card + .grid-2 { gap: 28px 24px; margin-top: 8px; }
+.layout .tab-panel > .card + .grid-2 .mini { background: #fff; border: 1px solid var(--line); }
+.profile .act-bar > .act-more > summary { width: 100%; }
+@media (max-width: 599px) {
+    .page-head > .agregar-jaula, .page-head > .agregar-jaula > summary { width: 100%; }
+    .profile .act-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .profile .act-bar > .btn-primary,
+    .profile .act-bar > .act-more[open],
+    .profile .act-bar > .act-more:only-child { grid-column: 1 / -1; }
+    .profile .act-bar > .act-more { min-width: 0; }
+    .profile .act-bar > .btn, .profile .act-bar > .act-more > summary { width: 100%; padding-inline: 12px; font-size: 14px; }
+}
+
+/* La jaula grande no es una fila de jaula: no tiene ficha propia. */
+.cage.cage-grande { cursor: default; }
+.cage.cage-grande:hover { transform: none; }
+
+/* Registro de pareja: un paso anterior es un formulario GET que no debe cambiar el aspecto del botón de la maqueta. */
+.stepper.wiz form { display: contents; }
+
+/* Paginación de Mis canarios y filas de administración. */
+.paginacion { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 24px 0; }
+.admin-row { display: flex; align-items: center; gap: 12px; }
+.admin-estado { display: flex; align-items: center; gap: 8px; }
+.admin-estado select { min-height: 40px; }
+@media (max-width: 599px) { .admin-row { flex-wrap: wrap; } .admin-estado { width: 100%; } }
+
+/* Historial de la jaula: cada línea lleva a su canario o cruce. */
+.timeline a { color: inherit; text-decoration: none; }
+.timeline a:hover { text-decoration: underline; }
+
+/* Pantalla sin conexión: la pone tucri.js cuando el navegador pierde la red. */
+.sin-conexion { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; background: #193f46e6; }
+.sin-conexion .err-state { max-width: 520px; padding: 32px; background: var(--surface); border-radius: 16px; }
+
+/* Formularios que en la maqueta no existen como caja: sus tarjetas se ubican como si no hubiera <form> (registrar pareja). */
+form.plano { display: contents; }
+
+/* Temporadas del libro de crías: son enlaces (GET ?temporada=) con el aspecto de los botones .chip de la maqueta. */
+a.chip { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+/* Como form.plano no es caja, las reglas «.layout .main > .form-actions» de tablero.css no lo alcanzan: se repiten aquí. */
+.layout .main > form.plano > .form-actions { background: #fff; padding: 16px 22px; border-radius: 14px; border: 1px solid var(--line); }
+.layout .main > form.plano > .form-actions .btn-ghost { color: var(--ink); }
+
+/* «De mis canarios» / «Ave nueva»: el mismo tamaño de letra que los botones .seg-mini de la maqueta. */
+.seg-mini.origen span { font-size: 14px; }
+/* En la maqueta, la ayuda y los campos son hijos directos del panel (.cparent): toman su mismo espacio entre elementos. */
+.cparent > .solo-mis, .cparent > .solo-nueva, .cparent > .solo-canario, .cparent > .solo-variedad { display: contents; }
+
+/* Administrador: sin buscador en la barra, su menú de usuario va igual al extremo derecho. */
+.topbar .desktop-nav + .umenu-wrap { margin-left: auto; }
+/* Factores de una variedad: el tipo de herencia, separado y más tenue que el nombre. */
+.chip-cb span small { margin-left: 6px; font-weight: 400; color: var(--muted); }

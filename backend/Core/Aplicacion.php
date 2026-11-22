@@ -7,6 +7,7 @@ namespace TuCriadero\Core;
 use Throwable;
 use TuCriadero\Controllers\AdminCatalogoController;
 use TuCriadero\Controllers\AdminCuentaController;
+use TuCriadero\Controllers\CanarioController;
 use TuCriadero\Controllers\CuentaController;
 use TuCriadero\Controllers\ErrorController;
 use TuCriadero\Controllers\InicioController;
@@ -71,6 +72,13 @@ final class Aplicacion
             new Ruta('admin.cuentas', 'GET', '/admin/cuentas', AdminCuentaController::class, 'index'),
             new Ruta('admin.cuentas.estado', 'POST', '/admin/cuentas/{id}/estado', AdminCuentaController::class, 'estado'),
 
+            new Ruta('canarios', 'GET', '/canarios', CanarioController::class, 'index'),
+            new Ruta('canarios.nuevo', 'GET', '/canarios/nuevo', CanarioController::class, 'nuevo'),
+            new Ruta('canarios.guardar', 'POST', '/canarios', CanarioController::class, 'guardar'),
+            new Ruta('canarios.ficha', 'GET', '/canarios/{id}', CanarioController::class, 'ficha'),
+            new Ruta('canarios.editar', 'GET', '/canarios/{id}/editar', CanarioController::class, 'editar'),
+            new Ruta('canarios.actualizar', 'POST', '/canarios/{id}', CanarioController::class, 'actualizar'),
+
             new Ruta('admin.variedades', 'GET', '/admin/variedades', AdminCatalogoController::class, 'variedades'),
             new Ruta('admin.variedades.nueva', 'GET', '/admin/variedades/nueva', AdminCatalogoController::class, 'variedadesNueva'),
             new Ruta('admin.variedades.crear', 'POST', '/admin/variedades', AdminCatalogoController::class, 'variedadesCrear'),
@@ -129,6 +137,11 @@ final class Aplicacion
             return;
         }
 
+        if (str_starts_with($ruta, '/js/')) {
+            $this->servirJs($ruta);
+            return;
+        }
+
         self::comprobarCsrf($metodo, $_POST);
         $this->router->despachar($metodo, $ruta);
     }
@@ -175,7 +188,39 @@ final class Aplicacion
             throw HttpException::noEncontrado();
         }
 
-        header('Content-Type: text/css; charset=UTF-8');
+        $extension = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+        $tipos = [
+            'css' => 'text/css; charset=UTF-8',
+            'woff2' => 'font/woff2',
+            'svg' => 'image/svg+xml',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            'html' => 'text/html; charset=UTF-8',
+        ];
+        if (!isset($tipos[$extension])) {
+            throw HttpException::noEncontrado();
+        }
+
+        header('Content-Type: ' . $tipos[$extension]);
+        readfile($archivo);
+    }
+
+    private function servirJs(string $ruta): void
+    {
+        $relativa = rawurldecode(substr($ruta, strlen('/js/')));
+
+        if ($relativa === '' || str_contains($relativa, '..') || str_contains($relativa, '\\') || !str_ends_with(strtolower($relativa), '.js')) {
+            throw HttpException::noEncontrado();
+        }
+
+        $archivo = $this->raiz . '/public/js/' . $relativa;
+        if (!is_file($archivo)) {
+            throw HttpException::noEncontrado();
+        }
+
+        header('Content-Type: application/javascript; charset=UTF-8');
         readfile($archivo);
     }
 
