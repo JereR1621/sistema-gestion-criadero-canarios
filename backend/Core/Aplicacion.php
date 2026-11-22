@@ -137,6 +137,11 @@ final class Aplicacion
             return;
         }
 
+        if (str_starts_with($ruta, '/js/')) {
+            $this->servirJs($ruta);
+            return;
+        }
+
         self::comprobarCsrf($metodo, $_POST);
         $this->router->despachar($metodo, $ruta);
     }
@@ -183,7 +188,39 @@ final class Aplicacion
             throw HttpException::noEncontrado();
         }
 
-        header('Content-Type: text/css; charset=UTF-8');
+        $extension = strtolower(pathinfo($archivo, PATHINFO_EXTENSION));
+        $tipos = [
+            'css' => 'text/css; charset=UTF-8',
+            'woff2' => 'font/woff2',
+            'svg' => 'image/svg+xml',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            'html' => 'text/html; charset=UTF-8',
+        ];
+        if (!isset($tipos[$extension])) {
+            throw HttpException::noEncontrado();
+        }
+
+        header('Content-Type: ' . $tipos[$extension]);
+        readfile($archivo);
+    }
+
+    private function servirJs(string $ruta): void
+    {
+        $relativa = rawurldecode(substr($ruta, strlen('/js/')));
+
+        if ($relativa === '' || str_contains($relativa, '..') || str_contains($relativa, '\\') || !str_ends_with(strtolower($relativa), '.js')) {
+            throw HttpException::noEncontrado();
+        }
+
+        $archivo = $this->raiz . '/public/js/' . $relativa;
+        if (!is_file($archivo)) {
+            throw HttpException::noEncontrado();
+        }
+
+        header('Content-Type: application/javascript; charset=UTF-8');
         readfile($archivo);
     }
 
