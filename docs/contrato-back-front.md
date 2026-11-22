@@ -21,7 +21,7 @@ Navegador ──GET/POST──▶ public/index.php ──▶ Controlador ──�
 | Textos de los mensajes de error | Los redacta | Los ubica en la pantalla |
 
 Reglas fijas:
-- **Estilos CSS:** Los archivos `.css` van separados en la carpeta pública (ej. `public/css/`) y se enlazan desde las vistas; no se escribe CSS embebido dentro de los archivos PHP.
+- **Estilos CSS:** Los archivos `.css` van en `frontend/css/` y se publican en la URL `/css/`; se enlazan desde las vistas y no se escribe CSS embebido dentro de los archivos PHP.
 - **Las vistas no consultan la base de datos ni llaman a servicios.** Solo leen las variables que reciben y usan los helpers de la sección 3.
 - **Las vistas nunca reciben datos de otro criadero.** El backend ya entrega todo filtrado.
 - Después de un POST exitoso, el backend **redirige** a otra página (patrón POST → redirección → GET) con un mensaje *flash*. Así, recargar la página no repite el envío.
@@ -137,11 +137,11 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 | registro | GET /registro | cuentas/registro | — | — | RF001 |
 | registro.guardar | POST /registro | (redirige a /inicio) | — | nombre, correo, contrasena, consentimiento (casilla obligatoria que acepta el uso de los datos para el servicio, POL-001) | RF001 |
 | ingreso | GET /ingresar | cuentas/ingresar | — | — | RF002 |
-| ingreso.enviar | POST /ingresar | (redirige a /inicio) | — | correo, contrasena. Cuenta desactivada → `_general` | RF002, RF005 |
+| ingreso.enviar | POST /ingresar | (redirige a /inicio; si el rol es admin, a /admin/cuentas) | — | correo, contrasena. Cuenta desactivada → `_general` | RF002, RF005 |
 | salida | POST /salir | (redirige a /ingresar) | — | — | SEG-004 |
 | perfil | GET /perfil | cuentas/perfil | `$perfil` = nombre, correo, numero_socio, club | — | RF004 |
 | perfil.guardar | POST /perfil | (redirige a /perfil) | — | numero_socio, club | RF004 |
-| inicio | GET /inicio | inicio | — (el buscador va en la vista) | — | RNF003 |
+| inicio | GET /inicio | inicio/index | — (el buscador va en la vista) | — | RNF003 |
 
 ### Canarios (RF007–RF013, RF024)
 
@@ -212,6 +212,7 @@ Las rutas con `{id}` responden **404** si el registro no existe **o es de otro c
 |---|---|---|
 | El registro no existe o es de otro criadero | 404 | errores/404 |
 | Un criador entra a una ruta de administración | 403 | errores/403 |
+| El administrador entra a una ruta de criador | 403 | errores/403 |
 | El token CSRF no es válido o la sesión expiró | 419 | errores/sesion (con enlace para ingresar de nuevo) |
 | Modo mantenimiento (SRS §2.5) | 503 | errores/mantenimiento |
 | Error inesperado | 500 | errores/500 (sin detalles técnicos) |
