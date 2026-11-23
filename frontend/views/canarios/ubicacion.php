@@ -31,7 +31,6 @@ $errorJaula = error('jaula_id');
 $errorFecha = error('fecha');
 $valorJaulaId = (string) viejo('jaula_id', '');
 $valorFecha = (string) viejo('fecha', hoy());
-$enGrande = $textoUbicacionActual === 'Jaula grande';
 
 ob_start(); ?>
 <h1 class="sr-only">Mover <?= e($anilloCanario !== '' ? $anilloCanario : ('#' . $idCanario)) ?> de jaula</h1>
@@ -58,18 +57,13 @@ ob_start(); ?>
                     $jaulaIdItem = (string) ($j['id'] ?? '');
                     $jaulaNumeroItem = (string) ($j['numero'] ?? '');
                     $ocupantesItem = (int) ($j['ocupantes'] ?? 0);
-                    $motivoItem = isset($j['motivo']) && is_string($j['motivo']) ? $j['motivo'] : null;
                     $etiquetaJaula = $jaulaNumeroItem !== ''
                         ? 'Jaula ' . $jaulaNumeroItem . ' (' . ocupantes_texto($ocupantesItem) . ')'
                         : 'Jaula #' . $jaulaIdItem;
-                    if ($motivoItem !== null && $motivoItem !== '') {
-                        $etiquetaJaula .= ' — ' . $motivoItem;
-                    }
                 ?>
                     <option
                         value="<?= e($jaulaIdItem) ?>"
                         <?= $valorJaulaId !== '' && $valorJaulaId === $jaulaIdItem ? ' selected' : '' ?>
-                        <?= $motivoItem !== null && $motivoItem !== '' ? ' disabled' : '' ?>
                     >
                         <?= e($etiquetaJaula) ?>
                     </option>
