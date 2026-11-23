@@ -1,62 +1,35 @@
 <?php
-
-declare(strict_types=1);
-
+/** RF002: ingreso. Campos: correo, contrasena (contrato §6). La contraseña nunca se rellena. */
 require_once __DIR__ . '/../_partes/ayudas.php';
-require __DIR__ . '/../_partes/cabeza.php';
-
-$correo = viejo('correo');
-$errorGeneral = error('_general');
-$errorCorreo = error('correo');
-$errorContrasena = error('contrasena');
-?>
-<body>
-<main class="auth">
-    <section class="auth-art" aria-label="TuCri">
-        <div class="auth-brand brand"><span class="brand-mark"><?= icono('bird') ?></span><span>TuCri</span></div>
-        <div class="auth-claim">
-            <h2>Tu aviario, organizado.</h2>
-            <p>Canarios, jaulas y crías, todo en un solo lugar.</p>
-        </div>
-    </section>
-
-    <section class="auth-panel">
-        <form class="auth-card" method="post" action="<?= e(ruta('ingreso.enviar')) ?>">
-            <p class="eyebrow">Bienvenido</p>
-            <h1>Iniciar sesión</h1>
-
-            <?php if ($errorGeneral !== ''): ?>
-            <div class="aviso aviso-error" role="alert"><?= e($errorGeneral) ?></div>
-            <?php endif; ?>
-
-            <?= csrf_campo($csrf ?? '') ?>
-
-            <div class="field">
-                <label for="correo">Correo electrónico</label>
-                <input id="correo" name="correo" type="email" autocomplete="email" inputmode="email" required
-                    value="<?= e((string) $correo) ?>"<?= $errorCorreo !== '' ? ' aria-invalid="true" aria-describedby="correo-error"' : '' ?>>
-                <?php if ($errorCorreo !== ''): ?><small id="correo-error" class="field-error"><?= e($errorCorreo) ?></small><?php endif; ?>
-            </div>
-
-            <div class="field">
-                <label for="contrasena">Contraseña</label>
-                <span class="pwd">
-                    <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required
-                        <?= $errorContrasena !== '' ? ' aria-invalid="true" aria-describedby="contrasena-error"' : '' ?>>
-                    <button class="eye" type="button" data-act="eye" aria-label="Mostrar contraseña">Ver</button>
-                </span>
-                <?php if ($errorContrasena !== ''): ?><small id="contrasena-error" class="field-error"><?= e($errorContrasena) ?></small><?php endif; ?>
-            </div>
-
-            <div class="form-actions">
-                <button class="btn btn-primary" type="submit">Iniciar sesión</button>
-            </div>
-
-            <p class="lead">¿No tienes cuenta? <a href="<?= e(ruta('registro')) ?>">Crear una cuenta</a></p>
-        </form>
-
-        <p class="auth-foot"><a href="/css/creditos.html">Fotografías y créditos</a></p>
-    </section>
-</main>
-</body>
-</html>
+$titulo = 'Iniciar sesión';
+$ojo = '<button type="button" class="eye" data-act="eye" aria-label="Mostrar contraseña">' . icono('eye') . '</button>';
+try {
+    $urlRecuperar = ruta('recuperar');
+} catch (InvalidArgumentException) {
+    $urlRecuperar = null;
+}
+ob_start(); ?>
+<h1>Bienvenido a tu criadero</h1><p class="auth-intro">Inicia sesión para seguir con tus canarios.</p>
+<?= error_general() ?>
+<form class="form" method="post" action="<?= e(ruta('ingreso.enviar')) ?>">
+    <?= csrf_campo($csrf) ?>
+    <div class="field<?= error('correo') !== '' ? ' has-error' : '' ?>">
+        <label class="lbl" for="correo">Correo electrónico</label>
+        <input type="email" id="correo" name="correo" value="<?= e(viejo('correo')) ?>" placeholder="correo@ejemplo.cl" autocomplete="email" required<?= error('correo') !== '' ? ' aria-invalid="true" aria-describedby="error-correo"' : '' ?>>
+        <?php if (error('correo') !== ''): ?><span id="error-correo" class="field-error" role="alert"><?= e(error('correo')) ?></span><?php endif; ?>
+    </div>
+    <div class="field<?= error('contrasena') !== '' ? ' has-error' : '' ?>">
+        <label class="lbl" for="contrasena">Contraseña</label>
+        <span class="pwd"><input type="password" id="contrasena" name="contrasena" placeholder="Tu contraseña" autocomplete="current-password" required<?= error('contrasena') !== '' ? ' aria-invalid="true" aria-describedby="error-contrasena"' : '' ?>><?= $ojo ?></span>
+        <?php if (error('contrasena') !== ''): ?><span id="error-contrasena" class="field-error" role="alert"><?= e(error('contrasena')) ?></span><?php endif; ?>
+    </div>
+    <?php if ($urlRecuperar !== null): ?>
+    <a class="link right" href="<?= e($urlRecuperar) ?>">¿Olvidaste tu contraseña?</a>
+    <?php else: ?>
+    <span class="link right" role="link" aria-disabled="true" title="Recuperación de contraseña aún no disponible">¿Olvidaste tu contraseña?</span>
+    <?php endif; ?>
+    <?= boton('Ingresar', 'type="submit"', 'primary big', 'chev') ?>
+</form>
+<p class="center muted">¿Aún no tienes cuenta? <a class="link" hx-boost="true" hx-target="#main" hx-select="#main" hx-select-oob="#toast" hx-swap="outerHTML show:window:top" href="<?= e(ruta('registro')) ?>">Crear cuenta</a></p>
+<?php $contenido = (string) ob_get_clean();
+require __DIR__ . '/../_partes/acceso.php';

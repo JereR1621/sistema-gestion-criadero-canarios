@@ -58,6 +58,7 @@ final class FrontendBaseTest extends TestCase
         $sesionAntes = $_SESSION ?? null;
         $_SESSION = [];
 
+        Vista::guardarFlash(['tipo' => 'exito', 'mensaje' => 'Has cerrado sesión.']);
         $html = Vista::renderizar('cuentas/ingresar', [
             'errores' => [
                 '_general' => 'Correo o contraseña incorrectos',
@@ -73,6 +74,8 @@ final class FrontendBaseTest extends TestCase
         }
 
         self::assertNotNull($html);
+        self::assertStringContainsString('Has cerrado sesión.', $html);
+        self::assertStringNotContainsString('/css/creditos.html', $html);
         self::assertStringContainsString('method="post" action="/ingresar"', $html);
         self::assertStringContainsString('name="correo"', $html);
         self::assertStringContainsString('name="contrasena"', $html);
