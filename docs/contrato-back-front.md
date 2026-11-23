@@ -245,7 +245,7 @@ Decidido por el PM (09/11/2026), POL-001: el consentimiento es una casilla oblig
 
 ## 9. Aplicación del contrato al desarrollo
 
-El contrato fija interfaces acordadas; cada issue conserva su responsable y sus criterios de aceptación. Integrarlo no cierra automáticamente la implementación de los RF ni entrega el frontend del Plan B privado.
+El contrato fija interfaces acordadas; cada issue conserva su responsable y sus criterios de aceptación. Integrarlo no cierra automáticamente la implementación de los RF ni entrega por sí solo las pantallas del frontend.
 
 Al contrastar con `develop` `d0df249` (22/11/2026), quedan estas adaptaciones específicas, además de los módulos aún en desarrollo:
 
