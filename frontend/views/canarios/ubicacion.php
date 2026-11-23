@@ -2,7 +2,7 @@
 /**
  * Vista: frontend/views/canarios/ubicacion.php
  * Issue: #105 (SRS-RF015 [Frontend]: Asignar canario a una jaula)
- * Usa el marco aprobado del Plan B (_partes/marco.php) con htmx 2.0.4 y hoja arrastrable (#hoja).
+ * Usa el marco común (_partes/marco.php) con htmx 2.0.4 y hoja arrastrable (#hoja).
  * Recibe: $canario CanarioResumen, $jaulas [JaulaResumen].
  * Campos del formulario: jaula_id (vacío = jaula grande), fecha.
  */

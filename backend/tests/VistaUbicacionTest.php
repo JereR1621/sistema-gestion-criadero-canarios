@@ -37,7 +37,7 @@ final class VistaUbicacionTest extends TestCase
         ], 'jaulas' => [['id' => 1, 'numero' => 25, 'ocupantes' => 2]]];
     }
 
-    public function testUsaMarcoPlanBHtmxVariedadYUbicacionDelContratoSinAvisos(): void
+    public function testUsaMarcoComunHtmxVariedadYUbicacionDelContratoSinAvisos(): void
     {
         $html = (string) render('canarios/ubicacion', $this->datos(), true);
         self::assertStringContainsString('ROJO INTENSO', $html);
