@@ -30,7 +30,6 @@ $urlInicio = $rutaOpcional('inicio') ?? '/inicio';
 $urlPerfil = $rutaOpcional('perfil');
 $urlSalida = $rutaOpcional('salida');
 $urlBuscar = $rutaOpcional('buscar');
-$urlCalculadora = $rutaOpcional('calculadora');
 $urlCruces = $rutaOpcional('cruces');
 $urlCanarios = $rutaOpcional('canarios');
 $urlJaulas = $rutaOpcional('jaulas');
@@ -96,7 +95,6 @@ require __DIR__ . '/cabeza.php';
                     <?php endforeach; ?>
                 <?php else: ?>
                 <?php if ($urlPerfil !== null): ?><a role="menuitem" href="<?= e($urlPerfil) ?>"><?= icono('user') ?>Mi perfil</a><?php endif; ?>
-                <?php if ($urlCalculadora !== null): ?><a role="menuitem" href="<?= e($urlCalculadora) ?>"><?= icono('dna') ?>Calculadora genética</a><?php endif; ?>
                 <?php if ($urlBuscar !== null): ?><a role="menuitem" href="<?= e($urlBuscar) ?>"><?= icono('search') ?>Buscar, incluidas bajas</a><?php endif; ?>
                 <?php endif; ?>
                 <?= $salir ?>
@@ -112,7 +110,6 @@ require __DIR__ . '/cabeza.php';
             <?php else: ?>
             <?= $enlaceLateral($urlInicio, 'Inicio', 'home', $seccion === 'inicio') ?>
             <?php foreach ($menuCrias as [$r, $texto, $ic, $sec, $url]): ?><?= $enlaceLateral($url, $texto, $ic, $seccion === $sec) ?><?php endforeach; ?>
-            <?php if ($urlCalculadora !== null): ?><?= $enlaceLateral($urlCalculadora, 'Calculadora genética', 'dna', $vista === 'calculadora') ?><?php endif; ?>
             <?php if ($urlBuscar !== null): ?><?= $enlaceLateral($urlBuscar, 'Buscar, incluidas bajas', 'search', $seccion === 'buscar') ?><?php endif; ?>
             <?php endif; ?>
         </nav>

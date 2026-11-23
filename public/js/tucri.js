@@ -1,4 +1,4 @@
-/* TuCri · front local. JavaScript mínimo de interfaz: lo de negocio va por PHP y htmx, y todo funciona sin este archivo.
+/* TuCri · JavaScript mínimo de interfaz: lo de negocio va por PHP y htmx, y todo funciona sin este archivo.
    Menú lateral y hojas (con arrastrar para cerrar, como la maqueta), desplegables, pestañas, contraseña,
    filtro de Mis canarios, agregar pichón, aviso flash y pantalla sin conexión. */
 (() => {
