@@ -96,7 +96,7 @@ final class JaulaService
         if ($this->jaulas->existeNumeroEnCriadero($numero, $criaderoId)) {
             return [
                 'errores' => [
-                    'numero' => 'Número de jaula ya registrado en el criadero.',
+                    'numero' => "Ya existe la jaula N.º {$numero}.",
                 ],
             ];
         }
@@ -116,7 +116,7 @@ final class JaulaService
 
                 return [
                     'errores' => [
-                        'numero' => 'Número de jaula ya registrado en el criadero.',
+                        'numero' => "Ya existe la jaula N.º {$numero}.",
                     ],
                 ];
             }
@@ -142,7 +142,7 @@ final class JaulaService
             if ($error instanceof PDOException && $error->getCode() === '23000') {
                 return [
                     'errores' => [
-                        'numero' => 'Número de jaula ya registrado en el criadero.',
+                        'numero' => "Ya existe la jaula N.º {$numero}.",
                     ],
                 ];
             }

@@ -1,4 +1,4 @@
-/* Front local: lo que agregan las páginas PHP sobre las hojas de la maqueta (que no se modifican).
+/* Ajustes de las páginas PHP sobre las hojas de la maqueta (que no se modifican).
    Sin JavaScript todo se ve y funciona; con JavaScript (clase .js en <html>) se pliegan pestañas y hojas. */
 
 /* Errores que devuelve el backend, junto a su campo (contrato §4). */
@@ -15,6 +15,10 @@
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .js .sin-js { display: none; }
+.fallback-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px; margin-bottom: 16px; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+.fallback-nav a, .fallback-nav button { display: inline-flex; align-items: center; min-height: 44px; padding: 8px; }
+.fallback-nav form { margin: 0; }
+html:not(.js) .topbar button[data-act] { display: none !important; }
 
 /* Pestañas de la ficha: enlaces con el aspecto de los botones de la maqueta. */
 .seg-tabs a.seg { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }

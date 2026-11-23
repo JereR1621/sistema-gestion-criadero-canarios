@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * Ayudas de presentación del front local (maqueta aprobada por el cliente, pasada a PHP).
+ * Ayudas de presentación del marco común de la aplicación.
  * Solo arman HTML con los datos que ya entrega el backend: no consultan la base ni llaman a servicios
  * (contrato §1). Todo dato se imprime con e().
  */

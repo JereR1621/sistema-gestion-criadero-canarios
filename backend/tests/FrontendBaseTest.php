@@ -47,6 +47,10 @@ final class FrontendBaseTest extends TestCase
         self::assertStringContainsString('>AP</span>', $html);
         self::assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
         self::assertStringNotContainsString('<script>alert(1)</script>', $html);
+        self::assertStringContainsString('aria-label="Navegación sin JavaScript"', $html);
+        self::assertStringContainsString('class="sin-js fallback-nav"', $html);
+        self::assertStringContainsString('action="/salir"', $html);
+        self::assertStringNotContainsString('Fotografías y créditos', $html);
     }
 
     public function testVistaIngresoIncluyeFormularioSeguroErroresYCorreoConservado(): void
