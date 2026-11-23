@@ -962,3 +962,38 @@ button.side-link, button.tab-link { background: none; border: 0; font-family: in
 /* Inicio: la misma foto del aviario que el acceso (pedido del PM, 19/11/2026). */
 .hero-photo, .view-home .hero-photo { background-image: url(assets/fotos/aviario-acceso.jpg); background-position: 24% 58%; background-size: cover; background-repeat: no-repeat; }
 @media (max-width: 899px) { .hero-photo, .view-home .hero-photo { background-position: 20% 58%; } }
+
+/* Prueba de diseño en Vercel (22/11/2026 v2 — sin líneas de borde repetidas) */
+:root { --r: 2px; }
+.card, .bird-card, .cage, .cross-card, .cross-row, .hero, .cross-hero, .big-action, .action,
+.profile, .home-crosses, .home-stats, .home-cages, .home-chicks, .home-promo, .page-head,
+.toolbar, .block, .form-actions, .cparent, .res-col, .parent, .pair-box, .cr-bird, .how,
+.how-steps li, .done-step, .notice, .empty, .empty-search, .empty-art, .sheet, .umenu,
+.nav-menu, .pk-list, .auth .auth-card, .auth .auth-foot, .ped-detail, .pcard,
+.profile .ring-parts, .cage-birds, .cp-cage, .cp-cage > span, .row, .mini, .cage-mini,
+.cross-row .cage-badge.big, .bc-top, .av-md, .av-lg, .av-xl, .av-xxl,
+.view-home .cross-card .pair .av-xl, .profile .av-xxl { border-radius: 2px !important; }
+.layout .main > .page-head, .cross-row, .parent, .parent.is-f, .cparent, .cparent.is-f,
+.res-col, .res-col.is-f, .cross-card { border-left-width: 1px !important; border-top-width: 1px !important; border-color: var(--line) !important; }
+.hero-photo, .view-home .hero-photo { border-radius: 0 !important; }
+.layout .main > .seg-tabs, .layout.view-registro-cria .main > .page-head { border-radius: 2px 2px 0 0 !important; }
+.layout .tab-body, .layout.view-registro-cria .main > .stepper.wiz { border-radius: 0 0 2px 2px !important; }
+.btn, .top-search, .search-box, .search-big, .hero-search, .field input, .field select,
+.segr span, .seg, .seg-mini, .seg-mini button, .top-btn, .desktop-nav .side-link, .tab-link,
+.umenu a, .nav-menu a, .pk-list li, .eye, #toast, .layout .photo-footer > a, .layout.view-crias .main > .chips { border-radius: 5px !important; }
+.pill, .tag, .chip, .chip-cb span, .chip-gold, .kind, .meta, .cage-badge:not(.big),
+.layout .main > .page-back .top-back, .stepper li, .stepper.wiz button, .bar, .bar span { border-radius: 999px !important; }
+.pill::before, .sx, .num, .stepper span, .stepper.wiz button span, .done-ic, .ok-badge, .fab,
+.x.big, .view-home .cross-card .pair .x, .how-steps li::before, .timeline li::before,
+.profile-initials, .av-xs, .av-sm { border-radius: 50% !important; }
+.ring, .pring, .pair-ring, .pair-rings, .code, .profile .ring-parts span {
+    font-family: "IBM Plex Mono", "Consolas", "SFMono-Regular", monospace !important;
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: 0.015em !important;
+}
+@media (min-width: 900px) {
+    .view-home .home-stats .stats { gap: 0 !important; border-top: 1px solid var(--line) !important; border-left: 1px solid var(--line) !important; }
+    .view-home .home-stats .stat { background: #fff !important; border-radius: 0 !important; border-right: 1px solid var(--line) !important; border-bottom: 1px solid var(--line) !important; padding: 16px 14px !important; }
+    .view-home .home-stats .stat.t-yellow { background: #FDF8EC !important; }
+}
+.home-chicks .list.compact .row { border-radius: 0 !important; border-top: 0 !important; border-left: 0 !important; border-right: 0 !important; border-bottom: 1px solid var(--line) !important; }

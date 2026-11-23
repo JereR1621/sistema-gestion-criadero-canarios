@@ -1,6 +1,10 @@
-# TuCri: maqueta aprobada para el equipo de frontend
+# TuCri · Referencia navegable de frontend
 
-19/11/2026. Es la referencia visual y de experiencia de uso para las vistas PHP de `frontend/views/`. Incluye los ajustes que pidió el cliente el 19/11/2026. Es la misma versión publicada en <https://tucriadero-mockup.vercel.app/>.
+La carpeta `public/` reproduce los archivos públicos del despliegue de Vercel `dpl_dGBFGhjLwmMmXGhJ3pobG5PNVfpE`, publicado el 22/11/2026. El alias [tucriadero-mockup.vercel.app](https://tucriadero-mockup.vercel.app/) puede cambiar. Para comparar pantallas con esta revisión, abre el visor local desde el mismo commit.
+
+La base de diseño incorpora los ajustes del 19/11. El despliegue contiene además una **prueba de estilos del 22/11** en `tablero.css`. La decisión sobre trasladar esa variante al producto corresponde al PM. Los iconos de pestaña y el pie sin enlace visible de créditos sí forman parte de esta publicación; las atribuciones siguen en `public/creditos.html`.
+
+El PDF del árbol de issues refleja la planificación del **16/11/2026**. Consulta GitHub para el estado y las asignaciones vigentes.
 
 ## Cómo abrirla
 
@@ -16,11 +20,11 @@ Después abrir <http://127.0.0.1:4173/#login>. Cualquier correo y contraseña si
 
 - Es HTML, CSS y JavaScript estático. Los datos son de ejemplo y viven en memoria: al recargar la página vuelven a su estado inicial.
 - **No es código para copiar en PHP.** Las vistas se programan según `docs/frontend.md` y `docs/contrato-back-front.md` del repositorio. La maqueta muestra cómo se ven y cómo se usan.
-- Es un diseño local: los ajustes del cliente están en la maqueta, pero no en los documentos del repositorio. Si la maqueta y un documento no coinciden, se avisa al PM antes de programar.
+- Si la maqueta y un documento vigente difieren, se consulta al PM antes de trasladar esa diferencia al producto.
 
 ## Diferencias con los documentos del repositorio
 
-Estos puntos de la maqueta todavía no figuran en el repositorio. Consultar al PM antes de programarlos:
+Esta comparación recoge las diferencias anotadas el 19/11. Antes de programar, consulta el contrato vigente y las decisiones posteriores del PM.
 
 | Tema | En la maqueta | En el repositorio |
 |---|---|---|
@@ -76,7 +80,7 @@ La maqueta incluye solo 2 de los 10 mensajes de validación de `docs/frontend.md
 
 ## Archivos
 
-- `public/index.html`: página única.
+- `public/index.html`: entrada de la maqueta navegable. La subcarpeta estática `public/figma/` también está en el despliegue y se conserva para reproducir su contenido. Usa la entrada principal para revisar las pantallas.
 - `public/tucriadero.js`: pantallas y comportamiento.
 - `public/catalogo.js`: nomenclador 2026 (880 variedades).
 - Hojas de estilo, en este orden de carga: `tucriadero.css`, `tema.css`, `mejoras.css` y `tablero.css`. Cada una ajusta a la anterior; los colores están en las variables de `:root`.

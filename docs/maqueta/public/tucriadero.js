@@ -365,7 +365,7 @@
                 </nav>
                 <div class="drawer-foot"><a class="drawer-profile" href="#perfil"><span class="profile-initials">${esc(perfil.nombre.split(' ').map(n => n[0]).slice(0, 2).join(''))}</span><span><strong>${esc(perfil.nombre)}</strong><small>Mi perfil</small></span>${ic('chev')}</a><a class="side-link" href="#login">${ic('logout')}<span>Cerrar sesión</span></a></div>
             </dialog>
-            <main class="main" id="main" tabindex="-1">${back}${html}<footer class="photo-footer"><a href="creditos.html" target="_blank" rel="noopener">Fotografías y créditos</a></footer></main>
+            <main class="main" id="main" tabindex="-1">${back}${html}</main>
             <nav class="tabbar" aria-label="Navegación principal">${tabs}</nav>
         </div>`;
     }
@@ -382,7 +382,7 @@
     function authShell(inner) {
         return `<div class="auth"><section class="auth-art"><a class="brand lg" href="#login"><span class="brand-mark">${ic('bird')}</span><span>TuCri</span></a>
             <div class="auth-claim"><h2>Tu aviario,<br>generación tras generación.</h2><p>Canarios, jaulas y crías en un mismo lugar.</p></div></section>
-            <section class="auth-panel"><div class="auth-card">${inner}</div><p class="auth-foot">© 2026 TuCri · <a href="creditos.html" target="_blank" rel="noopener">Fotografías</a></p></section></div>`;
+            <section class="auth-panel"><div class="auth-card">${inner}</div><p class="auth-foot">© 2026 TuCri</p></section></div>`;
     }
     const field = (label, input, hint = '') => `<label class="field"><span class="lbl">${label}</span>${input}${hint ? `<span class="hint">${hint}</span>` : ''}</label>`;
     V.login = () => authShell(`<h1>Bienvenido a tu criadero</h1><p class="auth-intro">Inicia sesión para seguir con tus canarios.</p>
@@ -456,7 +456,7 @@
             <section class="card home-cages"><div class="block-head"><h2>Tus jaulas</h2><a class="link" href="#jaulas" aria-label="Ver todas las jaulas">Ver todas ${ic('chev')}</a></div><p class="muted">Una pareja por jaula.</p><div class="cage-minis">${state.jaulas.map(cageMini).join('')}</div></section>
             </div>
             <section class="card home-chicks"><div class="block-head"><h2>Últimos pichones</h2><a class="link" href="#canarios">Ver canarios ${ic('chev')}</a></div><div class="list compact">${pich.map(birdRow).join('') || '<p class="muted">Aún no hay pichones anillados.</p>'}</div></section>
-            <section class="card promo home-promo"><span class="a-ic">${ic('dna')}</span><h2>¿Qué puede nacer?</h2><p class="muted">Prueba una pareja antes de juntarla y mira las variedades posibles.</p>${link('Probar una pareja', '#calculadora', 'soft', 'chev')}</section>
+            <section class="card promo home-promo"><span class="a-ic">${ic('dna')}</span><h2>Calculadora de cruces</h2><p class="muted">Simula una pareja antes de juntarla para ver su descendencia probable.</p>${link('Probar una pareja', '#calculadora', 'soft', 'chev')}</section>
             </div>`);
     };
     const birdRow = c => `<a class="row" href="#canario/${c.id}">${avatar(c.codigo, c.sexo, 'md')}<span class="row-main"><strong class="ring">${esc(ring(c))}</strong><span class="row-sub">${esc(sexoTxt(c.sexo))} · ${varChip(c.codigo)}</span></span><span class="row-end">${pill(c.estado)}${c.jaula ? `<span class="muted sm">${esc(cageName(c.jaula))}</span>` : ''}</span>${ic('chev', 'chev')}</a>`;
@@ -503,10 +503,10 @@
                 <section class="card"><h3>Hermanos</h3><div class="minis">${herm.map(mini).join('') || '<span class="muted">Sin hermanos registrados</span>'}</div></section>
                 <section class="card"><h3>Medios hermanos</h3><div class="minis">${medios.map(mini).join('') || '<span class="muted">Sin medios hermanos registrados</span>'}</div></section>
                 <section class="card"><h3>Crías</h3><div class="minis">${hijos.map(mini).join('') || '<span class="muted">Sin crías registradas</span>'}</div></section></div>`,
-            genetica: `<div class="grid-2"><section class="card"><h3>Lo que se le ve</h3><p class="muted">Sale de su variedad en el catálogo; no hay que escribirlo.</p><div class="tags">${manifiesta.map(t => `<span class="tag">${esc(t)}</span>`).join('') || '<span class="muted">Variedad sin determinar</span>'}</div></section>
-                <section class="card"><h3>Lo que lleva oculto (portador)</h3><p class="muted">Puede pasarlo a sus crías aunque no se le note.</p>
+            genetica: `<div class="grid-2"><section class="card"><h3>Factores visibles</h3><div class="tags">${manifiesta.map(t => `<span class="tag">${esc(t)}</span>`).join('') || '<span class="muted">Variedad sin determinar</span>'}</div></section>
+                <section class="card"><h3>Portador de</h3>
                 <div class="tags">${deducidos.map(t => `<span class="tag t-auto" title="Deducido por el sistema">${esc(t)} · deducido</span>`).join('')}${c.porta.map(k => `<span class="tag t-hand" title="Indicado por el criador">${esc(portaInfo(k)?.carrierLabel ?? k)} · indicado</span>`).join('') || (deducidos.length ? '' : '<span class="muted">Sin portadores conocidos</span>')}</div>
-                ${deducidos.length ? '<p class="muted sm">«Deducido»: TuCri lo calcula con seguridad a partir de la madre.</p>' : ''}</section></div>
+                ${deducidos.length ? '<p class="muted sm">«Deducido»: calculado automáticamente según su genealogía.</p>' : ''}</section></div>
                 <a class="btn btn-violet" href="#calculadora/${c.sexo === 'H' ? '' : c.id}">${ic('dna')}<span>Probar cruces con este canario</span></a>`,
             historia: `<div class="grid-2"><section class="card"><h3>Cruces en que participó</h3><div class="minis">${cruces.map(x => `<a class="mini" href="#cruce/${x.id}">${ic('book')}<span><strong>Cruce ${x.num} · ${esc(cageName(x.jaula))}</strong><span class="muted sm">Temporada ${x.temporada} · ${x.fin ? 'terminado' : 'activo'}</span></span></a>`).join('') || '<span class="muted">No ha participado en cruces</span>'}</div></section>
                 <section class="card"><h3>Datos del registro</h3><dl class="kv"><dt>Origen</dt><dd>${c.origen === 'adquirido' ? `Adquirido${c.procedencia ? ` · ${esc(c.procedencia)}` : ''}` : 'Nacido en el criadero'}</dd><dt>Nacimiento</dt><dd>${esc(c.nac || 'Sin registrar')}</dd><dt>Anillado</dt><dd>${esc(c.anillado || 'Sin registrar')}</dd>${c.baja ? `<dt>Fecha de baja</dt><dd>${esc(c.baja)}</dd>` : ''}</dl></section></div>`,
@@ -558,7 +558,7 @@
                 ${field('Socio *', `<input name="socio" value="${esc(perfil.socio)}" required>`)}${field('Año *', '<input name="anio" value="2026" inputmode="numeric" required>')}
                 ${field('Correlativo *', '<input name="corr" placeholder="Ej.: 014" inputmode="numeric" required>')}${field('Club *', `<input name="club" value="${esc(perfil.club)}" required>`)}</div>
                 <p class="hint">Socio y club vienen de Mi perfil; puedes cambiarlos.</p></section>
-            <section class="card step"><h2><span class="num">2</span>¿Cómo es?</h2>
+            <section class="card step"><h2><span class="num">2</span>Características</h2>
                 <div class="field"><span class="lbl">Sexo</span>${segRadio('sexo', [['M', '♂ Macho'], ['H', '♀ Hembra'], ['?', 'Sin determinar']], '?')}</div>
                 ${field('Variedad (nomenclador 2026)', picker('variedad', ''), 'Escribe parte del nombre o el código. Puede quedar sin determinar.')}
                 <div class="field"><span class="lbl">Portador de (opcional)</span>${carrierChips('porta', [])}</div></section>
@@ -576,8 +576,8 @@
     const portaInfo = k => k === 'isabel' ? { z: true, carrierLabel: 'isabel' } : LOCI[k];
     // Segundo nivel: los portadores son opcionales y se abren solo si hacen falta (menos carga para quien no sabe genética).
     const carrierBlock = (name, sel, femaleZ = false) => `<details class="porta" ${sel.length ? 'open' : ''}>
-        <summary><span>¿Lleva algún factor oculto? <small>Opcional</small></span>${sel.length ? `<b class="porta-n">${sel.length} ${sel.length === 1 ? 'marcado' : 'marcados'}</b>` : ''}</summary>
-        <p class="hint">Márcalo solo si sabes que lo lleva aunque no se le note. Si no lo sabes, déjalo así: el cálculo sigue funcionando.${femaleZ ? ' Las hembras no pueden llevar ocultos los factores ligados al sexo; por eso algunos aparecen desactivados.' : ''}</p>
+        <summary><span>Portador de <small>Opcional</small></span>${sel.length ? `<b class="porta-n">${sel.length} ${sel.length === 1 ? 'marcado' : 'marcados'}</b>` : ''}</summary>
+        ${femaleZ ? '<p class="hint">Los factores ligados al sexo aparecen desactivados en hembras.</p>' : ''}
         ${carrierChips(name, sel, femaleZ)}</details>`;
     // Mantiene al día el conteo «N marcados» del resumen sin volver a dibujar la pantalla.
     const portaCount = el => {
@@ -646,7 +646,7 @@
             <div class="res-txt"><span class="res-name">${e.code ? `<span class="code">${esc(e.code)}</span> ` : ''}${esc(resultName(e))}</span>
             ${e.code ? '' : '<span class="tag t-warn">Sin variedad en el catálogo</span>'}${e.carriers.map(cr => `<span class="tag t-hand">portador de ${esc(cr)}</span>`).join('')}${e.notes.map(n => `<span class="tag t-warn">${esc(n)}</span>`).join('')}
             <span class="bar"><span style="width:${(e.p * 100).toFixed(1)}%"></span></span></div><strong class="res-pct">${pct(e.p)}</strong></div>`).join('')}</section>`;
-        const how = `<details class="how" ${compact || innerWidth < 900 ? '' : 'open'}><summary>${ic('spark')}¿Cómo se llegó a este resultado?</summary><p>TuCri mira cada factor por separado, según la tabla de Mendel, y después los combina.</p>
+        const how = `<details class="how" ${compact || innerWidth < 900 ? '' : 'open'}><summary>${ic('spark')}Desglose por factor</summary><p>Herencia calculada por factor independiente.</p>
             <ol class="how-steps">${r.explain.map(e => `<li><div class="hs-head"><strong>${esc(e.name)}</strong><span class="kind">${esc(e.type)}</span></div>
                 ${e.simple ? `<p>${esc(e.simple)}</p>` : `<p class="hs-par"><span>♂ Padre: <strong>${esc(e.m)}</strong></span><span>♀ Madre: <strong>${esc(e.f)}</strong></span></p><p class="hs-res"><span>→ Machos: ${esc(e.M)}</span><span>→ Hembras: ${esc(e.H)}</span></p>`}</li>`).join('')}</ol>
             <p class="muted sm">Son probabilidades: con pocas crías puede haber diferencias. Se supone que cada factor se hereda por separado.</p></details>`;
@@ -659,7 +659,7 @@
     V.calculadora = (a, b) => {
         if (a && byId(a)) { const c = byId(a); calc[c.sexo === 'H' ? 'H' : 'M'] = { src: 'mis', id: c.id, codigo: c.codigo, porta: [...c.porta] }; }
         if (b && byId(b)) { const c = byId(b); calc.H = { src: 'mis', id: c.id, codigo: c.codigo, porta: [...c.porta] }; }
-        return shell('calculadora', `${pageHead('¿Qué puede nacer?', 'Elige un macho y una hembra y mira qué crías pueden salir. Prueba parejas sin modificar tu criadero.', 'dna')}
+        return shell('calculadora', `${pageHead('Calculadora de cruces', 'Elige un macho y una hembra para calcular la descendencia probable sin modificar tu criadero.', 'dna')}
             <div class="calc"><div class="calc-parents">${calcParent('M')}<span class="x big">×</span>${calcParent('H')}</div>
             <div class="calc-out" id="calc-out">${resultsHtml(calcular(calc.M, calc.H))}</div></div>`, { back: '#crias', title: 'Libro de crías' });
     };
@@ -697,16 +697,16 @@
         // Una jaula tiene una sola pareja a la vez: las que ya tienen un cruce activo no se pueden elegir y dicen por qué,
         // en vez de rechazarse recién al guardar (Conclusiones conjuntas 14/11).
         if (cruceActivo(rc.jaula)) rc.jaula = state.jaulas.find(jj => !cruceActivo(jj)) ?? rc.jaula;
-        if (rcStep === 1) body = `<section class="card step"><h2><span class="num">1</span>¿En qué jaula va la pareja?</h2><p class="hint">Cada jaula tiene una sola pareja a la vez. Las que ya tienen un cruce en marcha aparecen desactivadas: termina ese cruce para volver a usarlas.</p><div class="cage-pick">${state.jaulas.map(jj => { const aves = enJaula(jj), busy = cruceActivo(jj);
+        if (rcStep === 1) body = `<section class="card step"><h2><span class="num">1</span>Jaula y fecha</h2><p class="hint">Cada jaula admite una pareja activa. Las jaulas ocupadas aparecen desactivadas.</p><div class="cage-pick">${state.jaulas.map(jj => { const aves = enJaula(jj), busy = cruceActivo(jj);
                 const nota = busy ? `Cruce ${busy.num} en marcha` : aves.length ? `Ocupada por ${aves.map(c => esc(ring(c))).join(' y ')}` : 'Vacía';
                 return `<label class="cp-cage ${busy ? 'busy' : ''}"><input type="radio" name="rc-jaula" value="${jj}" ${rc.jaula === jj ? 'checked' : ''} ${busy ? 'disabled' : ''}><span>${ic('cage')}<strong>${esc(cageName(jj))}</strong><small>${nota}</small></span></label>`; }).join('')}</div>
                 <div class="grid-2">${field('Temporada', '<input value="2026" readonly>')}${field('Fecha de inicio', `<input id="rc-inicio" value="${esc(rc.inicio)}">`)}</div></section>
             <div class="form-actions">${btn('Siguiente: la pareja', 'data-act="rc-step" data-v="2"', 'coral big', 'chev')}${link('Cancelar', '#crias', 'ghost big')}</div>`;
         else if (rcStep === 2) body = `${summary(cageName(rc.jaula), `Temporada 2026 · desde el ${esc(rc.inicio)}`, 1)}
-            <section class="card step"><h2><span class="num">2</span>¿Quiénes son la pareja?</h2><p class="hint">Si un ave aún no está en TuCri, elige «Ave nueva» y anótala aquí mismo.</p><div class="calc-parents">${pane('M')}<span class="x big">×</span>${pane('H')}</div></section>
+            <section class="card step"><h2><span class="num">2</span>Macho y hembra</h2><p class="hint">Selecciona aves del criadero o registra un ave nueva.</p><div class="calc-parents">${pane('M')}<span class="x big">×</span>${pane('H')}</div></section>
             <div class="form-actions">${btn('Ver posible resultado', 'data-act="rc-step" data-v="3"', 'coral big', 'dna')}${btn('Atrás', 'data-act="rc-step" data-v="1"', 'ghost big')}</div>`;
         else body = `${summary(cageName(rc.jaula), `Temporada 2026 · desde el ${esc(rc.inicio)}`, 1)}${summary('La pareja', `${birdSum('M')}<br>${birdSum('H')}`, 2)}
-            <section class="card step"><h2><span class="num">3</span>Esto puede nacer de la pareja</h2><div id="rc-out">${resultsHtml(calcular(rcBird('M'), rcBird('H')))}</div></section>
+            <section class="card step"><h2><span class="num">3</span>Resultado esperado</h2><div id="rc-out">${resultsHtml(calcular(rcBird('M'), rcBird('H')))}</div></section>
             <div class="form-actions">${btn('Guardar en el libro de crías', 'data-act="rc-save"', 'coral big', 'check')}${btn('Atrás', 'data-act="rc-step" data-v="2"', 'ghost big')}</div>`;
         return shell('registro-cria', `${pageHead('Registrar pareja', 'Elige la jaula, el macho y la hembra.', 'book')}${stepper}${body}`, { back: '#crias', title: 'Libro de crías' });
     };

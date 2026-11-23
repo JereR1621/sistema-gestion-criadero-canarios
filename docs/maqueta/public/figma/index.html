@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#155d50">
+    <title>TuCriadero · Revisión del diseño</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23155d50'/%3E%3Ctext x='20' y='28' text-anchor='middle' fill='white' font-size='28' font-family='Arial'%3ET%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="propuesta.css">
+    <script src="screens.js" defer></script>
+    <script src="catalogo.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <header class="review-bar">
+        <div class="review-title"><strong>TuCriadero</strong><span>Maqueta · datos de ejemplo</span></div>
+        <label class="sr-only" for="scene">Pantalla para revisar</label>
+        <select id="scene" aria-label="Pantalla para revisar"></select>
+        <label class="sr-only" for="device">Formato</label>
+        <select id="device" aria-label="Formato">
+            <option value="auto">Automático</option>
+            <option value="desktop">Escritorio</option>
+            <option value="mobile">Móvil</option>
+        </select>
+        <label class="notes-switch"><input id="notes" type="checkbox"> Notas</label>
+        <button id="present">Presentar</button>
+        <button class="help-button" id="help" aria-label="Cómo revisar la maqueta">?</button>
+    </header>
+    <main id="viewer" aria-label="Maqueta navegable">
+        <div id="stage-wrap"><div id="stage"></div></div>
+    </main>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <dialog id="help-dialog">
+        <h1>Revisa el diseño</h1>
+        <p>Pulsa los botones y enlaces de las pantallas para recorrer TuCriadero. Puedes entrar sin completar el inicio de sesión.</p>
+        <p>La barra superior permite abrir cualquier pantalla y comparar móvil y escritorio. «Notas» muestra las anotaciones del diseñador.</p>
+        <p>Los formularios son de demostración: no crean cuentas ni guardan datos. Los resultados genéticos son ejemplos, no cálculos.</p>
+        <p>Para guardar la ficha de ejemplo, abre «Ficha A4 / guardar PDF» y pulsa «Guardar / imprimir PDF».</p>
+        <button class="dialog-close" autofocus>Entendido</button>
+    </dialog>
+    <noscript>Activa JavaScript para recorrer esta maqueta de diseño.</noscript>
+</body>
+</html>
