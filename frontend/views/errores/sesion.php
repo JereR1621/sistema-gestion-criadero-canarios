@@ -1,14 +1,9 @@
 <?php
+/** 419: el token CSRF no es válido o la sesión expiró (contrato §7), con enlace para ingresar de nuevo. */
 require_once __DIR__ . '/../_partes/ayudas.php';
-
-$urlIngreso = '/ingresar';
-try {
-    $urlIngreso = ruta('ingreso');
-} catch (InvalidArgumentException) {
-}
-
-$acciones = '<a class="btn btn-primary" href="' . e($urlIngreso) . '">' . icono('login') . '<span>Volver a ingresar</span></a>';
-ob_start();
-echo bloque_error('419', 'lock', 'warn', $titulo, 'Tu sesión expiró o la solicitud ya no es válida. Vuelve a ingresar para continuar.', $acciones);
-$contenido = (string) ob_get_clean();
+$titulo = 'Sesión expirada';
+$contenido = bloque_error('', 'clock', 'warn', 'Tu sesión expiró',
+    $sesion !== null ? 'La solicitud ya no es válida. Ingresa de nuevo para seguir. Si estabas guardando algo, revisa que haya quedado registrado.'
+        : 'Por seguridad cerramos la sesión después de un tiempo sin uso. Ingresa de nuevo para seguir. Si estabas guardando algo, revisa que haya quedado registrado.',
+    enlace('Ingresar de nuevo', ruta('ingreso'), 'primary big', 'chev'));
 require __DIR__ . '/../_partes/acceso.php';

@@ -29,6 +29,8 @@ final class Aplicacion
         Vista::definirRaiz($raiz);
 
         try {
+            $router = self::crearRouter();
+            Rutas::definir($router);
             Entorno::cargar($raiz . '/.env');
             if (Entorno::obtener('APP_ENV') === 'local') {
                 ini_set('display_errors', '1');
@@ -37,8 +39,6 @@ final class Aplicacion
             Sesion::iniciar();
             self::cerrarSesionSiLaCuentaNoEstaActiva();
 
-            $router = self::crearRouter();
-            Rutas::definir($router);
             // Sin sesión iniciada, la conexión a MySQL no se abre aquí: los modelos la piden con Conexion::obtener().
             (new self($raiz, $router))->manejar();
         } catch (HttpException $error) {

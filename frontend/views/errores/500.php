@@ -1,24 +1,12 @@
 <?php
+/** Error inesperado. La información técnica se registra en el servidor. */
 require_once __DIR__ . '/../_partes/ayudas.php';
-
-$urlInicio = '/inicio';
-try {
-    $urlInicio = ruta('inicio');
-} catch (InvalidArgumentException) {
+$titulo = 'Algo salió mal';
+$acciones = enlace('Ir al inicio', ruta('inicio'), 'ghost big');
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    $acciones = enlace('Reintentar', '', 'primary big') . $acciones;
 }
-
-$acciones = '<a class="btn btn-primary" href="' . e($urlInicio) . '">' . icono('refresh') . '<span>Volver a intentar</span></a>';
-ob_start();
-echo bloque_error('500', 'warning', 'danger', $titulo, 'No fue posible completar la solicitud. Inténtalo nuevamente más tarde.', $acciones);
-$contenido = (string) ob_get_clean();
-
-if (($sesion ?? null) !== null) {
-    $seccion = 'inicio';
-    $vista = 'error';
-    $volver = null;
-    $flash = $flash ?? null;
-    $csrf = $csrf ?? '';
-    require __DIR__ . '/../_partes/marco.php';
-} else {
-    require __DIR__ . '/../_partes/acceso.php';
-}
+$contenido = bloque_error('', 'alert', 'danger', $titulo,
+    'No pudimos completar la acción. Inténtalo de nuevo; si vuelve a pasar, avisa al administrador de TuCri.',
+    $acciones);
+require __DIR__ . '/../_partes/acceso.php';

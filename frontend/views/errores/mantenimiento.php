@@ -1,14 +1,8 @@
 <?php
+/** 503: modo mantenimiento (SRS §2.5). «Reintentar» vuelve a pedir la página. */
 require_once __DIR__ . '/../_partes/ayudas.php';
-
-$urlIngreso = '/ingresar';
-try {
-    $urlIngreso = ruta('ingreso');
-} catch (InvalidArgumentException) {
-}
-
-$acciones = '<a class="btn btn-primary" href="' . e($urlIngreso) . '">' . icono('refresh') . '<span>Volver a intentar</span></a>';
-ob_start();
-echo bloque_error('503', 'settings', 'warn', $titulo, 'Estamos realizando mantenimiento. Inténtalo nuevamente más tarde.', $acciones);
-$contenido = (string) ob_get_clean();
+$titulo = 'En mantenimiento';
+$contenido = bloque_error('', 'tool', 'warn', 'Estamos en mantenimiento',
+    'TuCri no está disponible por un momento. Tus canarios, jaulas y crías están guardados. Vuelve a intentarlo en unos minutos.',
+    (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' ? enlace('Reintentar', '', 'primary big') : enlace('Ir al inicio', ruta('inicio'), 'primary big')));
 require __DIR__ . '/../_partes/acceso.php';

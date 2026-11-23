@@ -87,51 +87,44 @@ final class FrontendBaseTest extends TestCase
         self::assertStringContainsString('href="/registro"', $html);
     }
 
-    public function testPaginasDeErrorUsanLayoutComunYEscapanTitulo(): void
+    public function testErroresMuestranElMarcoYElMensajePublico(): void
     {
-        $sesionAntes = $_SESSION ?? null;
-
+        $_SESSION = [];
         foreach ([
-            'errores/403' => ['codigo' => '403', 'texto' => 'No tienes permiso'],
-            'errores/404' => ['codigo' => '404', 'texto' => 'La página que buscas'],
-            'errores/500' => ['codigo' => '500', 'texto' => 'Inténtalo nuevamente'],
-            'errores/sesion' => ['codigo' => '419', 'texto' => 'Volver a ingresar'],
-            'errores/mantenimiento' => ['codigo' => '503', 'texto' => 'mantenimiento'],
-        ] as $vista => $esperado) {
-            $_SESSION = [];
-            $html = Vista::renderizar($vista, [
-                'titulo' => 'Título <script>alert(1)</script>',
-                'mensaje' => 'Mensaje <b>de prueba</b>',
+            '403' => 'Esta sección no está disponible para tu cuenta',
+            '404' => 'No encontramos lo que buscas',
+            '500' => 'Algo salió mal',
+            'sesion' => 'Tu sesión expiró',
+            'mantenimiento' => 'Estamos en mantenimiento',
+        ] as $vista => $titulo) {
+            $html = Vista::renderizar('errores/' . $vista, [
+                'titulo' => 'Título privado',
+                'mensaje' => 'Detalle técnico privado',
             ], true);
-
-            self::assertNotNull($html);
-            self::assertStringContainsString('TuCri', $html);
+            self::assertStringContainsString('<h1>' . $titulo . '</h1>', $html);
+            self::assertStringContainsString('class="is-auth"', $html);
             self::assertStringContainsString('href="/css/tucriadero.css"', $html);
-            self::assertStringContainsString($esperado['codigo'], $html);
-            self::assertStringContainsString($esperado['texto'], $html);
-            self::assertStringContainsString('Título &lt;script&gt;alert(1)&lt;/script&gt;', $html);
-            self::assertStringNotContainsString('<script>alert(1)</script>', $html);
-            self::assertStringNotContainsString('/css/app.css', $html);
-        }
-
-        if ($sesionAntes === null) {
-            $_SESSION = [];
-        } else {
-            $_SESSION = $sesionAntes;
+            self::assertStringNotContainsString('privado', $html);
         }
     }
 
-    public function testError500NoDebeRevelarMensajeTecnico(): void
+    public function testErroresDistinguenSesionYReintentoDeLectura(): void
     {
-        $html = Vista::renderizar('errores/500', [
-            'titulo' => 'Error inesperado',
-            'mensaje' => 'PDOException: password=secreto',
-        ], true);
-
-        self::assertNotNull($html);
-        self::assertStringContainsString('No fue posible completar la solicitud', $html);
-        self::assertStringNotContainsString('PDOException', $html);
-        self::assertStringNotContainsString('secreto', $html);
+        foreach (['403', '404'] as $codigo) {
+            $html = Vista::renderizar('errores/' . $codigo, [], true);
+            self::assertStringContainsString('action="/salir"', $html);
+            self::assertStringContainsString('href="/inicio"', $html);
+        }
+        foreach (['500', 'mantenimiento'] as $vista) {
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            $html = Vista::renderizar('errores/' . $vista, [], true);
+            self::assertStringContainsString('class="is-auth"', $html);
+            self::assertStringContainsString('href=""', $html);
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $html = Vista::renderizar('errores/' . $vista, [], true);
+            self::assertStringNotContainsString('Reintentar', $html);
+            self::assertStringContainsString('href="/inicio"', $html);
+        }
     }
 
     public function testVistaPerfilRF004EscapaDatosIncluyeCSRFYErrores(): void

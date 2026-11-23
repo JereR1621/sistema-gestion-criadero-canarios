@@ -1,24 +1,24 @@
 <?php
+/** 404: el registro no existe o es de otro criadero (contrato §7). Con sesión, dentro del menú; sin sesión, en la pantalla de acceso. */
 require_once __DIR__ . '/../_partes/ayudas.php';
-
-$urlInicio = '/inicio';
-try {
-    $urlInicio = ruta('inicio');
-} catch (InvalidArgumentException) {
+$titulo = 'Página no encontrada';
+$acciones = enlace('Iniciar sesión', ruta('ingreso'), 'primary big', 'chev');
+if ($sesion !== null) {
+    $acciones = enlace('Ir al inicio', ruta('inicio'), 'primary big', 'home');
+    if ($sesion['rol'] === 'criador') {
+        try {
+            $acciones .= enlace('Buscar canario', ruta('buscar'), 'soft big', 'search');
+        } catch (InvalidArgumentException) {
+            $acciones .= '<span class="btn btn-soft big" role="link" aria-disabled="true" title="Búsqueda aún no disponible">'
+                . icono('search') . '<span>Buscar canario</span></span>';
+        }
+    }
 }
-
-$acciones = '<a class="btn btn-primary" href="' . e($urlInicio) . '">' . icono('home') . '<span>Volver al inicio</span></a>';
-ob_start();
-echo bloque_error('404', 'search', 'warn', $titulo, 'La página que buscas no existe o ya no está disponible.', $acciones);
-$contenido = (string) ob_get_clean();
-
-if (($sesion ?? null) !== null) {
-    $seccion = 'inicio';
-    $vista = 'error';
-    $volver = null;
-    $flash = $flash ?? null;
-    $csrf = $csrf ?? '';
-    require __DIR__ . '/../_partes/marco.php';
-} else {
-    require __DIR__ . '/../_partes/acceso.php';
-}
+$contenido = bloque_error('Error 404', 'search', 'muted', 'No encontramos lo que buscas',
+    ($sesion['rol'] ?? '') === 'criador'
+        ? 'El canario, la jaula o el cruce no existe o ya no está en tu criadero. Revisa el anillo o búscalo de nuevo.'
+        : 'La página que buscas no existe o ya no está disponible.',
+    $acciones);
+$seccion = 'buscar';
+$vista = '404';
+require __DIR__ . '/../_partes/' . ($sesion !== null ? 'marco.php' : 'acceso.php');

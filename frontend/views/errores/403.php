@@ -1,24 +1,12 @@
 <?php
+/** 403: un criador entra a una ruta de administración (contrato §7). */
 require_once __DIR__ . '/../_partes/ayudas.php';
-
-$urlInicio = '/inicio';
-try {
-    $urlInicio = ruta('inicio');
-} catch (InvalidArgumentException) {
-}
-
-$acciones = '<a class="btn btn-primary" href="' . e($urlInicio) . '">' . icono('home') . '<span>Volver al inicio</span></a>';
-ob_start();
-echo bloque_error('403', 'lock', 'danger', $titulo, 'No tienes permiso para acceder a esta página.', $acciones);
-$contenido = (string) ob_get_clean();
-
-if (($sesion ?? null) !== null) {
-    $seccion = 'inicio';
-    $vista = 'error';
-    $volver = null;
-    $flash = $flash ?? null;
-    $csrf = $csrf ?? '';
-    require __DIR__ . '/../_partes/marco.php';
-} else {
-    require __DIR__ . '/../_partes/acceso.php';
-}
+$titulo = 'Sin acceso';
+$contenido = bloque_error('Error 403', 'lock', 'muted', 'Esta sección no está disponible para tu cuenta',
+    ($sesion['rol'] ?? '') === 'criador'
+        ? 'Solo el administrador de TuCri puede entrar aquí. Tus canarios y tus datos siguen a salvo.'
+        : 'Tu cuenta no tiene permiso para entrar en esta sección.',
+    $sesion !== null ? enlace('Volver al inicio', ruta('inicio'), 'primary big', 'home') : enlace('Iniciar sesión', ruta('ingreso'), 'primary big', 'chev'));
+$seccion = 'buscar';
+$vista = '403';
+require __DIR__ . '/../_partes/' . ($sesion !== null ? 'marco.php' : 'acceso.php');
