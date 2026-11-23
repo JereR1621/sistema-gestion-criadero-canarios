@@ -53,6 +53,43 @@ final class FrontendBaseTest extends TestCase
         self::assertStringNotContainsString('Fotografías y créditos', $html);
     }
 
+    public function testVistaPerfilRF004EscapaDatosIncluyeCSRFYErrores(): void
+    {
+        $perfil = [
+            'nombre' => 'Ana <b>Prueba</b>',
+            'correo' => 'ana@example.cl',
+            'numero_socio' => 'S-<script>',
+            'club' => 'Club Norte',
+        ];
+        $errores = [
+            'numero_socio' => 'El número de socio no es válido',
+            '_general' => 'Revisa los datos del perfil',
+        ];
+        $viejo = [
+            'numero_socio' => 'S-X',
+            'club' => 'Club <b>Sur</b>',
+        ];
+
+        $html = \render('cuentas/perfil', [
+            'perfil' => $perfil,
+            'errores' => $errores,
+            'viejo' => $viejo,
+        ], true);
+
+        self::assertStringContainsString('Mi perfil', $html);
+        self::assertStringContainsString('name="numero_socio"', $html);
+        self::assertStringContainsString('name="club"', $html);
+        self::assertStringContainsString('name="_csrf"', $html);
+        self::assertStringContainsString('action="/perfil"', $html);
+        self::assertStringContainsString('value="S-X"', $html);
+        self::assertStringContainsString('Club &lt;b&gt;Sur&lt;/b&gt;', $html);
+        self::assertStringContainsString('Ana &lt;b&gt;Prueba&lt;/b&gt;', $html);
+        self::assertStringContainsString('El número de socio no es válido', $html);
+        self::assertStringContainsString('Revisa los datos del perfil', $html);
+        self::assertStringNotContainsString('<script>', $html);
+        self::assertStringNotContainsString('<b>Prueba</b>', $html);
+    }
+
     public function testMarcoNoFallaCuandoFaltanRutasDeModulosPendientes(): void
     {
         $propiedad = new \ReflectionProperty(Router::class, 'rutas');

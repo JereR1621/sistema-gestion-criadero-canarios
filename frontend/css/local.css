@@ -57,6 +57,19 @@ form:has(input[name="origen"][value="criadero"]:checked) .solo-adquirido { displ
 .sheet .hoja-form > h2:first-child { display: none; }
 .hoja-form .sheet-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 
+/* Perfil RF004: datos del criador y valores por defecto de los anillos. */
+.perfil-card { max-width: 640px; width: 100%; }
+.perfil-datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0 0 24px; }
+.perfil-datos div { min-width: 0; }
+.perfil-datos dt { color: var(--muted); font-size: 13px; font-weight: 700; }
+.perfil-datos dd { margin: 4px 0 0; overflow-wrap: anywhere; font-weight: 700; }
+.perfil-form { max-width: 520px; }
+.perfil-actions { padding-top: 4px; }
+@media (max-width: 599px) {
+    .perfil-datos { grid-template-columns: 1fr; }
+    .perfil-actions .btn { width: 100%; }
+}
+
 /* Cerrar sesión es un formulario (POST con CSRF): se ve igual que los enlaces del menú. */
 .form-salir { margin: 0; }
 .umenu .form-salir button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border: 0; background: none; font: inherit; font-weight: 600; cursor: pointer; text-align: left; }
