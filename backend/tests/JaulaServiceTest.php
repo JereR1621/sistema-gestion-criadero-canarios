@@ -149,7 +149,7 @@ final class JaulaServiceTest extends TestCase
         $duplicada = $this->servicio->registrar($this->criaderoA, ['numero' => '7']);
 
         self::assertSame(
-            'Número de jaula ya registrado en el criadero.',
+            'Ya existe la jaula N.º 7.',
             $duplicada['errores']['numero'] ?? ''
         );
         self::assertArrayNotHasKey('jaula_id', $duplicada);
