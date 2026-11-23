@@ -34,6 +34,7 @@ final class CuentaController extends BaseController
                 'errores' => $resultado['errores'],
                 'viejo' => [
                     'nombre' => trim(texto_de($datos['nombre'])),
+                    'consentimiento' => isset($resultado['errores']['consentimiento']) ? '' : 'si',
                     'correo' => trim(texto_de($datos['correo'])),
                 ],
             ]);
