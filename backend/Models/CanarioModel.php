@@ -380,6 +380,7 @@ final class CanarioModel extends ModeloCriadero
 
     /**
      * Actualiza la variedad de un canario solo si pertenece al criadero indicado (devuelve filas afectadas).
+     * No valida la variedad: quien la llame debe aplicar antes la regla de sexo de RF012 (CanarioService).
      */
     public function actualizarVariedadEnCriadero(int $id, int $criaderoId, ?string $variedadCodigo): int
     {
