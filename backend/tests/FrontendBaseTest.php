@@ -49,6 +49,37 @@ final class FrontendBaseTest extends TestCase
         self::assertStringNotContainsString('<script>alert(1)</script>', $html);
     }
 
+    public function testVistaIngresoIncluyeFormularioSeguroErroresYCorreoConservado(): void
+    {
+        $sesionAntes = $_SESSION ?? null;
+        $_SESSION = [];
+
+        $html = Vista::renderizar('cuentas/ingresar', [
+            'errores' => [
+                '_general' => 'Correo o contraseña incorrectos',
+                'correo' => 'Revisa el correo',
+            ],
+            'viejo' => ['correo' => 'ana<script>@ejemplo.com'],
+        ], true);
+
+        if ($sesionAntes === null) {
+            $_SESSION = [];
+        } else {
+            $_SESSION = $sesionAntes;
+        }
+
+        self::assertNotNull($html);
+        self::assertStringContainsString('method="post" action="/ingresar"', $html);
+        self::assertStringContainsString('name="correo"', $html);
+        self::assertStringContainsString('name="contrasena"', $html);
+        self::assertStringContainsString('name="_csrf"', $html);
+        self::assertStringContainsString('Correo o contraseña incorrectos', $html);
+        self::assertStringContainsString('Revisa el correo', $html);
+        self::assertStringContainsString('ana&lt;script&gt;@ejemplo.com', $html);
+        self::assertStringNotContainsString('ana<script>@ejemplo.com', $html);
+        self::assertStringContainsString('href="/registro"', $html);
+    }
+
     public function testMarcoNoFallaCuandoFaltanRutasDeModulosPendientes(): void
     {
         $propiedad = new \ReflectionProperty(Router::class, 'rutas');
