@@ -335,6 +335,10 @@ final class CanarioService
             }
         }
 
+        if ($existente !== null && ($existente['cruce_origen_id'] ?? null) !== null && $procedencia !== null) {
+            $errores['procedencia'] = 'Un canario nacido de un cruce del criadero no puede tener procedencia externa.';
+        }
+
         if ($existente !== null && ($existente['cruce_origen_id'] ?? null) !== null) {
             $padreOriginal = $existente['padre_id'] !== null ? (int) $existente['padre_id'] : null;
             $madreOriginal = $existente['madre_id'] !== null ? (int) $existente['madre_id'] : null;

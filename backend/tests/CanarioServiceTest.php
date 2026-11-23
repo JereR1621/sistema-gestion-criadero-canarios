@@ -210,6 +210,95 @@ final class CanarioServiceTest extends TestCase
     }
 
     /**
+     * Criterio positivo (SRS-RF010): registra un canario adquirido con su procedencia
+     * y sin padres registrados, verificando ficha y auditoría (SEG-003).
+     */
+    public function testPositivoRegistrarYEditarCanarioAdquiridoConProcedenciaSinPadres(): void
+    {
+        $registro = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'EXT-15',
+            'anillo_anio' => '2025',
+            'anillo_correlativo' => '701',
+            'anillo_club' => 'Club Coquimbo',
+            'sexo' => 'macho',
+            'variedad_codigo' => '',
+            'procedencia' => 'Criadero El Valle',
+            'padre_id' => '',
+            'madre_id' => '',
+        ]);
+
+        self::assertSame([], $registro['errores']);
+        $canarioId = (int) $registro['canario_id'];
+
+        $ficha = $this->servicio->obtenerFicha($canarioId, $this->criaderoA);
+        self::assertNotNull($ficha);
+        self::assertSame('Criadero El Valle', $ficha['procedencia']);
+        self::assertNull($ficha['padre']);
+        self::assertNull($ficha['madre']);
+
+        // Editar procedencia manteniendo padres vacíos
+        $edicion = $this->servicio->actualizar($canarioId, $this->criaderoA, [
+            'anillo_socio' => 'EXT-15',
+            'anillo_anio' => '2025',
+            'anillo_correlativo' => '701',
+            'anillo_club' => 'Club Coquimbo',
+            'sexo' => 'macho',
+            'variedad_codigo' => '',
+            'procedencia' => 'Aviario La Serena',
+            'padre_id' => '',
+            'madre_id' => '',
+        ]);
+
+        self::assertSame([], $edicion['errores']);
+        $fichaEditada = $this->servicio->obtenerFicha($canarioId, $this->criaderoA);
+        self::assertSame('Aviario La Serena', $fichaEditada['procedencia']);
+        self::assertNull($fichaEditada['padre']);
+        self::assertNull($fichaEditada['madre']);
+    }
+
+    /**
+     * Criterio negativo (SRS-RF010): rechaza procedencia > 150 caracteres, tipos no escalares
+     * y asignación de padres al editar un canario con procedencia.
+     */
+    public function testNegativoProcedenciaExcedeLargoOSeEditaConPadres(): void
+    {
+        $machoId = $this->insertarCanario($this->criaderoA, 702, 2024, 'macho');
+        $antes = $this->contarCanarios();
+
+        // Largo mayor a 150 caracteres
+        $resLargo = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'EXT-16',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '703',
+            'anillo_club' => 'Club Externo',
+            'procedencia' => str_repeat('A', 151),
+        ]);
+        self::assertArrayHasKey('procedencia', $resLargo['errores']);
+        self::assertSame($antes, $this->contarCanarios());
+
+        // Registrar adquirido válido y luego intentar agregarle padre al editar
+        $ok = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'EXT-16',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '703',
+            'anillo_club' => 'Club Externo',
+            'procedencia' => 'Criadero Sur',
+        ]);
+        $adquiridoId = (int) $ok['canario_id'];
+
+        $resEditarConPadre = $this->servicio->actualizar($adquiridoId, $this->criaderoA, [
+            'anillo_socio' => 'EXT-16',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '703',
+            'anillo_club' => 'Club Externo',
+            'procedencia' => 'Criadero Sur',
+            'padre_id' => (string) $machoId,
+            'madre_id' => '',
+        ]);
+        self::assertArrayHasKey('padre_id', $resEditarConPadre['errores']);
+    }
+
+    /**
      * Criterio: $por_defecto trae socio y club del perfil (RF004), listas vacías para variedades/portadores,
      * y en edición excluye al propio canario de posibles padres/madres.
      */
