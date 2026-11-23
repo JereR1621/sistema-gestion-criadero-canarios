@@ -123,9 +123,21 @@ require __DIR__ . '/cabeza.php';
         </div>
     </dialog>
     <main class="main" id="main" tabindex="-1">
+        <nav class="sin-js fallback-nav" aria-label="Navegación sin JavaScript">
+            <a href="<?= e($urlInicio) ?>">Inicio</a>
+            <?php if ($esAdmin): ?>
+                <?php foreach ($menuAdmin as [$r, $texto, $ic, $url]): ?><a href="<?= e($url) ?>"><?= e($texto) ?></a><?php endforeach; ?>
+            <?php else: ?>
+                <?php foreach ($menuCrias as [$r, $texto, $ic, $sec, $url]): ?><a href="<?= e($url) ?>"><?= e($texto) ?></a><?php endforeach; ?>
+                <?php if ($urlPerfil !== null): ?><a href="<?= e($urlPerfil) ?>">Mi perfil</a><?php endif; ?>
+                <?php if ($urlBuscar !== null): ?><a href="<?= e($urlBuscar) ?>">Buscar</a><?php endif; ?>
+            <?php endif; ?>
+            <?php if ($urlSalida !== null): ?>
+                <form method="post" action="<?= e($urlSalida) ?>"><?= csrf_campo($csrf ?? '') ?><button type="submit">Cerrar sesión</button></form>
+            <?php endif; ?>
+        </nav>
         <?php if ($volver !== null): ?><div class="page-back"><a class="top-back" href="<?= e($volver[0]) ?>"><?= icono('back') ?><span><?= e($volver[1]) ?></span></a></div><?php endif; ?>
         <?= $contenido ?>
-        <footer class="photo-footer"><a href="/css/creditos.html" target="_blank" rel="noopener">Fotografías y créditos</a></footer>
     </main>
     <nav class="tabbar" aria-label="Navegación principal">
         <?php if ($esAdmin): ?>

@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+// La aplicación web, los comandos y las pruebas comparten la fecha local del criadero.
+date_default_timezone_set('America/Santiago');
+
 /**
  * Cargador mínimo de la aplicación. Composer añade un cargador equivalente
  * cuando vendor/ existe; este permite que la base arranque antes de instalarlo.

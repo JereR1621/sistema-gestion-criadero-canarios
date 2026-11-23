@@ -45,10 +45,14 @@ final class Conexion
 
         $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $puerto, $base);
 
-        return new PDO($dsn, $usuario, $contrasena, [
+        $pdo = new PDO($dsn, $usuario, $contrasena, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+        // Desfase vigente de Santiago: respeta horario de verano sin exigir tablas horarias en MySQL.
+        $desfase = (new \DateTimeImmutable('now', new \DateTimeZone('America/Santiago')))->format('P');
+        $pdo->prepare('SET time_zone = ?')->execute([$desfase]);
+        return $pdo;
     }
 }

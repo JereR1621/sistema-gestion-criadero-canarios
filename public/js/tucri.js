@@ -63,9 +63,12 @@
 
     // ---- Hojas (modales) ----
     let volverFoco = null;
+    let devolverFormulario = null;
     function abrirHoja(titulo, contenido) {
         if (!sheetRoot) return;
         if (!sheetRoot.innerHTML) volverFoco = document.activeElement;
+        devolverFormulario?.();
+        devolverFormulario = null;
         sheetRoot.innerHTML = '';
         const bg = document.createElement('div'); bg.className = 'sheet-bg'; bg.dataset.act = 'close';
         const s = document.createElement('div'); s.className = 'sheet'; s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true'); s.setAttribute('aria-label', titulo);
@@ -81,11 +84,24 @@
     }
     function cerrarHoja() {
         if (!sheetRoot?.innerHTML) return;
+        devolverFormulario?.();
+        devolverFormulario = null;
         sheetRoot.innerHTML = '';
         if (app) app.inert = false;
         document.body.style.overflow = '';
         if (volverFoco?.isConnected) volverFoco.focus();
         volverFoco = null;
+    }
+    // Conserva un único formulario y sus IDs, valores y asociaciones de etiquetas.
+    function abrirDetalles(detalles) {
+        cerrarHoja();
+        const lista = $('.sheet-list', detalles);
+        if (!lista) return;
+        detalles.open = false;
+        const origen = document.createComment('origen del formulario');
+        lista.before(origen);
+        abrirHoja(lista.dataset.titulo || '', [lista]);
+        devolverFormulario = () => origen.replaceWith(lista);
     }
     // Lo que htmx trae del servidor para una hoja (#hoja: mover, dar de baja) se muestra como hoja.
     document.addEventListener('htmx:afterSwap', e => {
@@ -100,12 +116,10 @@
         const resumen = e.target.closest('details[data-hoja-detalles] > summary');
         if (!resumen) return;
         e.preventDefault();
-        const lista = resumen.parentElement.querySelector('.sheet-list');
-        const copia = lista.cloneNode(true);
-        abrirHoja(lista.dataset.titulo || resumen.textContent.trim(), [copia]);
+        abrirDetalles(resumen.parentElement);
     });
     // Un formulario que volvió con errores abre su hoja de inmediato.
-    $$('details[data-hoja-detalles][open]').forEach(d => { d.open = false; const l = $('.sheet-list', d); abrirHoja(l.dataset.titulo || '', [l.cloneNode(true)]); });
+    $$('details[data-hoja-detalles][open]').forEach(abrirDetalles);
 
     // ---- Menú lateral del teléfono ----
     const drawer = $('#mobile-menu');
