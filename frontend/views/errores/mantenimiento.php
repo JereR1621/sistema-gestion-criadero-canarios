@@ -1,3 +1,14 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?= e($titulo) ?></title><link rel="stylesheet" href="/css/app.css"></head>
-<body><main class="contenedor"><h1><?= e($titulo) ?></h1><p>Estamos realizando mantenimiento. Inténtalo nuevamente más tarde.</p></main></body></html>
+<?php
+require_once __DIR__ . '/../_partes/ayudas.php';
+
+$urlIngreso = '/ingresar';
+try {
+    $urlIngreso = ruta('ingreso');
+} catch (InvalidArgumentException) {
+}
+
+$acciones = '<a class="btn btn-primary" href="' . e($urlIngreso) . '">' . icono('refresh') . '<span>Volver a intentar</span></a>';
+ob_start();
+echo bloque_error('503', 'settings', 'warn', $titulo, 'Estamos realizando mantenimiento. Inténtalo nuevamente más tarde.', $acciones);
+$contenido = (string) ob_get_clean();
+require __DIR__ . '/../_partes/acceso.php';

@@ -1,3 +1,14 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?= e($titulo) ?></title><link rel="stylesheet" href="/css/app.css"></head>
-<body><main class="contenedor"><h1><?= e($titulo) ?></h1><p>Vuelve a ingresar para continuar.</p><p><a href="/ingresar">Ir a ingreso</a></p></main></body></html>
+<?php
+require_once __DIR__ . '/../_partes/ayudas.php';
+
+$urlIngreso = '/ingresar';
+try {
+    $urlIngreso = ruta('ingreso');
+} catch (InvalidArgumentException) {
+}
+
+$acciones = '<a class="btn btn-primary" href="' . e($urlIngreso) . '">' . icono('login') . '<span>Volver a ingresar</span></a>';
+ob_start();
+echo bloque_error('419', 'lock', 'warn', $titulo, 'Tu sesión expiró o la solicitud ya no es válida. Vuelve a ingresar para continuar.', $acciones);
+$contenido = (string) ob_get_clean();
+require __DIR__ . '/../_partes/acceso.php';
