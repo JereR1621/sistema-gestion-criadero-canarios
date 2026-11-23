@@ -1,3 +1,12 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?= e($titulo) ?></title><link rel="stylesheet" href="/css/app.css"></head>
-<body><main class="contenedor"><h1><?= e($titulo) ?></h1><p>No fue posible completar la solicitud. Inténtalo nuevamente más tarde.</p></main></body></html>
+<?php
+/** Error inesperado. La información técnica se registra en el servidor. */
+require_once __DIR__ . '/../_partes/ayudas.php';
+$titulo = 'Algo salió mal';
+$acciones = enlace('Ir al inicio', ruta('inicio'), 'ghost big');
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    $acciones = enlace('Reintentar', '', 'primary big') . $acciones;
+}
+$contenido = bloque_error('', 'alert', 'danger', $titulo,
+    'No pudimos completar la acción. Inténtalo de nuevo; si vuelve a pasar, avisa al administrador de TuCri.',
+    $acciones);
+require __DIR__ . '/../_partes/acceso.php';

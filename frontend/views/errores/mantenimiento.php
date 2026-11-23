@@ -1,3 +1,8 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?= e($titulo) ?></title><link rel="stylesheet" href="/css/app.css"></head>
-<body><main class="contenedor"><h1><?= e($titulo) ?></h1><p>Estamos realizando mantenimiento. Inténtalo nuevamente más tarde.</p></main></body></html>
+<?php
+/** 503: modo mantenimiento (SRS §2.5). «Reintentar» vuelve a pedir la página. */
+require_once __DIR__ . '/../_partes/ayudas.php';
+$titulo = 'En mantenimiento';
+$contenido = bloque_error('', 'tool', 'warn', 'Estamos en mantenimiento',
+    'TuCri no está disponible por un momento. Tus canarios, jaulas y crías están guardados. Vuelve a intentarlo en unos minutos.',
+    (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' ? enlace('Reintentar', '', 'primary big') : enlace('Ir al inicio', ruta('inicio'), 'primary big')));
+require __DIR__ . '/../_partes/acceso.php';

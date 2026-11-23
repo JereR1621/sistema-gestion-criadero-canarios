@@ -87,6 +87,46 @@ final class FrontendBaseTest extends TestCase
         self::assertStringContainsString('href="/registro"', $html);
     }
 
+    public function testErroresMuestranElMarcoYElMensajePublico(): void
+    {
+        $_SESSION = [];
+        foreach ([
+            '403' => 'Esta sección no está disponible para tu cuenta',
+            '404' => 'No encontramos lo que buscas',
+            '500' => 'Algo salió mal',
+            'sesion' => 'Tu sesión expiró',
+            'mantenimiento' => 'Estamos en mantenimiento',
+        ] as $vista => $titulo) {
+            $html = Vista::renderizar('errores/' . $vista, [
+                'titulo' => 'Título privado',
+                'mensaje' => 'Detalle técnico privado',
+            ], true);
+            self::assertStringContainsString('<h1>' . $titulo . '</h1>', $html);
+            self::assertStringContainsString('class="is-auth"', $html);
+            self::assertStringContainsString('href="/css/tucriadero.css"', $html);
+            self::assertStringNotContainsString('privado', $html);
+        }
+    }
+
+    public function testErroresDistinguenSesionYReintentoDeLectura(): void
+    {
+        foreach (['403', '404'] as $codigo) {
+            $html = Vista::renderizar('errores/' . $codigo, [], true);
+            self::assertStringContainsString('action="/salir"', $html);
+            self::assertStringContainsString('href="/inicio"', $html);
+        }
+        foreach (['500', 'mantenimiento'] as $vista) {
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            $html = Vista::renderizar('errores/' . $vista, [], true);
+            self::assertStringContainsString('class="is-auth"', $html);
+            self::assertStringContainsString('href=""', $html);
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $html = Vista::renderizar('errores/' . $vista, [], true);
+            self::assertStringNotContainsString('Reintentar', $html);
+            self::assertStringContainsString('href="/inicio"', $html);
+        }
+    }
+
     public function testVistaPerfilRF004EscapaDatosIncluyeCSRFYErrores(): void
     {
         $perfil = [

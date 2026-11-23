@@ -1,3 +1,9 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?= e($titulo) ?></title><link rel="stylesheet" href="/css/app.css"></head>
-<body><main class="contenedor"><h1><?= e($titulo) ?></h1><p>Vuelve a ingresar para continuar.</p><p><a href="/ingresar">Ir a ingreso</a></p></main></body></html>
+<?php
+/** 419: el token CSRF no es válido o la sesión expiró (contrato §7), con enlace para ingresar de nuevo. */
+require_once __DIR__ . '/../_partes/ayudas.php';
+$titulo = 'Sesión expirada';
+$contenido = bloque_error('', 'clock', 'warn', 'Tu sesión expiró',
+    $sesion !== null ? 'La solicitud ya no es válida. Ingresa de nuevo para seguir. Si estabas guardando algo, revisa que haya quedado registrado.'
+        : 'Por seguridad cerramos la sesión después de un tiempo sin uso. Ingresa de nuevo para seguir. Si estabas guardando algo, revisa que haya quedado registrado.',
+    enlace('Ingresar de nuevo', ruta('ingreso'), 'primary big', 'chev'));
+require __DIR__ . '/../_partes/acceso.php';

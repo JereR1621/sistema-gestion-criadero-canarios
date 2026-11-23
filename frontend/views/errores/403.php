@@ -1,3 +1,12 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?= e($titulo) ?></title><link rel="stylesheet" href="/css/app.css"></head>
-<body><main class="contenedor"><h1><?= e($titulo) ?></h1><p>No tienes permiso para acceder a esta página.</p></main></body></html>
+<?php
+/** 403: un criador entra a una ruta de administración (contrato §7). */
+require_once __DIR__ . '/../_partes/ayudas.php';
+$titulo = 'Sin acceso';
+$contenido = bloque_error('Error 403', 'lock', 'muted', 'Esta sección no está disponible para tu cuenta',
+    ($sesion['rol'] ?? '') === 'criador'
+        ? 'Solo el administrador de TuCri puede entrar aquí. Tus canarios y tus datos siguen a salvo.'
+        : 'Tu cuenta no tiene permiso para entrar en esta sección.',
+    $sesion !== null ? enlace('Volver al inicio', ruta('inicio'), 'primary big', 'home') : enlace('Iniciar sesión', ruta('ingreso'), 'primary big', 'chev'));
+$seccion = 'buscar';
+$vista = '403';
+require __DIR__ . '/../_partes/' . ($sesion !== null ? 'marco.php' : 'acceso.php');
