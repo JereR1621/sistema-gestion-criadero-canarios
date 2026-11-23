@@ -1,0 +1,964 @@
+/* Inicio: tablero claro. Mantiene los componentes existentes y unifica la navegación compartida. */
+/* Inicio de sesión: wallpaper exterior y formulario sobre un material claro. */
+.auth .auth-panel {
+    background: url("assets/fondos/aves-suave.png") center top / 1024px auto repeat var(--bg);
+}
+.auth .auth-card {
+    max-width: 480px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px #203B4012;
+}
+.auth .auth-foot {
+    align-self: center;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 8px;
+}
+.auth .auth-intro,
+.auth .auth-card .lead,
+.auth .auth-card .center { color: #40575A; }
+@supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .auth .auth-card {
+        background: rgb(255 255 255 / 65%);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .auth .auth-card {
+        background: #fff;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+@media (max-width: 899px) {
+    .auth .auth-panel { padding-inline: 16px; }
+    .auth .auth-card { padding: 24px 20px; }
+}
+.layout {
+    background-image: url("assets/fondos/aves-suave.png");
+    background-size: 1024px auto;
+    background-position: center top;
+    background-repeat: repeat;
+}
+
+/* Lectura sobre superficies opacas; el patrón queda en los espacios exteriores. */
+.layout .main > .page-head {
+    background: #fff;
+    padding: 20px 24px;
+    border: 0;
+    border-radius: 14px;
+}
+.layout .main > .page-back {
+    align-self: flex-start;
+    max-width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    padding: 4px 12px 4px 4px;
+}
+.layout.view-home .home-crosses .block-head {
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 14px;
+}
+.layout .main > p.muted,
+.layout .main > .stepper,
+.layout .main > .seg-tabs,
+.layout .main > .form-actions,
+.layout .main > .list,
+.layout .profile,
+.layout .tab-body > .card,
+.layout .tab-body > .grid-2 > .card {
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 14px;
+}
+.layout .main > .photo-footer { border-top: 0; padding-top: 0; }
+.layout .photo-footer > a { background: #fff; padding: 8px 12px; border-radius: 8px; }
+
+/* Navegación compartida en los mismos tonos petróleo del producto. */
+.layout > .topbar {
+    background: #E5EEF0;
+    border-bottom: 1px solid #BDD1D4;
+    box-shadow: none;
+}
+@supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .layout > .topbar {
+        background: rgb(229 238 240 / 70%);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .layout > .topbar {
+        background: #E5EEF0;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+.layout .topbar .brand { color: var(--green-d); }
+.layout .desktop-nav .side-link { color: var(--green-d); }
+.layout .desktop-nav .side-link.on { background: var(--green); color: #fff; }
+.layout .top-search { background: #fff; }
+.layout .topbar .profile-initials { background: #fff; color: var(--green-d); }
+@media (hover: hover) and (pointer: fine) {
+    .layout .desktop-nav .side-link:not(.on):hover { background: #fff; }
+}
+@media (max-width: 899px) {
+    .layout .main > .page-head { padding: 18px 16px; }
+    .layout.view-home .home-crosses .block-head { padding: 14px; }
+    .layout .main > p.muted,
+    .layout .main > .stepper,
+    .layout .main > .seg-tabs,
+    .layout .main > .form-actions,
+    .layout .main > .list,
+    .layout .profile,
+    .layout .tab-body > .card,
+    .layout .tab-body > .grid-2 > .card { padding: 16px; }
+}
+/* Textos expuestos al patrón: reforzar contraste sin cambiar su contenido. */
+.layout .main > .page-head p,
+.layout .main > .page-back > span,
+.layout .main > .photo-footer,
+.layout .main > p.muted,
+.layout .main > .stepper button,
+.layout .main > .form-actions .btn-ghost,
+.layout .main > .seg-tabs .seg:not(.on),
+.layout .main > .list > .row .muted,
+.layout .profile .ring-parts small,
+.layout .tab-body .minis > .muted,
+.layout.view-home .home-crosses .section-count { color: var(--ink); }
+.layout .main > .list > .row .pill.ok { color: #16432B; }
+.layout .main > .list > .row .pill.off { color: #7C2D27; }
+.view-home .main { padding-top: 24px; }
+.desktop-nav .side-link { border-radius: 10px; border-bottom: 0; }
+.desktop-nav .side-link.on { background: var(--green-s); color: var(--green-d); }
+.desktop-nav .side-link .ic { display: block; width: 18px; height: 18px; }
+.view-home .home-board {
+    --board-gap: 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas: 'intro intro' 'crosses summary' 'chicks summary' 'promo promo';
+    gap: 28px var(--board-gap);
+    padding: 24px;
+    background: var(--soft);
+    border-radius: 24px;
+    align-items: start;
+}
+.view-home .home-board > * { min-width: 0; }
+.view-home .home-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: var(--board-gap);
+    align-items: stretch;
+}
+.view-home .home-intro .hero {
+    grid-area: auto;
+    min-height: 168px;
+    grid-template-columns: minmax(0, 1fr) 156px;
+    border-radius: 16px;
+    background: transparent;
+}
+.view-home .hero-txt { padding: 12px 24px 12px 0; gap: 10px; justify-content: center; }
+.view-home .hero h1 { font-size: 30px; line-height: 1.15; font-weight: 600; text-wrap: balance; }
+.view-home .hero p { max-width: 36ch; font-size: 15px; }
+.view-home .hero-season { margin-top: 0; font-size: 13px; }
+.view-home .hero-photo { border-radius: 16px; background-position: 61% 43%; }
+.view-home .home-actions { grid-area: auto; gap: 12px; }
+.view-home .big-action {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 168px;
+    padding: 20px;
+    border-radius: 16px;
+    gap: 12px;
+    position: relative;
+}
+.view-home .big-action strong { font-size: 18px; }
+.view-home .big-action > span > span { font-size: 13px; line-height: 1.45; }
+.view-home .big-action .a-ic { display: flex; width: 26px; height: 26px; }
+.view-home .big-action .a-ic .ic { width: 26px; height: 26px; }
+.view-home .big-action > .chev { position: absolute; right: 16px; top: 24px; display: block; }
+.view-home .big-action.t-yellow { border-color: transparent !important; }
+.view-home .home-crosses {
+    background: transparent;
+    color: var(--ink);
+    padding: 0;
+    border-radius: 0;
+    gap: 0;
+}
+.view-home .home-board h2 { font-size: 21px; line-height: 1.25; }
+.view-home .home-crosses .block-head h2 { color: var(--ink); }
+.view-home .home-crosses .section-count { color: var(--muted); font-size: 15px; }
+.view-home .home-crosses .block-head { margin-bottom: 16px; }
+.view-home .home-crosses .block-head .link { color: var(--green-d); text-decoration: none; font-size: 14px; }
+.view-home .home-crosses .cross-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.view-home .home-crosses .cross-card {
+    border: 0;
+    background: #DCE8E7;
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 16px;
+    gap: 12px;
+    min-height: 322px;
+    height: 100%;
+    max-width: none;
+}
+.view-home .cross-card .pair-rings { color: inherit; font-size: 24px; margin: 0; }
+.view-home .cross-card .cross-vars { font-size: 13px; line-height: 1.45; color: var(--muted); }
+.view-home .cross-card .pair { gap: 6px; }
+.view-home .cross-card .pair .av-xl { aspect-ratio: 1; border-radius: 10px; }
+.view-home .cross-card .cross-meta { margin-top: auto; padding-top: 12px; gap: 8px; border-color: #B5CDCD; }
+.view-home .cross-card .cross-meta > span:first-child { font-size: 12px; }
+.view-home .cross-card .pill { font-size: 12px; }
+.view-home .home-crosses .has-chicks { background: var(--green); color: #fff; }
+.view-home .has-chicks .cage-badge, .view-home .has-chicks .cross-card-head > .chev { color: #fff; }
+.view-home .has-chicks .cross-vars, .view-home .has-chicks .cross-meta,
+.view-home .has-chicks .pair .x { color: #D9E9EB; }
+.view-home .has-chicks .cross-meta { border-color: #5F8990; }
+.view-home .has-chicks .pill.ok { color: #FFE0A7; }
+.view-home .has-chicks .sx-m { color: #B5E0FF; }
+.view-home .has-chicks .sx-f { color: #FFD6E0; }
+.view-home .home-summary { display: flex; flex-direction: column; gap: 20px; }
+.view-home .home-stats, .view-home .home-cages, .view-home .home-chicks {
+    padding: 20px;
+    background: #fff;
+    border: 0;
+    border-radius: 16px;
+}
+.view-home .home-stats h2 { margin-bottom: 16px; }
+.view-home .home-stats .stats { border: 0; border-radius: 0; background: transparent; }
+.view-home .home-stats .stat { padding: 14px 8px; min-height: 88px; gap: 6px; }
+.view-home .home-stats .stat strong { font-size: 30px; }
+.view-home .home-stats .stat-ic { right: 8px; top: 14px; width: 16px; height: 16px; }
+.view-home .home-stats .stat-ic .ic { width: 16px; height: 16px; }
+.view-home .home-stats .stat > span:last-child { font-size: 13px; font-weight: 500; }
+.view-home .home-stats .stat > span:last-child::after { content: none; }
+.view-home .home-cages .block-head { margin-bottom: 8px; }
+.view-home .home-cages .block-head .link { font-size: 13px; }
+.view-home .home-cages > .muted { margin-bottom: 16px; font-size: 13px; }
+.view-home .cage-minis { gap: 8px; }
+.view-home .cage-mini { border: 0; background: #F3F1EC; padding: 10px; border-radius: 9px; }
+.view-home .cage-mini.busy { background: var(--green-s); }
+.view-home .cage-mini strong { font-size: 13px; }
+.view-home .cage-mini span { font-size: 12px; }
+.view-home .home-chicks .block-head { margin-bottom: 8px; }
+.view-home .home-chicks .list.compact .row { padding: 12px 0; }
+.view-home .home-chicks .list.compact .row:last-child { border-bottom: 0; }
+.view-home .home-chicks .list.compact .ring { font-size: 15px; }
+.view-home .home-chicks .list.compact .row-sub { font-size: 13px; }
+.view-home .home-promo { background: var(--yellow-s) !important; padding: 20px; border: 0; border-radius: 16px; gap: 12px; }
+.view-home .home-promo .a-ic { color: var(--yellow-d); width: 28px; height: 28px; }
+.view-home .home-promo .muted { font-size: 14px; line-height: 1.5; }
+.view-home .home-promo .btn { width: 100%; font-size: 14px; }
+.view-home .home-crosses .empty-art { grid-column: 1 / -1; background: #fff; border-radius: 16px; }
+@media (min-width: 1200px) {
+    .view-home .home-promo { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; grid-template-areas: 'icon title action' 'icon description action'; column-gap: 16px; row-gap: 4px; align-items: center; }
+    .view-home .home-promo .a-ic { grid-area: icon; }
+    .view-home .home-promo h2 { grid-area: title; }
+    .view-home .home-promo .muted { grid-area: description; }
+    .view-home .home-promo .btn { grid-area: action; width: auto; margin: 0; }
+}
+@media (hover: hover) and (pointer: fine) {
+    .view-home .home-crosses .cross-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px #203B4014; }
+    .view-home .home-stats .stat:hover { transform: none; box-shadow: none; background: var(--green-s); }
+    .desktop-nav .side-link:hover { background: var(--green-s); }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+    .view-home .home-board { grid-template-columns: minmax(0, 1fr) 300px; grid-template-areas: 'intro intro' 'crosses crosses' 'summary summary' 'chicks promo'; }
+    .view-home .home-intro { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+    .view-home .home-intro .hero { grid-template-columns: minmax(0, 1fr) 110px; }
+    .view-home .hero h1 { font-size: 27px; }
+    .view-home .hero-txt { padding-right: 12px; }
+    .view-home .big-action { padding: 16px; }
+    .view-home .big-action > .chev { display: none; }
+    .view-home .home-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+    .view-home .home-summary > * { grid-area: auto; }
+    .view-home .home-stats .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 899px) {
+    .view-home .main { padding-top: 16px; }
+    .view-home .home-board { display: flex; flex-direction: column; padding: 0; gap: 24px; background: transparent; border-radius: 0; }
+    .view-home .home-intro, .view-home .home-summary { display: contents; }
+    .view-home .home-intro .hero { order: 0; min-height: 148px; grid-template-columns: minmax(0, 1fr) 116px; background: var(--soft); }
+    .view-home .hero-txt { padding: 16px; gap: 8px; }
+    .view-home .hero h1 { font-size: 25px; }
+    .view-home .hero p { font-size: 14px; line-height: 1.45; }
+    .view-home .hero-season { font-size: 12px; }
+    .view-home .hero-photo { border-radius: 0; background: url(assets/fotos/canario-inicio.jpg) 63% 45% / cover no-repeat; }
+    .view-home .home-actions { order: 1; gap: 10px; }
+    .view-home .big-action { min-height: 116px; padding: 14px; gap: 10px; justify-content: flex-start; }
+    .view-home .big-action strong { font-size: 16px; }
+    .view-home .big-action > span > span { font-size: 13px; }
+    .view-home .big-action .a-ic, .view-home .big-action .a-ic .ic { width: 22px; height: 22px; }
+    .view-home .big-action > .chev { display: none; }
+    .view-home .home-stats { order: 2; padding: 14px 0; border: 1px solid var(--line); }
+    .view-home .home-stats h2 { display: none; }
+    .view-home .home-stats .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0; }
+    .view-home .home-stats .stat { padding: 0 4px; min-height: 0; border-bottom: 0; }
+    .view-home .home-stats .stat strong { font-size: 27px; }
+    .view-home .home-stats .stat > span:last-child { font-size: 12px; }
+    .view-home .home-stats .stat:not(:last-child) { border-right: 1px solid var(--line); }
+    .view-home .home-board > .home-crosses { order: 3; width: 100%; margin: 0; padding: 0; }
+    .view-home .home-crosses .cross-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; overflow: visible; }
+    .view-home .home-crosses .cross-card { min-height: 0; }
+    .view-home .home-chicks { order: 4; padding: 18px; }
+    .view-home .home-cages { order: 5; padding: 18px; }
+    .view-home .home-promo { order: 6; padding: 20px; }
+    .view-home .home-board h2 { font-size: 21px; }
+    .view-home .cage-mini { padding: 12px; }
+}
+@media (max-width: 599px) {
+    .view-home .home-crosses .cross-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .view-home .home-crosses .cross-card { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 8px 12px; padding: 16px; }
+    .view-home .cross-card-head { grid-column: 1 / -1; }
+    .view-home .cross-card .pair { grid-column: 2; grid-row: 2 / 4; align-self: center; gap: 4px; }
+    .view-home .cross-card .pair .av-xl { height: 66px; aspect-ratio: auto; }
+    .view-home .cross-card .pair .x { font-size: 13px; }
+    .view-home .cross-card .pair-rings { grid-column: 1; grid-row: 2; font-size: 22px; align-self: end; }
+    .view-home .cross-card .cross-vars { grid-column: 1; grid-row: 3; align-self: start; font-size: 12px; }
+    .view-home .cross-card .cross-meta { grid-column: 1 / -1; grid-row: 4; margin: 4px 0 0; padding-top: 10px; }
+    .view-home .home-crosses .block-head .link { font-size: 13px; }
+    .view-home .home-chicks .list.compact .row { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; }
+    .view-home .home-chicks .av-md { width: 44px; height: 48px; }
+}
+@media (max-width: 359px) {
+    .view-home .home-intro .hero { grid-template-columns: minmax(0, 1fr) 92px; }
+    .view-home .hero h1 { font-size: 23px; }
+    .view-home .hero-txt { padding: 14px; }
+    .view-home .big-action { padding: 12px; }
+    .view-home .home-crosses .cross-card { grid-template-columns: minmax(0, 1fr) 96px; padding: 14px; gap: 8px; }
+    .view-home .cross-card .pair-rings { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .view-home .home-crosses .cross-card:hover { transform: none; }
+}
+
+/* ==========================================================================
+   Ronda 4 (14/11/2026): ancho completo, neutros de la paleta y menos plantilla.
+   ========================================================================== */
+
+/* Neutros fríos con el tono del petróleo: sin fondo crema. */
+:root { --bg: #F2F6F6; --soft: #E5EDEE; --line: #D2DEDF; }
+.top-search { background: #F7FAFA; }
+.hero, .cross-hero { background: #E3EDEE; }
+.home-promo { background: var(--yellow-s) !important; }
+
+/* En pantallas anchas la página usa todo el ancho, con márgenes laterales parejos. */
+@media (min-width: 1200px) {
+    .main { max-width: 1920px; padding-inline: clamp(32px, 3vw, 56px); }
+}
+
+/* Inicio: sin marco alrededor del tablero; los bloques se apoyan directo en el fondo. */
+.view-home .home-board { padding: 0; background: transparent; border-radius: 0; }
+
+/* Lo que se toca conserva su señal; los íconos que solo decoraban se quitan. */
+.view-home .home-stats .stat-ic,
+.view-home .home-promo .a-ic,
+.view-home .big-action .a-ic,
+.view-home .cross-card .cage-badge .ic { display: none; }
+.view-home .home-stats .stat > span:last-child { color: var(--green-d); font-weight: 600; }
+.view-home .home-stats .stat > span:last-child::after { content: ' ›'; }
+.view-home .cage-mini { background: #fff; border: 1px solid var(--line); }
+.view-home .cage-mini.busy { background: var(--green-s); border-color: transparent; }
+
+@media (min-width: 1200px) {
+    .view-home .home-board {
+        grid-template-columns: minmax(0, 1fr) clamp(320px, 22vw, 420px);
+        grid-template-areas: 'intro summary' 'crosses summary' 'crosses promo' 'chicks chicks';
+        gap: 28px clamp(24px, 2vw, 36px);
+    }
+    /* La bienvenida recupera su foto grande; las dos acciones van debajo, en fila. */
+    .view-home .home-intro { display: flex; flex-direction: column; gap: 16px; }
+    .view-home .home-intro .hero { min-height: 280px; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); background: #E3EDEE; overflow: hidden; }
+    .view-home .hero-txt { padding: 32px 28px 32px 36px; }
+    .view-home .hero h1 { font-size: clamp(32px, 2.4vw, 44px); }
+    .view-home .hero p { font-size: 17px; }
+    .view-home .hero-photo { border-radius: 0; }
+    .view-home .home-actions { display: grid; grid-template-columns: 1fr 1fr; }
+    .view-home .big-action { min-height: 104px; flex-direction: row; align-items: center; justify-content: space-between; padding: 22px 24px; }
+    .view-home .big-action > .chev { position: static; }
+    /* Los cruces llenan la fila, sea cual sea el ancho. */
+    .view-home .home-crosses .cross-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .view-home .home-promo { display: flex; flex-direction: column; align-items: flex-start; }
+    .view-home .home-promo .btn { width: auto; }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+    /* También en tableta la bienvenida conserva la foto grande y las acciones van debajo. */
+    .view-home .home-intro { display: flex; flex-direction: column; gap: 14px; }
+    .view-home .home-intro .hero { min-height: 240px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: #E3EDEE; overflow: hidden; }
+    .view-home .hero-txt { padding: 28px 24px; }
+    .view-home .hero-photo { border-radius: 0; }
+    .view-home .home-actions { display: grid; grid-template-columns: 1fr 1fr; }
+    .view-home .big-action { min-height: 96px; flex-direction: row; align-items: center; justify-content: space-between; }
+    .view-home .big-action > .chev { display: block; position: static; }
+}
+
+/* ==========================================================================
+   Ronda 5 (14/11/2026): movimiento del menú lateral, las hojas y los pasos.
+   Menú y hojas entran y salen por el mismo lado; en el teléfono se cierran
+   arrastrando. Con «reducir movimiento», todo pasa a un fundido corto.
+   ========================================================================== */
+:root { --ease-drawer: cubic-bezier(.32, .72, 0, 1); }
+@keyframes drawer-in { from { transform: translateX(-100%); } }
+@keyframes step-in { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 32px)); } }
+
+/* Hojas: la entrada no queda fijada al terminar (así se pueden arrastrar) y la salida repite el camino. */
+.sheet { animation: pop 220ms var(--ease-ui) backwards; }
+.sheet-bg { animation: fade 200ms ease backwards; }
+.sheet-grip { display: none; }
+.sheet-ghost { pointer-events: none; }
+.sheet-ghost .sheet, .sheet-ghost .sheet-bg { animation: none; }
+.sheet-ghost .sheet-bg { z-index: 58; transition: opacity 200ms ease; }
+.sheet-ghost .sheet { z-index: 59; transition: opacity 160ms ease, transform 200ms var(--ease-ui); }
+.sheet-ghost.out .sheet-bg, .sheet-ghost.out .sheet { opacity: 0; }
+.sheet-ghost.out .sheet { transform: translate(-50%, -48%) scale(.98); }
+
+/* Pasos del registro: lo nuevo entra desde el lado hacia el que se avanza. */
+.main > .step-in { animation: step-in 280ms var(--ease-ui) backwards; }
+
+@media (max-width: 899px) {
+    /* Menú lateral: entra desde la izquierda, sale por el mismo lado y sigue al dedo. */
+    .mobile-drawer[open] { animation: drawer-in 320ms var(--ease-drawer) backwards; transition: transform 260ms var(--ease-drawer); touch-action: pan-y; }
+    .mobile-drawer[open]::backdrop { animation: fade 320ms ease backwards; transition: opacity 260ms ease; }
+    .mobile-drawer.is-closing { transform: translateX(-100%); animation: none; }
+    .mobile-drawer.is-closing::backdrop { opacity: 0; }
+
+    /* Hoja inferior: agarradera arriba para bajarla con el dedo; sale hacia abajo. */
+    .sheet { animation: up 320ms var(--ease-drawer) backwards; }
+    .sheet-grip { display: block; position: absolute; top: 0; left: 0; right: 0; height: 24px; touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+    .sheet-grip::before { content: ''; position: absolute; top: 9px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: var(--muted); opacity: .4; }
+    .sheet > h2 { touch-action: none; }
+    .sheet-ghost .sheet { transition: transform 260ms var(--ease-drawer); }
+    .sheet-ghost.out .sheet { opacity: 1; transform: translateY(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sheet, .sheet-bg, .main > .step-in, .mobile-drawer[open], .mobile-drawer[open]::backdrop { animation: fade 150ms ease backwards !important; }
+    .sheet-ghost .sheet, .sheet-ghost .sheet-bg, .mobile-drawer[open], .mobile-drawer[open]::backdrop { transition: opacity 150ms ease !important; }
+    .sheet-ghost.out .sheet { transform: translate(-50%, -50%) !important; opacity: 0 !important; }
+    .mobile-drawer.is-closing { transform: none !important; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 899px) {
+    .sheet-ghost.out .sheet { transform: none !important; }
+}
+
+/* ==========================================================================
+   Cohesión de superficies, jerarquía tipográfica y aprovechamiento del espacio
+   (15/11/2026): menos cajas sueltas, anchos alineados y fichas estructuradas.
+   ========================================================================== */
+
+/* 1. Carácter editorial en los saludos de entrada y cifras tabulares en códigos. */
+.hero h1,
+.auth-claim h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+.ring,
+.pring,
+.pair-rings,
+.code,
+.ring-parts span {
+    font-variant-numeric: tabular-nums;
+}
+
+/* 2. Retorno ligero: una sola pastilla clicable hacia la vista de origen, sin caja dentro de caja. */
+.layout .main > .page-back {
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    margin-bottom: -10px;
+}
+.layout .main > .page-back .top-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    height: auto;
+    min-height: 40px;
+    padding: 6px 14px 6px 10px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--green-d);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 160ms ease, border-color 160ms ease;
+}
+.layout .main > .page-back .top-back .ic {
+    width: 18px;
+    height: 18px;
+}
+.layout .main > .page-back span {
+    color: var(--green-d);
+}
+@media (hover: hover) and (pointer: fine) {
+    .layout .main > .page-back .top-back:hover {
+        background: var(--green-s);
+        border-color: #9EBBC0;
+    }
+}
+
+/* 3. Cabeceras de sección con borde editorial y ancho coherente con su contenido. */
+.layout .main > .page-head {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--green);
+    border-radius: 14px;
+    padding: 20px 24px;
+}
+.layout .main > .page-head h1 {
+    color: var(--green-d);
+}
+@media (min-width: 1200px) {
+    .layout.view-perfil .main,
+    .layout.view-buscar .main,
+    .layout.view-canario-nuevo .main,
+    .layout.view-registro-cria .main,
+    .layout.view-anillar .main {
+        max-width: 1080px;
+    }
+    .layout.view-canario .main,
+    .layout.view-cruce .main,
+    .layout.view-calculadora .main {
+        max-width: 1280px;
+    }
+}
+.form.wide {
+    max-width: none;
+}
+
+/* 4. Cuadrícula de dos columnas real (evita 3 columnas + 1 campo huérfano en Mi perfil y Ficha). */
+.grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 24px;
+}
+@media (max-width: 699px) {
+    .grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+}
+
+/* 5. Inicio: integrar el encabezado de «Cruces en marcha» dentro de su propio bloque y enmarcar tarjetas. */
+.layout.view-home .home-crosses {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 24px 24px;
+}
+.layout.view-home .home-crosses .block-head {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin-bottom: 16px;
+}
+.view-home .home-stats,
+.view-home .home-cages,
+.view-home .home-chicks {
+    border: 1px solid var(--line);
+}
+.view-home .home-crosses .cross-card {
+    border: 1px solid #C2D5D6;
+    background: #E4EFEF;
+}
+.view-home .home-crosses .cross-card.has-chicks {
+    background: var(--green);
+    border-color: var(--green-d);
+    color: #fff;
+}
+.view-home .cross-card .pair .av-xl {
+    box-shadow: inset 0 0 0 1px rgb(25 63 70 / 12%);
+}
+.view-home .cross-card .pair .x {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    color: var(--green-d);
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: -18px;
+}
+.view-home .has-chicks .pair .x {
+    background: rgb(255 255 255 / 18%);
+    color: #fff;
+}
+
+/* 6. Mis canarios: barra de búsqueda/filtros unificada y tarjetas con estructura de ficha. */
+.layout.view-canarios .main > .toolbar {
+    background: #fff;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+}
+@media (min-width: 900px) {
+    .bird-card {
+        padding: 12px;
+        gap: 10px;
+        border-radius: 14px;
+        background: #fff;
+    }
+    .bc-top {
+        margin: 0;
+    }
+    .bc-body {
+        padding: 2px 4px 4px;
+        gap: 6px;
+    }
+    .bc-meta {
+        border-top: 1px solid var(--line);
+        padding-top: 8px;
+        margin-top: 2px;
+    }
+}
+
+/* 7. Ficha del canario: retrato, desglose del anillo y acciones en una sola pieza; pestañas unidas a su panel. */
+.layout .profile {
+    padding: 28px 32px;
+    gap: 32px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    align-items: flex-start;
+}
+.profile .av-xxl {
+    width: 248px;
+    height: 256px;
+    border-radius: 12px;
+}
+.profile-txt {
+    flex: 1;
+    padding-top: 2px;
+    gap: 12px;
+}
+.profile .ring-parts {
+    display: inline-grid;
+    grid-template-columns: repeat(4, minmax(68px, auto));
+    gap: 0;
+    background: #F4F8F8;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 4px;
+    width: fit-content;
+    max-width: 100%;
+}
+.profile .ring-parts > div {
+    padding: 2px 16px;
+    border-right: 1px solid var(--line);
+}
+.profile .ring-parts > div:last-child {
+    border-right: 0;
+}
+.profile .act-bar {
+    margin-top: 6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
+.layout .main > .seg-tabs {
+    background: #F6F9F9;
+    border: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    border-radius: 14px 14px 0 0;
+    padding: 4px 20px 0;
+    margin-bottom: -28px;
+}
+.layout .tab-body {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 0 0 14px 14px;
+    padding: 24px;
+}
+.layout .tab-body > .card,
+.layout .tab-body > .grid-2 > .card,
+.layout .tab-body > .card + .grid-2 > .card {
+    background: #F7FAFA;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+}
+
+/* 8. Jaulas: aves en su propio soporte sin chocar con los barrotes del dibujo y detalle en tonos de la paleta. */
+.cage-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+}
+.cage {
+    padding: 20px 16px 18px;
+    gap: 8px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+}
+.cage .cage-art {
+    width: 92px;
+    height: 92px;
+}
+.cage-birds {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -12px;
+    padding: 6px 10px;
+    background: #F4F8F8;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    z-index: 1;
+}
+.cage-birds:empty {
+    display: none;
+}
+.pair-box {
+    background: #F4F8F8;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+.pair-box h3 {
+    margin-bottom: 12px;
+}
+.pair-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+}
+
+/* 9. Libro de crías y Ficha de cruce: filas equilibradas sin vacío central y bloques con superficie propia. */
+.layout.view-crias .main > .chips {
+    background: #fff;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    width: fit-content;
+    max-width: 100%;
+}
+.cross-row {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+}
+.cross-row .cage-badge.big {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 112px;
+    padding: 12px 14px;
+    background: var(--green-s);
+    color: var(--green-d);
+    border-radius: 12px;
+    text-align: center;
+}
+.cross-row .cage-badge.big .cr-num {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--green);
+}
+.cross-row .cage-badge.big strong {
+    font-size: 16px;
+    font-weight: 700;
+}
+@media (min-width: 900px) {
+    .cross-row {
+        grid-template-columns: 120px minmax(0, 1fr) 190px;
+        gap: 22px;
+        padding: 18px 22px;
+    }
+    .cr-pair {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+    }
+    .cr-bird {
+        padding: 10px 14px;
+        background: #F6F9F9;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+    }
+    .cr-end {
+        border-left: 1px solid var(--line);
+        padding-left: 20px;
+        justify-content: center;
+    }
+}
+.cross-hero {
+    background: #E5EEF0;
+    border: 1px solid #C2D6D9;
+    border-radius: 16px;
+}
+.cross-hero .chip-gold {
+    order: 0;
+    font-weight: 600;
+    color: var(--green-d);
+}
+.layout.view-cruce .main > .act-bar {
+    background: #fff;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+}
+.layout .main > .block {
+    background: #fff;
+    padding: 22px 24px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+}
+
+/* 10. Registrar pareja y formularios: pasos integrados a la cabecera, sin numeración repetida. */
+.layout.view-registro-cria .main > .page-head {
+    border-radius: 14px 14px 0 0;
+    border-bottom: 0;
+}
+.layout.view-registro-cria .main > .stepper.wiz {
+    margin-top: -28px;
+    border-radius: 0 0 14px 14px;
+    border: 1px solid var(--line);
+    background: #F6F9F9;
+    padding: 8px 24px;
+}
+.layout.view-registro-cria .step h2 .num {
+    display: none;
+}
+.layout .main > .form-actions,
+.layout .form > .form-actions {
+    background: #fff;
+    padding: 16px 22px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+}
+.layout .photo-footer > a {
+    border: 1px solid var(--line);
+    color: var(--green-d);
+    font-weight: 500;
+}
+
+@media (max-width: 899px) {
+    .view-home .home-intro .hero {
+        overflow: hidden;
+        border-radius: 16px;
+    }
+    .layout.view-home .home-crosses {
+        padding: 18px 16px;
+    }
+    .layout .profile {
+        padding: 18px 16px;
+        gap: 16px;
+    }
+    .profile .av-xxl {
+        width: 100%;
+        height: 210px;
+    }
+    .profile .ring-parts {
+        width: 100%;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .profile .ring-parts > div {
+        padding: 2px 8px;
+    }
+    .layout .main > .seg-tabs {
+        margin-bottom: -24px;
+        padding: 4px 12px 0;
+    }
+    .layout .tab-body {
+        padding: 18px 16px;
+    }
+    .layout .main > .block {
+        padding: 18px 16px;
+    }
+    .layout.view-registro-cria .main > .stepper.wiz {
+        margin-top: -24px;
+        padding: 6px 14px;
+    }
+    .pair-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pair-row .x.big {
+        display: none;
+    }
+    .cross-row .cage-badge.big {
+        flex-direction: row;
+        gap: 8px;
+        min-width: 0;
+        padding: 6px 12px;
+    }
+}
+@media (max-width: 380px) {
+    .profile .av-xxl {
+        height: 188px;
+    }
+}
+
+/* Ajustes del cliente (19/11/2026): un canario estándar de color fijo para todos y la jaula moderna ilustrada. La foto del inicio y del acceso se mantiene. */
+.av { background: #FFF8E6; }
+.av img { object-fit: contain; object-position: 50% 50%; padding: 10%; transform: none; }
+.cage .cage-art, .empty-art .cage-art { object-fit: contain; opacity: 1; }
+
+/* Ajustes del cliente (19/11/2026): filas con fondo blanco, menú «Libro de crías» y anillos completos en las parejas. */
+.row { background: var(--surface); padding-inline: 14px; }
+button.side-link, button.tab-link { background: none; border: 0; font-family: inherit; cursor: pointer; }
+.nav-drop .drop-chev { width: 14px; height: 14px; transform: rotate(90deg); transition: transform 160ms var(--ease-ui, ease-out); }
+.nav-drop [aria-expanded="true"] .drop-chev { transform: rotate(-90deg); }
+.nav-menu { left: 0; right: auto; }
+.pair-rings, .cage-pair .pair-stack, .cage-mini .pair-ring { display: grid; gap: 2px; }
+.pair-ring { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.pair-ring .ic { width: 14px; height: 14px; flex: none; }
+.cage-pair { flex-direction: column; }
+.cage-mini .pair-ring { display: flex; font-size: 12px; }
+/* Desplegable «Libro de crías»: la misma pastilla que «Inicio», con una flecha chica y un panel liviano. */
+.desktop-nav > .nav-drop { display: flex; align-items: center; align-self: center; }
+.nav-drop .drop-chev { width: 12px; height: 12px; margin-left: -2px; opacity: .65; stroke-width: 2.5; }
+.nav-drop .side-link.on .drop-chev { opacity: .9; }
+.nav-menu { top: calc(100% + 6px); width: 220px; padding: 6px; border-radius: 12px; border-color: var(--line); box-shadow: 0 10px 28px #193F4622, 0 2px 6px #193F4612; }
+.nav-menu a { padding: 10px 12px; gap: 12px; font-size: 15px; font-weight: 500; color: var(--ink); }
+.nav-menu a .ic { width: 18px; height: 18px; color: var(--muted); }
+.nav-menu a:hover { background: var(--soft); }
+.nav-menu a[aria-current="page"] { background: var(--green-s); color: var(--green-d); font-weight: 600; box-shadow: inset 3px 0 0 var(--green); }
+.nav-menu a[aria-current="page"] .ic { color: var(--green-d); }
+/* Con dos opciones, el menú en su propia fila no se estira: dos pastillas alineadas a la izquierda. */
+@media (min-width: 900px) and (max-width: 1199px) { .desktop-nav { gap: 6px; } .desktop-nav .side-link { flex: none; } }
+/* «Tus jaulas»: el anillo completo necesita unos 140 px; caben tantas columnas como entren, sin cortar los anillos. */
+.cage-minis { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+@media (min-width: 1200px) { .cage-minis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Acceso: foto del aviario (pedido del cliente, 19/11/2026). El inicio conserva su foto del canario. */
+.auth-art { background-image: linear-gradient(180deg, #193f46bb, #193f4614 35%, #193f46ed 90%), url(assets/fotos/aviario-acceso.jpg); background-position: 0 0, 28% 50%; background-size: auto, cover; }
+@media (max-width: 899px) {
+    .auth { background-image: linear-gradient(180deg, #104d47c4 0%, #104d4722 24%, #104d4740 44%, #104d47 74%), url(assets/fotos/aviario-acceso.jpg); }
+    .auth-art { background-image: linear-gradient(90deg, #193F46e6, #193F4626 90%), url(assets/fotos/aviario-acceso.jpg); background-position: 0 0, 22% 55%; }
+}
+
+/* Inicio: un solo botón «Libro de crías» (pedido del cliente, 19/11/2026). */
+.view-home .home-actions.home-libro { display: block; }
+.view-home .home-libro .libro-main { width: 100%; min-height: 96px; flex-direction: row; align-items: center; justify-content: flex-start; padding: 20px 56px 20px 24px; }
+.view-home .home-libro .libro-main > .chev { display: block; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+@media (max-width: 700px) { .view-home .home-libro .libro-main { min-height: 0; padding: 16px 44px 16px 16px; } }
+
+/* Cruces en marcha en el teléfono: los dos anillos completos caben junto a las miniaturas sin montarse sobre ellas. */
+@media (max-width: 599px) {
+    .view-home .home-crosses .cross-card { grid-template-columns: minmax(0, 1fr) 96px; }
+    .view-home .cross-card .pair { gap: 4px; justify-content: flex-end; }
+    .view-home .cross-card .pair .av-xl { width: 38px; height: 38px; aspect-ratio: 1; border-radius: 8px; }
+    .view-home .cross-card .pair .x { width: 16px; height: 16px; font-size: 11px; }
+    .view-home .cross-card .pair-rings { font-size: 15px; align-self: center; }
+}
+/* Bajo 360 px las miniaturas (la misma ilustración para todos) no caben junto a los anillos; ♂ y ♀ ya indican el sexo. */
+@media (max-width: 359px) { .view-home .home-crosses .cross-card { grid-template-columns: minmax(0, 1fr); } .view-home .cross-card .pair { display: none; } .view-home .cross-card .pair-rings { font-size: 15px; } }
+
+/* Inicio: la misma foto del aviario que el acceso (pedido del PM, 19/11/2026). */
+.hero-photo, .view-home .hero-photo { background-image: url(assets/fotos/aviario-acceso.jpg); background-position: 24% 58%; background-size: cover; background-repeat: no-repeat; }
+@media (max-width: 899px) { .hero-photo, .view-home .hero-photo { background-position: 20% 58%; } }
