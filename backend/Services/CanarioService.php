@@ -293,10 +293,22 @@ final class CanarioService
         if ($variedadCruda !== '') {
             // Soporta tanto el código directo ("D.049") como el formato del datalist ("D.049 – ROJO INTENSO", contrato §4).
             $codigoExtraido = trim(explode('–', $variedadCruda, 2)[0]);
-            if ($codigoExtraido === '' || mb_strlen($codigoExtraido) > 5 || $this->variedades->buscarPorCodigo($codigoExtraido) === null) {
+            $variedad = ($codigoExtraido !== '' && mb_strlen($codigoExtraido) <= 5)
+                ? $this->variedades->buscarPorCodigo($codigoExtraido)
+                : null;
+
+            if ($variedad === null) {
                 $errores['variedad_codigo'] = 'La variedad indicada no existe en el catálogo.';
             } else {
-                $variedadCodigo = $codigoExtraido;
+                $sexoVariedad = $variedad['sexo'] ?? null;
+                // Con un sexo no válido basta su propio error: no se compara contra la variedad.
+                if (in_array($sexoVariedad, ['macho', 'hembra'], true) && $sexo !== $sexoVariedad && !isset($errores['sexo'])) {
+                    $errores['variedad_codigo'] = $sexoVariedad === 'macho'
+                        ? 'Esta variedad es solo para machos.'
+                        : 'Esta variedad es solo para hembras.';
+                } else {
+                    $variedadCodigo = $codigoExtraido;
+                }
             }
         }
 
