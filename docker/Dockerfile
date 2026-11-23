@@ -16,3 +16,6 @@ RUN a2enmod rewrite
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
+
+# También fija la fecha local antes de que PHP cargue el código de la aplicación.
+RUN echo 'date.timezone=America/Santiago' > /usr/local/etc/php/conf.d/tucri-zona.ini

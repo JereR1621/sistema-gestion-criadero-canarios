@@ -26,6 +26,8 @@ Antes de cada commit, revisa con `git status` qué vas a subir. Si aparece `.env
 
 Versiones: **MySQL 8.4 LTS** (sirve cualquier 8.0.16 o superior; las anteriores ignoran las restricciones `CHECK`) y **PHP 8.2 o superior** (recomendado 8.3).
 
+La fecha de la aplicación usa `America/Santiago`, tanto en web como en comandos. Cada conexión de la aplicación a MySQL fija el desfase vigente de Santiago para que `CURRENT_TIMESTAMP`, `NOW()` y `CURDATE()` coincidan con PHP, incluido el horario de verano. No requiere cargar tablas de zonas horarias en MySQL.
+
 Hay dos formas de preparar tu computador. **Elige una:**
 
 - **Opción A: Docker (recomendada).** Un solo programa levanta PHP 8.3 con Apache y MySQL 8.4, iguales para todo el equipo. No instalas PHP ni MySQL.
