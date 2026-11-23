@@ -1,7 +1,7 @@
 <?php
 /**
  * Vista: frontend/views/canarios/ubicacion.php
- * Issue: #105 (SRS-RF015 [Frontend]: Asignar canario a una jaula)
+ * Issues: #105 (SRS-RF015) y #107 (SRS-RF016 [Frontend]: Traslado a la jaula grande)
  * Usa el marco común (_partes/marco.php) con htmx 2.0.4 y hoja arrastrable (#hoja).
  * Recibe: $canario CanarioResumen, $jaulas [JaulaResumen].
  * Campos del formulario: jaula_id (vacío = jaula grande), fecha.
@@ -69,6 +69,7 @@ ob_start(); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
+            <p class="hint">Selecciona «Jaula grande» si el canario no va a una jaula numerada.</p>
             <?php if ($errorJaula !== ''): ?>
                 <span id="error-jaula-id" class="field-error" role="alert"><?= e($errorJaula) ?></span>
             <?php endif; ?>
