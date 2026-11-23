@@ -301,7 +301,8 @@ final class CanarioService
                 $errores['variedad_codigo'] = 'La variedad indicada no existe en el catálogo.';
             } else {
                 $sexoVariedad = $variedad['sexo'] ?? null;
-                if (in_array($sexoVariedad, ['macho', 'hembra'], true) && $sexo !== $sexoVariedad) {
+                // Con un sexo no válido basta su propio error: no se compara contra la variedad.
+                if (in_array($sexoVariedad, ['macho', 'hembra'], true) && $sexo !== $sexoVariedad && !isset($errores['sexo'])) {
                     $errores['variedad_codigo'] = $sexoVariedad === 'macho'
                         ? 'Esta variedad es solo para machos.'
                         : 'Esta variedad es solo para hembras.';

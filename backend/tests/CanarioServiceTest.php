@@ -714,6 +714,19 @@ final class CanarioServiceTest extends TestCase
         self::assertArrayHasKey('variedad_codigo', $rechazoSinDeterminar['errores']);
         self::assertSame($antesCanarios + 1, $this->contarCanarios());
 
+        // Negativo: con un sexo no válido se informa solo ese error, no también el de la variedad
+        $rechazoSexoInvalido = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'S-77',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '903',
+            'anillo_club' => 'Club Norte',
+            'sexo' => 'otro',
+            'variedad_codigo' => $varHembra,
+        ]);
+        self::assertArrayHasKey('sexo', $rechazoSexoInvalido['errores']);
+        self::assertArrayNotHasKey('variedad_codigo', $rechazoSexoInvalido['errores']);
+        self::assertSame($antesCanarios + 1, $this->contarCanarios());
+
         // Negativo: actualizar un canario ID que pertenece a otro criadero se rechaza sin alterar nada
         $canarioAjeno = $this->insertarCanario($this->criaderoB, 903, 2026, 'hembra');
         $fichaAjenaAntes = $this->servicio->obtenerFicha($canarioAjeno, $this->criaderoB);
