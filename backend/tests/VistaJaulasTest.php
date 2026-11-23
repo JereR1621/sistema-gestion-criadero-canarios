@@ -26,7 +26,7 @@ final class VistaJaulasTest extends TestCase
         Sesion::iniciarAutenticada(1001, 'criador', 1001, 'Ana Prueba');
     }
 
-    public function testRenderizaConMarcoPlanBHtmxYAnimacionesSinDependerDeModulosPendientes(): void
+    public function testRenderizaConMarcoComunHtmxYAnimacionesSinDependerDeModulosPendientes(): void
     {
         $html = (string) render('jaulas/lista', ['jaulas' => []], true);
         self::assertStringContainsString('Todavía no hay jaulas', $html);

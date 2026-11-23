@@ -1,6 +1,6 @@
 <?php
 /**
- * Marco común de la aplicación con sesión (base visual aprobada del Plan B + htmx 2.0.4).
+ * Marco común de la aplicación con sesión (base visual de la maqueta aprobada + htmx 2.0.4).
  * Recibe: $titulo, $seccion (inicio | canarios | jaulas | crias | buscar | perfil | admin), $vista (clase view-…),
  * $volver (null o [url, texto]) y $contenido (HTML ya armado). Además, $sesion, $csrf y $flash del backend.
  */

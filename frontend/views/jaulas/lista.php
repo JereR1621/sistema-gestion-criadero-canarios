@@ -2,7 +2,7 @@
 /**
  * Vista: frontend/views/jaulas/lista.php
  * Issue: #103 (SRS-RF014 [Frontend]: Registro de jaula)
- * Usa el marco aprobado del Plan B (_partes/marco.php) con htmx 2.0.4 y animaciones progresivas.
+ * Usa el marco común (_partes/marco.php) con htmx 2.0.4 y animaciones progresivas.
  * Recibe: $jaulas [JaulaResumen].
  */
 require_once __DIR__ . '/../_partes/ayudas.php';
