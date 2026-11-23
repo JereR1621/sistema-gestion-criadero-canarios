@@ -29,7 +29,11 @@ final class ZonaHorariaTest extends TestCase
         $anterior = $_ENV['DB_NAME'] ?? null;
         $_ENV['DB_NAME'] = Entorno::obtener('DB_NAME_PRUEBAS');
         try {
-            $pdo = Conexion::crearDesdeEntorno();
+            try {
+                $pdo = Conexion::crearDesdeEntorno();
+            } catch (\PDOException) {
+                self::markTestSkipped('Sin base de pruebas: levanta MySQL y corre php backend/database/migrar.php --pruebas.');
+            }
             $fila = $pdo->query("SELECT @@session.time_zone AS zona, UNIX_TIMESTAMP() AS instante, DATE_FORMAT(NOW(), '%Y-%m-%d') AS fecha")->fetch();
             $instante = (new DateTimeImmutable('@' . $fila['instante']))->setTimezone(new DateTimeZone('America/Santiago'));
             self::assertSame($instante->format('P'), $fila['zona']);
