@@ -116,6 +116,10 @@ final class FrontendBaseTest extends TestCase
         self::assertStringContainsString('name="_csrf"', $html);
         self::assertStringContainsString('action="/perfil"', $html);
         self::assertStringContainsString('value="S-X"', $html);
+        self::assertStringContainsString('aria-describedby="error-numero_socio"', $html);
+        self::assertStringContainsString('id="error-numero_socio"', $html);
+        self::assertStringNotContainsString('maxlength="50"', $html);
+        self::assertStringContainsString('Guardar cambios', $html);
         self::assertStringContainsString('Club &lt;b&gt;Sur&lt;/b&gt;', $html);
         self::assertStringContainsString('Ana &lt;b&gt;Prueba&lt;/b&gt;', $html);
         self::assertStringContainsString('El número de socio no es válido', $html);

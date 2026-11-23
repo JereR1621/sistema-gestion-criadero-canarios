@@ -1,83 +1,32 @@
 <?php
-/**
- * Vista: frontend/views/cuentas/perfil.php
- * Issue: #77 (SRS-RF004 [Frontend]: Socio y club por defecto en los anillos)
- * Recibe: $perfil = nombre, correo, numero_socio, club.
- * Campos del formulario: numero_socio, club.
- */
+/** RF004: perfil del criador y valores por defecto al anillar. */
 require_once __DIR__ . '/../_partes/ayudas.php';
-
-$perfilData = is_array($perfil ?? null) ? $perfil : [];
-$nombre = (string) ($perfilData['nombre'] ?? '');
-$correo = (string) ($perfilData['correo'] ?? '');
-
-$errorSocio = error('numero_socio');
-$errorClub = error('club');
-$valorSocio = (string) viejo('numero_socio', (string) ($perfilData['numero_socio'] ?? ''));
-$valorClub = (string) viejo('club', (string) ($perfilData['club'] ?? ''));
-
 $titulo = 'Mi perfil';
 $seccion = 'perfil';
-
+$volver = [ruta('inicio'), 'Inicio'];
 ob_start(); ?>
-<?= encabezado_pagina('Mi perfil', 'Configura los datos que se proponen al anillar un canario.', 'user') ?>
+<?= encabezado_pagina('Mi perfil', 'Tus datos y los valores que se proponen al registrar anillos.', 'user') ?>
 <?= error_general() ?>
-
-<div class="card perfil-card">
-    <dl class="perfil-datos">
-        <div>
-            <dt>Nombre</dt>
-            <dd><?= e($nombre) ?></dd>
+<form class="form wide" method="post" action="<?= e(ruta('perfil.guardar')) ?>">
+    <?= csrf_campo($csrf) ?>
+    <section class="card step">
+        <div class="grid-2">
+            <?= campo('Nombre', '<input value="' . e($perfil['nombre']) . '" readonly>') ?>
+            <?= campo('Correo', '<input type="email" value="' . e($perfil['correo']) . '" readonly>') ?>
+            <?php foreach (['numero_socio' => 'Número de socio', 'club' => 'Club (sigla del anillo)'] as $campo => $etiqueta): ?>
+                <?php $mensaje = error($campo); ?>
+                <label for="<?= e($campo) ?>" class="field<?= $mensaje !== '' ? ' has-error' : '' ?>">
+                    <span class="lbl"><?= e($etiqueta) ?></span>
+                    <input id="<?= e($campo) ?>" name="<?= e($campo) ?>" value="<?= e(viejo($campo, $perfil[$campo])) ?>"
+                        <?php if ($mensaje !== ''): ?>aria-invalid="true" aria-describedby="error-<?= e($campo) ?>"<?php endif; ?>>
+                    <?php if ($mensaje !== ''): ?>
+                        <span id="error-<?= e($campo) ?>" class="field-error" role="alert"><?= e($mensaje) ?></span>
+                    <?php endif; ?>
+                </label>
+            <?php endforeach; ?>
         </div>
-        <div>
-            <dt>Correo</dt>
-            <dd><?= e($correo) ?></dd>
-        </div>
-    </dl>
-
-    <form class="form perfil-form" method="post" action="<?= e(ruta('perfil.guardar')) ?>">
-        <?= csrf_campo($csrf ?? '') ?>
-
-        <div class="field<?= $errorSocio !== '' ? ' has-error' : '' ?>">
-            <label class="lbl" for="numero_socio">Número de socio</label>
-            <input
-                id="numero_socio"
-                name="numero_socio"
-                type="text"
-                value="<?= e($valorSocio) ?>"
-                maxlength="50"
-                autocomplete="off"
-                placeholder="Ej.: S-0452"
-                <?= $errorSocio !== '' ? 'aria-invalid="true" aria-describedby="error-numero-socio"' : '' ?>
-            >
-            <p class="hint">Se usará por defecto en el campo Socio al anillar canarios.</p>
-            <?php if ($errorSocio !== ''): ?>
-                <span id="error-numero-socio" class="field-error" role="alert"><?= e($errorSocio) ?></span>
-            <?php endif; ?>
-        </div>
-
-        <div class="field<?= $errorClub !== '' ? ' has-error' : '' ?>">
-            <label class="lbl" for="club">Club</label>
-            <input
-                id="club"
-                name="club"
-                type="text"
-                value="<?= e($valorClub) ?>"
-                maxlength="50"
-                autocomplete="organization"
-                placeholder="Ej.: Club Norte"
-                <?= $errorClub !== '' ? 'aria-invalid="true" aria-describedby="error-club"' : '' ?>
-            >
-            <p class="hint">Se usará por defecto en el campo Club al anillar canarios.</p>
-            <?php if ($errorClub !== ''): ?>
-                <span id="error-club" class="field-error" role="alert"><?= e($errorClub) ?></span>
-            <?php endif; ?>
-        </div>
-
-        <div class="form-actions perfil-actions">
-            <?= boton('Guardar perfil', 'type="submit"', 'primary', 'check') ?>
-        </div>
-    </form>
-</div>
+    </section>
+    <div class="form-actions"><?= boton('Guardar cambios', 'type="submit"', 'primary big', 'check') ?></div>
+</form>
 <?php $contenido = (string) ob_get_clean();
 require __DIR__ . '/../_partes/marco.php';
