@@ -1,0 +1,2 @@
+# Mantener los bytes del despliegue al versionar la copia de referencia.
+public/** -text
