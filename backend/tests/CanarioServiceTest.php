@@ -650,6 +650,94 @@ final class CanarioServiceTest extends TestCase
             array_replace($this->datosEdicion(801, 'macho'), ['anillo_anio' => '2023']))['errores']);
     }
 
+    /**
+     * RF012 (#98): Variedad del catálogo con sexo solo se asigna a un canario del mismo sexo;
+     * si no coincide, se rechaza en `variedad_codigo` sin guardar nada.
+     */
+    public function testValidacionVariedadSegunSexoEnRegistroYActualizacion(): void
+    {
+        $varMacho = $this->buscarCodigoVariedadPorSexo('macho');
+        $varHembra = $this->buscarCodigoVariedadPorSexo('hembra');
+        self::assertNotNull($varMacho, 'Debe existir al menos una variedad con sexo macho en el catálogo.');
+        self::assertNotNull($varHembra, 'Debe existir al menos una variedad con sexo hembra en el catálogo.');
+
+        $antesCanarios = $this->contarCanarios();
+        $antesAuditoria = (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn();
+
+        // Negativo: canario macho con variedad exclusiva de hembra -> se rechaza sin guardar
+        $rechazoRegistro = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'S-77',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '901',
+            'anillo_club' => 'Club Norte',
+            'sexo' => 'macho',
+            'variedad_codigo' => $varHembra,
+        ]);
+        self::assertArrayHasKey('variedad_codigo', $rechazoRegistro['errores']);
+        self::assertSame($antesCanarios, $this->contarCanarios());
+        self::assertSame($antesAuditoria, (int) $this->pdo->query('SELECT COUNT(*) FROM auditoria')->fetchColumn());
+
+        // Positivo: canario macho con variedad compatible de macho -> guarda correctamente
+        $okRegistro = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'S-77',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '901',
+            'anillo_club' => 'Club Norte',
+            'sexo' => 'macho',
+            'variedad_codigo' => $varMacho,
+        ]);
+        self::assertSame([], $okRegistro['errores']);
+        $canarioId = (int) $okRegistro['canario_id'];
+
+        // Negativo al actualizar: cambiar variedad a una de hembra se rechaza sin alterar el registro
+        $rechazoUpdate = $this->servicio->actualizar($canarioId, $this->criaderoA, [
+            'anillo_socio' => 'S-77',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '901',
+            'anillo_club' => 'Club Norte',
+            'sexo' => 'macho',
+            'variedad_codigo' => $varHembra,
+        ]);
+        self::assertArrayHasKey('variedad_codigo', $rechazoUpdate['errores']);
+        $ficha = $this->servicio->obtenerFicha($canarioId, $this->criaderoA);
+        self::assertSame($varMacho, $ficha['variedad']['codigo'] ?? null);
+
+        // Negativo: canario sin_determinar con variedad sexuada -> se rechaza sin guardar
+        $rechazoSinDeterminar = $this->servicio->registrar($this->criaderoA, [
+            'anillo_socio' => 'S-77',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '902',
+            'anillo_club' => 'Club Norte',
+            'sexo' => 'sin_determinar',
+            'variedad_codigo' => $varHembra,
+        ]);
+        self::assertArrayHasKey('variedad_codigo', $rechazoSinDeterminar['errores']);
+        self::assertSame($antesCanarios + 1, $this->contarCanarios());
+
+        // Negativo: actualizar un canario ID que pertenece a otro criadero se rechaza sin alterar nada
+        $canarioAjeno = $this->insertarCanario($this->criaderoB, 903, 2026, 'hembra');
+        $fichaAjenaAntes = $this->servicio->obtenerFicha($canarioAjeno, $this->criaderoB);
+        $rechazoIdAjeno = $this->servicio->actualizar($canarioAjeno, $this->criaderoA, [
+            'anillo_socio' => 'S-77',
+            'anillo_anio' => '2026',
+            'anillo_correlativo' => '903',
+            'anillo_club' => 'Club Norte',
+            'sexo' => 'hembra',
+            'variedad_codigo' => $varHembra,
+        ]);
+        self::assertTrue($rechazoIdAjeno['no_encontrado'] ?? false);
+        self::assertSame($fichaAjenaAntes, $this->servicio->obtenerFicha($canarioAjeno, $this->criaderoB));
+    }
+
+    private function buscarCodigoVariedadPorSexo(string $sexo): ?string
+    {
+        $stmt = $this->pdo->prepare('SELECT codigo FROM variedad WHERE sexo = ? LIMIT 1');
+        $stmt->execute([$sexo]);
+        $codigo = $stmt->fetchColumn();
+
+        return is_string($codigo) && $codigo !== '' ? $codigo : null;
+    }
+
     public function testRechazoNoGuardaNiCierraLaTransaccionDelLlamador(): void
     {
         $id = $this->insertarCanario($this->criaderoA, 804, 2024, 'macho');
